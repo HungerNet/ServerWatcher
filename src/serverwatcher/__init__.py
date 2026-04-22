@@ -14,6 +14,6 @@ from .messages import WatcherMessages
 __all__ = [
     # core utilities
     'ServerWatcher',
-    'WatcherConfig,
+    'WatcherConfig',
     'WatcherMessages',
 ]
