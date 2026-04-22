@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class WatcherMessages:
-    prefix: str = "<dark_red><bold>[<reset><red>HungerAC<dark_red><bold>] <reset><gray>»<white>"
+    prefix: str = "<aqua>[Server Watcher]"
 
     # broadcast templates
     broadcast_restart_at: str = "{prefix} The server will restart at {time} CDT."
