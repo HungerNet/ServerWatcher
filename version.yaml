@@ -1,4 +1,4 @@
 run: true
-version: "1.1.1"
+version: "1.1.2"
 description: |
-  - Fixed syntax error in __init__.py
+  - Edited readme
