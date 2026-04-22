@@ -1,18 +1,13 @@
-# HungerLib
+# ServerWatcher
 
-A powerful automation library for Pterodactyl panlels.
-Provides clean APIs for RCON, scheduling, panel integration, and server orchestration.
+A configurable server monitoring and restart engine for HungerLib / Pterodactyl-based Minecraft servers.
 
-## Features
+## Usage
 
-- Simple RCON wrapper
-- Pterodactyl API helpers
-- Server orchestration utilities
-- Scheduler utilities
-- Logging helpers
-- Zero external configuration required
+```python
+from serverwatcher.watcher import ServerWatcher
+from serverwatcher.config import WatcherConfig
+from serverwatcher.messages import WatcherMessages
 
-## Installation
-
-```bash
-pip install hungerlib
+watcher = ServerWatcher(server, origin, panel, logger, WatcherConfig(), WatcherMessages())
+watcher.evaluate()

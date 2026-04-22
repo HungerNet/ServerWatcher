@@ -3,9 +3,9 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hungerlib"
+name = "serverwatcher"
 version = "0.0.0"
-description = "Powerful automation library for Pterodactyl."
+description = "A HungerLib-powered Minecraft server automation engine."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -43,10 +43,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/iFamishedX/HungerLib"
-Documentation = "https://github.com/iFamishedX/HungerLib"
-Source = "https://github.com/iFamishedX/HungerLib"
-Issues = "https://github.com/iFamishedX/HungerLib/issues"
+Homepage = "https://github.com/iFamishedX/ServerWatcher"
+Documentation = "https://github.com/iFamishedX/ServerWatcher"
+Source = "https://github.com/iFamishedX/ServerWatcher"
+Issues = "https://github.com/iFamishedX/ServerWatcher/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
