@@ -7,7 +7,7 @@ from hungerlib import Panel, HungerLogger
 from hungerlib.addons import clearTerminal, Snapshot, snapSchedule, waitForOnline, validateAll, runCountdownEvents
 from hungerlib.servers import MinecraftServer, GenericServer
 
-from serverwatcher import WatcherConfig, WatcherMessages
+# from serverwatcher import WatcherConfig, WatcherMessages
 
 
 DEFAULT_CONFIG = {
