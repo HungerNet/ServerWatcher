@@ -1,4 +1,4 @@
 run: true
-version: "2.1.2"
+version: "2.2
 description: |
-  - Bump version
+  - Now uses HungerLib's config parsing
