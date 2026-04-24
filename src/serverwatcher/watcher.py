@@ -20,6 +20,8 @@ from serverwatcher.config.global_config import GlobalConfig
 from serverwatcher.config.messages import MessagesConfig
 from serverwatcher.config.watcher import WatcherConfig
 
+# BASE DIRECTORY OF THIS PACKAGE
+BASE_DIR = os.path.dirname(__file__)
 
 # ---------------------------------------------------------
 # Utility: load config or copy default from defaultconfigs/
@@ -29,12 +31,16 @@ def load_or_default(path: str, default_path: str, schema):
     Loads YAML from path. If missing, copies default_path → path.
     Then maps YAML → dataclass.
     """
-    if not os.path.exists(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(default_path, "r") as src, open(path, "w") as dst:
+
+    abs_path = os.path.join(BASE_DIR, path)
+    abs_default = os.path.join(BASE_DIR, default_path)
+
+    if not os.path.exists(abs_path):
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+        with open(abs_default, "r") as src, open(abs_path, "w") as dst:
             dst.write(src.read())
 
-    raw = load_yaml(path)
+    raw = load_yaml(abs_path)
     return map_to_dataclass(raw, schema)
 
 
@@ -46,19 +52,19 @@ class ServerWatcher:
         # Load all 3 configs
         self.global_cfg: GlobalConfig = load_or_default(
             "config/global.yaml",
-            "serverwatcher/defaultconfigs/global.yaml",
+            "defaultconfigs/global.yaml",
             GlobalConfig
         )
 
         self.messages: MessagesConfig = load_or_default(
             "config/messages.yaml",
-            "serverwatcher/defaultconfigs/messages.yaml",
+            "defaultconfigs/messages.yaml",
             MessagesConfig
         )
 
         self.cfg: WatcherConfig = load_or_default(
             "config/watcher.yaml",
-            "serverwatcher/defaultconfigs/watcher.yaml",
+            "defaultconfigs/watcher.yaml",
             WatcherConfig
         )
 
