@@ -10,8 +10,10 @@ from hungerlib.addons import (
     waitForOnline,
     validateAll,
     runCountdownEvents,
+    ensure_yaml,
+    load_yaml,
+    map_to_dataclass
 )
-from hungerlib.addons import configloader
 
 from .config import WatcherConfig
 from .messages import WatcherMessages

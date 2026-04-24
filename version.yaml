@@ -1,4 +1,4 @@
 run: true
-version: "2.2.3"
+version: "2.2.4"
 description: |
-  - Fixed broken messages.py
+  - Fixed configloader import
