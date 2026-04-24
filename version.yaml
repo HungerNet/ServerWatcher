@@ -1,4 +1,4 @@
 run: true
-version: "2.2
+version: "2.2.1"
 description: |
-  - Now uses HungerLib's config parsing
+  - Fixed configloader import

@@ -11,7 +11,7 @@ from hungerlib.addons import (
     validateAll,
     runCountdownEvents,
 )
-from hungerlib.configloader import ensure_yaml, load_yaml, map_to_dataclass
+from hungerlib.addons import configloader
 
 from .config import WatcherConfig
 from .messages import WatcherMessages
