@@ -18,7 +18,8 @@ class WatcherMessages:
     })
 
     broadcast_second: dict = field(default_factory=lambda: {
-        s: "{prefix} Restart in " + str(s) + " seconds!" for s in range(10, 0, -1)
+        s: "{prefix} Restart in " + str(s) + " seconds!"
+        for s in range(10, 0, -1)
     })
 
     # log messages
@@ -32,33 +33,7 @@ class WatcherMessages:
     log_gap_high: str = "Gap {gap}. Scheduling restart in 1 hour."
 
     # reason messages
-    reason_restart_soon: str = 'THIS MESSAGE IS LIKELY BROKEN'
-
-@dataclass
-class WatcherMessages:
-    prefix: str
-
-    log_start: str = "Evaluating server health..."
-    log_validation_fail: str = "Validation failed!"
-    log_no_restart: str = "No restart needed."
-    log_immediate_restart: str = "Restarting immediately..."
-    log_scheduled: str = "Scheduling restart..."
-    log_gap_low: str = "Gap is low ({gap}), using low-gap schedule."
-    log_gap_high: str = "Gap is high ({gap}), using high-gap schedule."
-
-    reason_restart_soon: str = "Restart soon schedule is active."
-    reason_ram: str = "RAM {ram}GB >= threshold {threshold}GB"
-    reason_cpu: str = "CPU {cpu}% >= threshold {threshold}%"
-    reason_uptime: str = "Uptime {uptime} >= {threshold} hours"
-    reason_tps: str = "TPS {tps} <= threshold {threshold}"
-    reason_low_uptime: str = "Uptime too low ({uptime})"
-    reason_players: str = "There {verb} {count} {plural} online."
-
-    broadcast_restart_at: str = "<yellow>Server restart scheduled at {time}"
-
-    broadcast_minute: dict = field(default_factory=dict)
-    broadcast_second: dict = field(default_factory=dict)
-: str = "The server is set to restart soon"
+    reason_restart_soon: str = "The server is set to restart soon"
     reason_ram: str = "RAM usage ({ram}) is higher than {threshold} GB"
     reason_cpu: str = "CPU usage ({cpu}) is higher than {threshold}%"
     reason_uptime: str = "Uptime {uptime} exceeds {threshold}h"

@@ -1,4 +1,4 @@
 run: true
-version: "2.2.1"
+version: "2.2.3"
 description: |
-  - Fixed syntax error
+  - Fixed broken messages.py
