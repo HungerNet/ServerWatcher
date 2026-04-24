@@ -1,12 +1,114 @@
+import os
 import time
+import yaml
 from zoneinfo import ZoneInfo
-from hungerlib.addons import (
-    Snapshot,
-    snapSchedule,
-    waitForOnline,
-    validateAll,
-    runCountdownEvents
-)
+
+from hungerlib import Panel, HungerLogger
+from hungerlib.addons import clearTerminal, Snapshot, snapSchedule, waitForOnline, validateAll, runCountdownEvents
+from hungerlib.servers import MinecraftServer, GenericServer
+
+from serverwatcher import WatcherConfig, WatcherMessages
+
+
+DEFAULT_CONFIG = {
+    "panel": {
+        "name": "My Panel",
+        "url": "https://example.com",
+        "api_key": "CHANGE_ME"
+    },
+
+    "origin": {
+        "server_id": "CHANGE_ME"
+    },
+
+    "server": {
+        "name": "My SMP",
+        "server_id": "CHANGE_ME",
+        "domain": "example.com",
+        "port": 25565,
+        "rcon_port": 25575,
+        "rcon_password": "password",
+        "tps_command": "ticks"
+    },
+
+    "watcher": {
+        "restart_soon_schedule_id": 0,
+        "origin_disable_schedule_id": 0,
+
+        "thresholds": {
+            "ram": 6,
+            "cpu": 150,
+            "uptime_hours": 12,
+            "tps": 19.5
+        },
+
+        "weights": {
+            "restart_soon": 3,
+            "ram": 1,
+            "cpu": 1,
+            "uptime": 1,
+            "tps": 1,
+            "low_uptime": 5,
+            "per_player": 1
+        },
+
+        "gaps": {
+            "low": 120,
+            "high": 60
+        },
+
+        "restart": {
+            "wait_seconds": 45,
+            "online_timeout": 120,
+            "online_interval": 2
+        }
+    },
+
+    "messages": {
+        "prefix": "<gray>[Watcher]</gray>",
+
+        "log_start": "Evaluating server health...",
+        "log_validation_fail": "Validation failed!",
+        "log_no_restart": "No restart needed.",
+        "log_immediate_restart": "Restarting immediately...",
+        "log_scheduled": "Scheduling restart...",
+        "log_gap_low": "Gap is low ({gap}), using low-gap schedule.",
+        "log_gap_high": "Gap is high ({gap}), using high-gap schedule.",
+
+        "reason_restart_soon": "Restart soon schedule is active.",
+        "reason_ram": "RAM {ram}GB >= threshold {threshold}GB",
+        "reason_cpu": "CPU {cpu}% >= threshold {threshold}%",
+        "reason_uptime": "Uptime {uptime} >= {threshold} hours",
+        "reason_tps": "TPS {tps} <= threshold {threshold}",
+        "reason_low_uptime": "Uptime too low ({uptime})",
+        "reason_players": "There {verb} {count} {plural} online.",
+
+        "broadcast_restart_at": "<yellow>Server restart scheduled at {time}",
+
+        "broadcast_minute": {
+            10: "<red>Restart in 10 minutes!",
+            5: "<red>Restart in 5 minutes!",
+            1: "<red>Restart in 1 minute!"
+        },
+
+        "broadcast_second": {
+            10: "<red>Restart in 10 seconds!",
+            5: "<red>Restart in 5 seconds!",
+            1: "<red>Restarting now!"
+        }
+    }
+}
+
+
+def load_or_create_config(path="config.yaml"):
+    if not os.path.exists(path):
+        with open(path, "w") as f:
+            yaml.dump(DEFAULT_CONFIG, f, sort_keys=False)
+        print("Generated default config.yaml — please edit it.")
+        time.sleep(2)
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
 
 class ServerWatcher:
     def __init__(self, server, origin, panel, logger, config, messages):
@@ -39,7 +141,7 @@ class ServerWatcher:
 
         if alive:
             self.log.info("Server is back online!")
-            self.server.sendBroadcast(f'{prefix}<green>This server was successfully restarted!')
+            self.server.sendBroadcast(f'{self.msg.prefix}<green>Restart successful!')
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error("Server failed to restart!")
@@ -162,3 +264,74 @@ class ServerWatcher:
             self.schedule_restart(self.cfg.high_gap_minutes)
 
         self.restart_and_wait()
+
+
+
+# -------------------------
+# MAIN
+# -------------------------
+
+cfg = load_or_create_config()
+
+panel = Panel(**cfg["panel"])
+
+origin = GenericServer(
+    name="Origin",
+    panel=panel,
+    server_id=cfg["origin"]["server_id"]
+)
+
+srv = cfg["server"]
+server = MinecraftServer(
+    name=srv["name"],
+    panel=panel,
+    server_id=srv["server_id"],
+    server_domain=srv["domain"],
+    server_port=srv["port"],
+    rcon_port=srv["rcon_port"],
+    rcon_password=srv["rcon_password"],
+    tpsCommand=srv["tps_command"]
+)
+
+log = HungerLogger(
+    name=f"ServerWatcher-{srv['name']}",
+    server=server,
+    log_path="/home/container/logs/",
+    console_backspaces=8
+)
+
+w = cfg["watcher"]
+config = WatcherConfig(
+    restart_soon_schedule_id=w["restart_soon_schedule_id"],
+    origin_disable_schedule_id=w["origin_disable_schedule_id"],
+
+    ram_threshold=w["thresholds"]["ram"],
+    cpu_threshold=w["thresholds"]["cpu"],
+    uptime_hours_threshold=w["thresholds"]["uptime_hours"],
+    tps_threshold=w["thresholds"]["tps"],
+
+    weight_restart_soon=w["weights"]["restart_soon"],
+    weight_ram=w["weights"]["ram"],
+    weight_cpu=w["weights"]["cpu"],
+    weight_uptime=w["weights"]["uptime"],
+    weight_tps=w["weights"]["tps"],
+    weight_low_uptime=w["weights"]["low_uptime"],
+    weight_per_player=w["weights"]["per_player"],
+
+    low_gap_minutes=w["gaps"]["low"],
+    high_gap_minutes=w["gaps"]["high"],
+
+    restart_wait_seconds=w["restart"]["wait_seconds"],
+    restart_online_timeout=w["restart"]["online_timeout"],
+    restart_online_interval=w["restart"]["online_interval"],
+)
+
+messages = WatcherMessages(**cfg["messages"])
+
+clearTerminal()
+
+Watcher = ServerWatcher(server, origin, panel, log, config, messages)
+
+while True:
+    Watcher.evaluate()
+    time.sleep(60)
