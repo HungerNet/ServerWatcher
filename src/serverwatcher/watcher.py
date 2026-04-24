@@ -79,6 +79,7 @@ class ServerWatcher:
             self.log.error(self.msg.log_validation_fail)
             self.shutdown()
 
+        self.server.refresh()
         snap = Snapshot(self.server, 2, True)
 
         pro = 0
