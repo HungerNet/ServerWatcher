@@ -1,4 +1,4 @@
 run: true
 version: "2.1.1"
 description: |
-  - Disabled old config system
+  - Disabled auto-config generation
