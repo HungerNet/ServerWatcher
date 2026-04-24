@@ -32,7 +32,7 @@ class WatcherMessages:
     log_gap_high: str = "Gap {gap}. Scheduling restart in 1 hour."
 
     # reason messages
-    reason_restart_soonfrom dataclasses import dataclass, field
+    reason_restart_soon: str = 'THIS MESSAGE IS LIKELY BROKEN'
 
 @dataclass
 class WatcherMessages:
