@@ -1,3 +1,4 @@
+import os
 import time
 from zoneinfo import ZoneInfo
 
@@ -10,132 +11,75 @@ from hungerlib.addons import (
     waitForOnline,
     validateAll,
     runCountdownEvents,
-    ensure_yaml,
     load_yaml,
     map_to_dataclass,
-    write_default_yaml,
 )
 
-from .config import WatcherConfig
-from .messages import WatcherMessages
-from .schema import validate_config_schema, validate_messages_schema
+# NEW CONFIG DATACLASSES
+from config.global import GlobalConfig
+from config.messages import MessagesConfig
+from config.watcher import WatcherConfig
 
 
-CONFIG_PATH = "config.yaml"
-MESSAGES_PATH = "messages.yaml"
+# ---------------------------------------------------------
+# Utility: load config or copy default from defaultconfigs/
+# ---------------------------------------------------------
+def load_or_default(path: str, default_path: str, schema):
+    """
+    Loads YAML from path. If missing, copies default_path → path.
+    Then maps YAML → dataclass.
+    """
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(default_path, "r") as src, open(path, "w") as dst:
+            dst.write(src.read())
+
+    raw = load_yaml(path)
+    return map_to_dataclass(raw, schema)
 
 
-DEFAULT_CONFIG = {
-    "panel": {
-        "name": "My Panel",
-        "url": "https://example.com",
-        "api_key": "CHANGE_ME",
-    },
-    "origin": {
-        "server_id": "CHANGE_ME",
-    },
-    "server": {
-        "name": "My SMP",
-        "server_id": "CHANGE_ME",
-        "domain": "example.com",
-        "port": 25565,
-        "rcon_port": 25575,
-        "rcon_password": "password",
-        "tps_command": "ticks",
-    },
-    "watcher": {},
-}
-
-
-DEFAULT_MESSAGES = {
-    "prefix": "<aqua>[Server Watcher]",
-    "broadcast_restart_at": "{prefix} The server will restart at {time} CDT.",
-    "broadcast_minute": {
-        120: "{prefix} Restart in 2 hours!",
-        60: "{prefix} Restart in 1 hour!",
-        45: "{prefix} Restart in 45 minutes!",
-        30: "{prefix} Restart in 30 minutes!",
-        15: "{prefix} Restart in 15 minutes!",
-        5: "{prefix} Restart in 5 minutes!",
-        1: "{prefix} Restart in 1 minute!",
-    },
-    "broadcast_second": {
-        s: "{prefix} Restart in " + str(s) + " seconds!"
-        for s in range(10, 0, -1)
-    },
-    "log_start": "ServerWatcher is running!",
-    "log_validation_fail": "Validation FAILED. Make sure you set up config.yaml.",
-    "log_validation_ok": "All validation checks succeeded.",
-    "log_immediate_restart": "Restarting immediately.",
-    "log_no_restart": "The server does not need to restart.",
-    "log_scheduled": "Restart needed, but anti-restart factors outweigh it.",
-    "log_gap_low": "Gap {gap}. Scheduling restart in 2 hours.",
-    "log_gap_high": "Gap {gap}. Scheduling restart in 1 hour.",
-    "reason_restart_soon": "The server is set to restart soon",
-    "reason_ram": "RAM usage ({ram}) is higher than {threshold} GB",
-    "reason_cpu": "CPU usage ({cpu}) is higher than {threshold}%",
-    "reason_uptime": "Uptime {uptime} exceeds {threshold}h",
-    "reason_tps": "TPS {tps} is lower than {threshold}",
-    "reason_low_uptime": "Uptime {uptime} is shorter than 30m",
-    "reason_players": "There {verb} {count} {plural} online",
-}
-
-
+# ---------------------------------------------------------
+# Main Watcher
+# ---------------------------------------------------------
 class ServerWatcher:
-    @staticmethod
-    def generate_default_files(
-        config_path: str = CONFIG_PATH,
-        messages_path: str = MESSAGES_PATH,
-        overwrite: bool = False,
-    ):
-        write_default_yaml(config_path, DEFAULT_CONFIG, overwrite=overwrite)
-        write_default_yaml(messages_path, DEFAULT_MESSAGES, overwrite=overwrite)
-
-    def __init__(
-        self,
-        config_path: str = CONFIG_PATH,
-        messages_path: str = MESSAGES_PATH,
-    ):
-        # ensure files exist
-        ensure_yaml(config_path, DEFAULT_CONFIG)
-        ensure_yaml(messages_path, DEFAULT_MESSAGES)
-
-        # load raw YAML
-        raw_config = load_yaml(config_path)
-        raw_messages = load_yaml(messages_path)
-
-        # validate schemas
-        config_errors = validate_config_schema(raw_config)
-        messages_errors = validate_messages_schema(raw_messages)
-        all_errors = config_errors + messages_errors
-        if all_errors:
-            msg = "Configuration errors:\n" + "\n".join(f"- {e}" for e in all_errors)
-            raise ValueError(msg)
-
-        # map watcher + messages into dataclasses
-        self.cfg: WatcherConfig = map_to_dataclass(
-            raw_config.get("watcher", {}), WatcherConfig
-        )
-        self.msg: WatcherMessages = map_to_dataclass(
-            raw_messages, WatcherMessages
+    def __init__(self):
+        # Load all 3 configs
+        self.global_cfg: GlobalConfig = load_or_default(
+            "config/global.yaml",
+            "defaultconfigs/global.yaml",
+            GlobalConfig
         )
 
-        # panel / origin / server wiring from YAML
-        p = raw_config["panel"]
+        self.messages: MessagesConfig = load_or_default(
+            "config/messages.yaml",
+            "defaultconfigs/messages.yaml",
+            MessagesConfig
+        )
+
+        self.cfg: WatcherConfig = load_or_default(
+            "config/watcher.yaml",
+            "defaultconfigs/watcher.yaml",
+            WatcherConfig
+        )
+
+        # PANEL
+        p = self.global_cfg.panel
         self.panel = Panel(
             name=p["name"],
             url=p["url"],
             api_key=p["api_key"],
         )
 
-        o = raw_config["origin"]
+        # ORIGIN
+        o = self.global_cfg.origin
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
             server_id=o["server_id"],
         )
 
-        s = raw_config["server"]
+        # SERVER
+        s = self.global_cfg.server
         self.server = MinecraftServer(
             name=s["name"],
             panel=self.panel,
@@ -147,8 +91,11 @@ class ServerWatcher:
             tpsCommand=s["tps_command"],
         )
 
-        # logger now fully configurable
-        logger_name = self.cfg.logger_name_template.format(server_name=s["name"])
+        # LOGGER (fully configurable)
+        logger_name = self.cfg.logger_name_template.format(
+            server_name=s["name"]
+        )
+
         self.log = HungerLogger(
             name=logger_name,
             server=self.server,
@@ -156,18 +103,27 @@ class ServerWatcher:
             console_backspaces=self.cfg.console_backspaces,
         )
 
-        # timezone
+        # TIMEZONE
         self.tz = ZoneInfo(self.cfg.timezone)
 
+    # -----------------------------------------------------
+    # Utility: format messages with prefix
+    # -----------------------------------------------------
     def fmt(self, template: str, **kwargs):
-        return template.format(prefix=self.msg.prefix, **kwargs)
+        return template.format(prefix=self.messages.prefix, **kwargs)
 
+    # -----------------------------------------------------
+    # Shutdown
+    # -----------------------------------------------------
     def shutdown(self):
         self.log.info("Shutting down ServerWatcher.")
         raise SystemExit
 
+    # -----------------------------------------------------
+    # Restart logic
+    # -----------------------------------------------------
     def restart_and_wait(self):
-        self.origin.disableSchedule(self.cfg.origin_disable_schedule_id)
+        self.origin.disableSchedule(self.cfg.restart_soon_schedule_id)
         self.server.restart()
         self.log.info("Restart action sent. Waiting...")
         time.sleep(self.cfg.restart_wait_seconds)
@@ -181,11 +137,16 @@ class ServerWatcher:
 
         if alive:
             self.log.info("Server is back online!")
-            self.server.sendBroadcast(f"{self.msg.prefix}<green>Restart successful!")
+            self.server.sendBroadcast(
+                f"{self.messages.prefix}<green>Restart successful!"
+            )
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error("Server failed to restart!")
 
+    # -----------------------------------------------------
+    # Schedule restart
+    # -----------------------------------------------------
     def schedule_restart(self, minutes):
         info = snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
@@ -194,17 +155,19 @@ class ServerWatcher:
         time_str = local_time.strftime("%I:%M %p")
 
         self.server.sendBroadcast(
-            self.fmt(self.msg.broadcast_restart_at, time=time_str)
+            self.fmt(self.messages.broadcast_restart_at, time=time_str)
         )
 
         minute_callbacks = {
-            m: (lambda msg=self.fmt(self.msg.broadcast_minute[m]): self.server.sendBroadcast(msg))
-            for m in self.msg.broadcast_minute
+            m: (lambda msg=self.fmt(self.messages.broadcast_minute[m]):
+                self.server.sendBroadcast(msg))
+            for m in self.messages.broadcast_minute
         }
 
         second_callbacks = {
-            s: (lambda msg=self.fmt(self.msg.broadcast_second[s]): self.server.sendBroadcast(msg))
-            for s in self.msg.broadcast_second
+            s: (lambda msg=self.fmt(self.messages.broadcast_second[s]):
+                self.server.sendBroadcast(msg))
+            for s in self.messages.broadcast_second
         }
 
         runCountdownEvents(
@@ -213,11 +176,14 @@ class ServerWatcher:
             second_callbacks=second_callbacks,
         )
 
+    # -----------------------------------------------------
+    # Main evaluation logic
+    # -----------------------------------------------------
     def evaluate(self):
-        self.log.info(self.msg.log_start)
+        self.log.info(self.messages.log_start)
 
         if not validateAll(self.panel, self.server):
-            self.log.error(self.msg.log_validation_fail)
+            self.log.error(self.messages.log_validation_fail)
             self.shutdown()
 
         self.server.refresh()
@@ -230,56 +196,38 @@ class ServerWatcher:
 
         # PRO-RESTART
         if self.server.getSchedule(self.cfg.restart_soon_schedule_id)["is_active"]:
-            restart_reasons.append(self.msg.reason_restart_soon)
+            restart_reasons.append(self.messages.reason_restart_soon)
             pro += self.cfg.weight_restart_soon
 
         if snap.ram >= self.cfg.ram_threshold:
             restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_ram,
-                    ram=snap.ram,
-                    threshold=self.cfg.ram_threshold,
-                )
+                self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold)
             )
             pro += round(snap.ram, 0) - 5
 
         if snap.cpu >= self.cfg.cpu_threshold:
             restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_cpu,
-                    cpu=snap.cpu,
-                    threshold=self.cfg.cpu_threshold,
-                )
+                self.fmt(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.cfg.cpu_threshold)
             )
             pro += self.cfg.weight_cpu
 
         if snap.uptime // 3600 >= self.cfg.uptime_hours_threshold:
             restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_uptime,
-                    uptime=snap.uptime_formatted,
-                    threshold=self.cfg.uptime_hours_threshold,
-                )
+                self.fmt(self.messages.reason_uptime, uptime=snap.uptime_formatted,
+                         threshold=self.cfg.uptime_hours_threshold)
             )
             pro += self.cfg.weight_uptime
 
         if snap.tps <= self.cfg.tps_threshold:
             restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_tps,
-                    tps=snap.tps,
-                    threshold=self.cfg.tps_threshold,
-                )
+                self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold)
             )
             pro += self.cfg.weight_tps
 
         # ANTI-RESTART
         if snap.uptime // 60 < 30:
             no_restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_low_uptime,
-                    uptime=snap.uptime_formatted,
-                )
+                self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted)
             )
             anti += self.cfg.weight_low_uptime
 
@@ -287,12 +235,7 @@ class ServerWatcher:
             verb = "are" if snap.players != 1 else "is"
             plural = "players" if snap.players != 1 else "player"
             no_restart_reasons.append(
-                self.fmt(
-                    self.msg.reason_players,
-                    verb=verb,
-                    count=snap.players,
-                    plural=plural,
-                )
+                self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural)
             )
             anti += snap.players * self.cfg.weight_per_player
 
@@ -308,25 +251,28 @@ class ServerWatcher:
         gap = abs(pro - anti)
 
         if pro == 0:
-            self.log.info(self.msg.log_no_restart)
+            self.log.info(self.messages.log_no_restart)
             return
 
         if pro > anti and snap.players == 0:
-            self.log.info(self.msg.log_immediate_restart)
+            self.log.info(self.messages.log_immediate_restart)
             self.restart_and_wait()
             return
 
-        self.log.info(self.msg.log_scheduled)
+        self.log.info(self.messages.log_scheduled)
 
         if gap <= 2:
-            self.log.warn(self.fmt(self.msg.log_gap_low, gap=gap))
+            self.log.warn(self.fmt(self.messages.log_gap_low, gap=gap))
             self.schedule_restart(self.cfg.low_gap_minutes)
         else:
-            self.log.warn(self.fmt(self.msg.log_gap_high, gap=gap))
+            self.log.warn(self.fmt(self.messages.log_gap_high, gap=gap))
             self.schedule_restart(self.cfg.high_gap_minutes)
 
         self.restart_and_wait()
 
+    # -----------------------------------------------------
+    # Main loop
+    # -----------------------------------------------------
     def run(self):
         clearTerminal()
         while True:

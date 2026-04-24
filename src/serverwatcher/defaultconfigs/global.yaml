@@ -1,0 +1,16 @@
+panel:
+  name: My Panel
+  url: https://example.com
+  api_key: CHANGE_ME
+
+origin:
+  server_id: CHANGE_ME
+
+server:
+  name: My SMP
+  server_id: CHANGE_ME
+  domain: mc.hungersmp.com
+  port: 25565
+  rcon_port: 25575
+  rcon_password: password
+  tps_command: ticks
