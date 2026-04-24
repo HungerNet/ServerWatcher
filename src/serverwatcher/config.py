@@ -31,3 +31,9 @@ class WatcherConfig:
     restart_wait_seconds: int = 45
     restart_online_timeout: int = 120
     restart_online_interval: int = 2
+
+    # logger / misc
+    logger_name_template: str = "ServerWatcher-{server_name}"
+    log_path: str = "/home/container/logs/"
+    console_backspaces: int = 8
+    timezone: str = "America/Chicago"

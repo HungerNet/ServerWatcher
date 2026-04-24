@@ -12,11 +12,17 @@ from hungerlib.addons import (
     runCountdownEvents,
     ensure_yaml,
     load_yaml,
-    map_to_dataclass
+    map_to_dataclass,
+    write_default_yaml,
 )
 
 from .config import WatcherConfig
 from .messages import WatcherMessages
+from .schema import validate_config_schema, validate_messages_schema
+
+
+CONFIG_PATH = "config.yaml"
+MESSAGES_PATH = "messages.yaml"
 
 
 DEFAULT_CONFIG = {
@@ -38,38 +44,98 @@ DEFAULT_CONFIG = {
         "tps_command": "ticks",
     },
     "watcher": {},
-    "messages": {},
+}
+
+
+DEFAULT_MESSAGES = {
+    "prefix": "<aqua>[Server Watcher]",
+    "broadcast_restart_at": "{prefix} The server will restart at {time} CDT.",
+    "broadcast_minute": {
+        120: "{prefix} Restart in 2 hours!",
+        60: "{prefix} Restart in 1 hour!",
+        45: "{prefix} Restart in 45 minutes!",
+        30: "{prefix} Restart in 30 minutes!",
+        15: "{prefix} Restart in 15 minutes!",
+        5: "{prefix} Restart in 5 minutes!",
+        1: "{prefix} Restart in 1 minute!",
+    },
+    "broadcast_second": {
+        s: "{prefix} Restart in " + str(s) + " seconds!"
+        for s in range(10, 0, -1)
+    },
+    "log_start": "ServerWatcher is running!",
+    "log_validation_fail": "Validation FAILED. Make sure you set up config.yaml.",
+    "log_validation_ok": "All validation checks succeeded.",
+    "log_immediate_restart": "Restarting immediately.",
+    "log_no_restart": "The server does not need to restart.",
+    "log_scheduled": "Restart needed, but anti-restart factors outweigh it.",
+    "log_gap_low": "Gap {gap}. Scheduling restart in 2 hours.",
+    "log_gap_high": "Gap {gap}. Scheduling restart in 1 hour.",
+    "reason_restart_soon": "The server is set to restart soon",
+    "reason_ram": "RAM usage ({ram}) is higher than {threshold} GB",
+    "reason_cpu": "CPU usage ({cpu}) is higher than {threshold}%",
+    "reason_uptime": "Uptime {uptime} exceeds {threshold}h",
+    "reason_tps": "TPS {tps} is lower than {threshold}",
+    "reason_low_uptime": "Uptime {uptime} is shorter than 30m",
+    "reason_players": "There {verb} {count} {plural} online",
 }
 
 
 class ServerWatcher:
-    def __init__(self, config_path: str = "config.yaml"):
-        # ensure config exists, then load it
-        ensure_yaml(config_path, DEFAULT_CONFIG)
-        raw = load_yaml(config_path)
+    @staticmethod
+    def generate_default_files(
+        config_path: str = CONFIG_PATH,
+        messages_path: str = MESSAGES_PATH,
+        overwrite: bool = False,
+    ):
+        write_default_yaml(config_path, DEFAULT_CONFIG, overwrite=overwrite)
+        write_default_yaml(messages_path, DEFAULT_MESSAGES, overwrite=overwrite)
 
-        # map watcher + messages sections into your dataclasses
-        self.cfg: WatcherConfig = map_to_dataclass(raw.get("watcher", {}), WatcherConfig)
+    def __init__(
+        self,
+        config_path: str = CONFIG_PATH,
+        messages_path: str = MESSAGES_PATH,
+    ):
+        # ensure files exist
+        ensure_yaml(config_path, DEFAULT_CONFIG)
+        ensure_yaml(messages_path, DEFAULT_MESSAGES)
+
+        # load raw YAML
+        raw_config = load_yaml(config_path)
+        raw_messages = load_yaml(messages_path)
+
+        # validate schemas
+        config_errors = validate_config_schema(raw_config)
+        messages_errors = validate_messages_schema(raw_messages)
+        all_errors = config_errors + messages_errors
+        if all_errors:
+            msg = "Configuration errors:\n" + "\n".join(f"- {e}" for e in all_errors)
+            raise ValueError(msg)
+
+        # map watcher + messages into dataclasses
+        self.cfg: WatcherConfig = map_to_dataclass(
+            raw_config.get("watcher", {}), WatcherConfig
+        )
         self.msg: WatcherMessages = map_to_dataclass(
-            raw.get("messages", {}), WatcherMessages
+            raw_messages, WatcherMessages
         )
 
         # panel / origin / server wiring from YAML
-        p = raw["panel"]
+        p = raw_config["panel"]
         self.panel = Panel(
             name=p["name"],
             url=p["url"],
             api_key=p["api_key"],
         )
 
-        o = raw["origin"]
+        o = raw_config["origin"]
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
             server_id=o["server_id"],
         )
 
-        s = raw["server"]
+        s = raw_config["server"]
         self.server = MinecraftServer(
             name=s["name"],
             panel=self.panel,
@@ -81,12 +147,17 @@ class ServerWatcher:
             tpsCommand=s["tps_command"],
         )
 
+        # logger now fully configurable
+        logger_name = self.cfg.logger_name_template.format(server_name=s["name"])
         self.log = HungerLogger(
-            name=f"ServerWatcher-{s['name']}",
+            name=logger_name,
             server=self.server,
-            log_path="/home/container/logs/",
-            console_backspaces=8,
+            log_path=self.cfg.log_path,
+            console_backspaces=self.cfg.console_backspaces,
         )
+
+        # timezone
+        self.tz = ZoneInfo(self.cfg.timezone)
 
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.msg.prefix, **kwargs)
@@ -119,11 +190,11 @@ class ServerWatcher:
         info = snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
 
-        cst = scheduled.astimezone(ZoneInfo("America/Chicago"))
-        time_in_cdt = cst.strftime("%I:%M %p")
+        local_time = scheduled.astimezone(self.tz)
+        time_str = local_time.strftime("%I:%M %p")
 
         self.server.sendBroadcast(
-            self.fmt(self.msg.broadcast_restart_at, time=time_in_cdt)
+            self.fmt(self.msg.broadcast_restart_at, time=time_str)
         )
 
         minute_callbacks = {

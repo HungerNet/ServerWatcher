@@ -9,6 +9,7 @@ except PackageNotFoundError:
 from .watcher import ServerWatcher
 from .config import WatcherConfig
 from .messages import WatcherMessages
+from .schema import validate_config_schema, validate_messages_schema
 
 
 __all__ = [
@@ -16,4 +17,6 @@ __all__ = [
     'ServerWatcher',
     'WatcherConfig',
     'WatcherMessages',
+    'validate_config_schema',
+    'validate_messages_schema',
 ]
