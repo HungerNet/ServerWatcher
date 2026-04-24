@@ -1,4 +1,4 @@
 run: true
-version: "3.1"
+version: "3.1.1"
 description: |
-  - Updated config engine
+  - Fixed global_config name

@@ -16,7 +16,7 @@ from hungerlib.addons import (
 )
 
 # NEW CONFIG DATACLASSES
-from config.global import GlobalConfig
+from config.global_config import GlobalConfig
 from config.messages import MessagesConfig
 from config.watcher import WatcherConfig
 
