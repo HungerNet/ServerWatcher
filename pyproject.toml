@@ -50,3 +50,6 @@ Issues = "https://github.com/iFamishedX/ServerWatcher/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+serverwatcher = ["defaultconfigs/*.yaml"]
