@@ -39,6 +39,7 @@ class ServerWatcher:
 
         if alive:
             self.log.info("Server is back online!")
+            self.server.sendBroadcast(f'{prefix}<green>This server was successfully restarted!')
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error("Server failed to restart!")
