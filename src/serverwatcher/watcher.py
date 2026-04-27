@@ -52,19 +52,19 @@ class ServerWatcher:
         # Load all 3 configs
         self.global_cfg: GlobalConfig = load_or_default(
             "config/global.yaml",
-            "defaultconfigs/global.yaml",
+            "serverwatcher/defaultconfigs/global.yaml",
             GlobalConfig
         )
 
         self.messages: MessagesConfig = load_or_default(
             "config/messages.yaml",
-            "defaultconfigs/messages.yaml",
+            "serverwatcher/defaultconfigs/messages.yaml",
             MessagesConfig
         )
 
         self.cfg: WatcherConfig = load_or_default(
             "config/watcher.yaml",
-            "defaultconfigs/watcher.yaml",
+            "serverwatcher/defaultconfigs/watcher.yaml",
             WatcherConfig
         )
 
