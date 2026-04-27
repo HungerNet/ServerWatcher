@@ -64,18 +64,18 @@ class ServerWatcher:
             tpsCommand=self.global_cfg.tps_command,
         )
 
-        logger_name = self.cfg.logger_name_template.format(
+        logger_name = self.global_cfg.logger_name.format(
             server_name=self.global_cfg.server_name
         )
 
         self.log = HungerLogger(
             name=logger_name,
             server=self.server,
-            log_path=self.cfg.log_path,
-            console_backspaces=self.cfg.console_backspaces,
+            log_path=self.global_cfg.log_path,
+            console_backspaces=self.global_cfg.console_backspaces,
         )
 
-        self.tz = ZoneInfo(self.cfg.timezone)
+        self.tz = ZoneInfo(self.global_cfg.timezone)
 
     # utility
     def fmt(self, template: str, **kwargs):
@@ -101,7 +101,7 @@ class ServerWatcher:
 
         if alive:
             self.log.info(self.messages.server_back_online)
-            self.server.sendBroadcast(self.messages.server_back_online_broadcast)
+            self.server.sendBroadcast(f"{self.messages.server_back_online_broadcast}")
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error(self.messages.server_failed_restart)
@@ -239,10 +239,10 @@ class ServerWatcher:
 
     # main loop
     def run(self):
-        if self.cfg.clear_terminal:
+        if self.global_cfg.clear_terminal:
             clearTerminal()
         while True:
-            if self.cfg.clear_terminal:
+            if self.global_cfg.clear_terminal:
                 clearTerminal()
             self.evaluate()
-            time.sleep(self.cfg.watch_interval)
+            time.sleep(self.global_cfg.watch_interval)

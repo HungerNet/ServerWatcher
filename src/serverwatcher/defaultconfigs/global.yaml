@@ -1,3 +1,5 @@
+watch_interval: 60
+
 panel:
   panel_name: My Panel
   panel_url: https://example.com
@@ -14,3 +16,13 @@ server:
   rcon_port: 25575
   rcon_password: password
   tps_command: ticks
+
+logging:
+  do_logging: True
+  logger_name: "Server Watcher"
+  log_path: "/home/container/logs/"
+  timezone: "America/Chicago"
+
+terminal:
+  console_backspaces: 8
+  clear_terminal: True

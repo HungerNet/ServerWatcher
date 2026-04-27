@@ -25,12 +25,3 @@ class WatcherConfig:
     restart_wait_seconds: int
     restart_online_timeout: int
     restart_online_interval: int
-
-    logger_name_template: str
-    log_path: str
-    console_backspaces: int
-    timezone: str
-
-    # New values (will reorder later)
-    watch_interval: int
-    clear_terminal: bool
