@@ -23,6 +23,7 @@ from serverwatcher.config.watcher import WatcherConfig
 # BASE DIRECTORY OF THIS PACKAGE
 # BASE_DIR = os.path.dirname(__file__)                               # OLD VERSION, may use later
 BASE_DIR = os.getcwd()                                               # NEW VERSION
+PACKAGE_DIR = os.path.dirname(__file__)   
 
 # ---------------------------------------------------------
 # Utility: load config or copy default from defaultconfigs/
@@ -34,7 +35,7 @@ def load_or_default(path: str, default_path: str, schema):
     """
 
     abs_path = os.path.join(BASE_DIR, path)
-    abs_default = os.path.join(BASE_DIR, default_path)
+    abs_default = os.path.join(PACKAGE_DIR, default_path)
 
     if not os.path.exists(abs_path):
         os.makedirs(os.path.dirname(abs_path), exist_ok=True)
