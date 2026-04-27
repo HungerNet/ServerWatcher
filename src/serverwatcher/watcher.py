@@ -142,32 +142,39 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
+        # Broadcast the scheduled restart time
         self.server.sendBroadcast(
             self.fmt(self.messages.broadcast_restart_at, time=time_str)
         )
 
-        minute_callbacks = {
-            m: (lambda msg=self.fmt(self.messages.broadcast_minute[m]):
-                self.server.sendBroadcast(msg))
-            minute_keys = [k for k in vars(self.messages) if k.startswith("minute_")]
-            minute_callbacks = {
-                k: (lambda msg=self.fmt(getattr(self.messages, k)):
-                    self.server.sendBroadcast(msg))
-                for k in minute_keys
-            }
+        # Collect all minute_* keys
+        minute_keys = [
+            k for k in vars(self.messages)
+            if k.startswith("minute_")
+        ]
 
+        minute_callbacks = {
+            int(k.split("_")[1]): (
+                lambda msg=self.fmt(getattr(self.messages, k)):
+                    self.server.sendBroadcast(msg)
+            )
+            for k in minute_keys
         }
+
+        # Collect all second_* keys
+        second_keys = [
+            k for k in vars(self.messages)
+            if k.startswith("second_")
+        ]
 
         second_callbacks = {
-            s: (lambda msg=self.fmt(self.messages.broadcast_second[s]):
-                self.server.sendBroadcast(msg))
-            second_keys = [k for k in vars(self.messages) if k.startswith("second_")]
-            second_callbacks = {
-                k: (lambda msg=self.fmt(getattr(self.messages, k)):
-                    self.server.sendBroadcast(msg))
-                for k in second_keys
-            }
+            int(k.split("_")[1]): (
+                lambda msg=self.fmt(getattr(self.messages, k)):
+                    self.server.sendBroadcast(msg)
+            )
+            for k in second_keys
         }
+
 
         runCountdownEvents(
             target_time=scheduled,
