@@ -9,9 +9,9 @@ class GlobalConfig:
     origin_server_id: str
 
     server_name: str
-    server_server_id: str
+    server_id: str
     server_domain: str
     server_port: int
-    server_rcon_port: int
-    server_rcon_password: str
-    server_tps_command: str
+    rcon_port: int
+    rcon_password: str
+    tps_command: str

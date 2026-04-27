@@ -1,16 +1,16 @@
 panel:
-  name: My Panel
-  url: https://example.com
-  api_key: CHANGE_ME
+  panel_name: My Panel
+  panel_url: https://example.com
+  panel_api_key: CHANGE_ME
 
 origin:
-  server_id: CHANGE_ME
+  origin_server_id: CHANGE_ME
 
 server:
-  name: My SMP
+  server_name: My SMP
   server_id: CHANGE_ME
-  domain: mc.example.com
-  port: 25565
+  server_domain: mc.example.com
+  server_port: 25565
   rcon_port: 25575
   rcon_password: password
   tps_command: ticks

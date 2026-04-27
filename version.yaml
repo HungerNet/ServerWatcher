@@ -1,4 +1,4 @@
 run: true
-version: "3.6"
+version: "3.6.1"
 description: |
-  - Added config flattening
+  - Fixed config flattening

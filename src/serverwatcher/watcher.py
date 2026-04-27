@@ -80,11 +80,11 @@ class ServerWatcher:
         )
 
         self.server = MinecraftServer(
-            name=self.global_cfg.name,
+            name=self.global_cfg.server_name,
             panel=self.panel,
             server_id=self.global_cfg.server_id,
-            server_domain=self.global_cfg.domain,
-            server_port=self.global_cfg.port,
+            server_domain=self.global_cfg.server_domain,
+            server_port=self.global_cfg.server_port,
             rcon_port=self.global_cfg.rcon_port,
             rcon_password=self.global_cfg.rcon_password,
             tpsCommand=self.global_cfg.tps_command,
@@ -93,7 +93,7 @@ class ServerWatcher:
 
         # logger
         logger_name = self.cfg.logger_name_template.format(
-            server_name=s["name"]
+            server_name=self.global_cfg.server_name
         )
 
         self.log = HungerLogger(
