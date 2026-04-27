@@ -48,6 +48,9 @@ Documentation = "https://github.com/iFamishedX/ServerWatcher"
 Source = "https://github.com/iFamishedX/ServerWatcher"
 Issues = "https://github.com/iFamishedX/ServerWatcher/issues"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
