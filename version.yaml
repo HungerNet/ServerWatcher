@@ -1,5 +1,4 @@
 run: true
-version: "3.9"
+version: "3.9.1"
 description: |
-  - Removed helpers folder
-  - Rewrite to use HungerLib's new configmap addon
+  - Fixed config imports

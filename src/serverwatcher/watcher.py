@@ -14,8 +14,6 @@ from hungerlib.addons import (
 )
 from hungerlib.addons.configmap import load_or_default
 
-from serverwatcher.config import GlobalConfig, MessagesConfig, WatcherConfig
-
 # Set directory
 BASE_DIR = os.getcwd()
 PACKAGE_DIR = os.path.dirname(__file__)
@@ -26,9 +24,10 @@ class ServerWatcher:
         # Load all configs in /config using configmap
         cfgmap = load_or_default("config", skip_files=[])
 
-        self.global_cfg: GlobalConfig = cfgmap["global.yaml"]
-        self.messages: MessagesConfig = cfgmap["messages.yaml"]
-        self.cfg: WatcherConfig       = cfgmap["watcher.yaml"]
+        self.global_cfg = cfgmap["global.yaml"]
+        self.messages   = cfgmap["messages.yaml"]
+        self.cfg        = cfgmap["watcher.yaml"]
+
 
         self.panel = Panel(
             name=self.global_cfg.panel_name,
