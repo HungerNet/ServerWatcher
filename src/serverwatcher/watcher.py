@@ -11,34 +11,47 @@ from hungerlib.addons import (
     waitForOnline,
     validateAll,
     runCountdownEvents,
+    loadConfig,
 )
-from hungerlib.addons.configmap import load_or_default
 
-# Set directory
-BASE_DIR = os.getcwd()
-PACKAGE_DIR = os.path.dirname(__file__)
+from serverwatcher import GlobalConfig, MessagesConfig, WatcherConfig
 
 
 class ServerWatcher:
     def __init__(self):
-        # Load all configs in /config using configmap
-        cfgmap = load_or_default("config", skip_files=[])
 
-        self.global_cfg = cfgmap["global.yaml"]
-        self.messages   = cfgmap["messages.yaml"]
-        self.cfg        = cfgmap["watcher.yaml"]
+        # load configs
+        self.global_cfg = loadConfig(
+            "config/global.yaml",
+            "/defaultconfigs/global.yaml",
+            GlobalConfig
+        )
 
+        self.messages = loadConfig(
+            "config/messages.yaml",
+            "/defaultconfigs/messages.yaml",
+            MessagesConfig
+        )
 
+        self.cfg = loadConfig(
+            "config/watcher.yaml",
+            "/defaultconfigs/watcher.yaml",
+            WatcherConfig
+        )
+
+        # initialize panels and servers
         self.panel = Panel(
             name=self.global_cfg.panel_name,
             url=self.global_cfg.panel_url,
             api_key=self.global_cfg.panel_api_key,
         )
+
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
             server_id=self.global_cfg.origin_server_id
         )
+
         self.server = MinecraftServer(
             name=self.global_cfg.server_name,
             panel=self.panel,
@@ -49,34 +62,36 @@ class ServerWatcher:
             rcon_password=self.global_cfg.rcon_password,
             tpsCommand=self.global_cfg.tps_command,
         )
+
         logger_name = self.cfg.logger_name_template.format(
             server_name=self.global_cfg.server_name
         )
+
         self.log = HungerLogger(
             name=logger_name,
             server=self.server,
             log_path=self.cfg.log_path,
             console_backspaces=self.cfg.console_backspaces,
         )
+
         self.tz = ZoneInfo(self.cfg.timezone)
 
-    # format messages with prefix
+    # utility
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.messages.prefix, **kwargs)
 
-    # simple shutdown
     def shutdown(self):
-        self.log.info(f"{self.messages.log_shutdown}")
+        self.log.info(self.messages.log_shutdown)
         raise SystemExit
 
     # restart logic
     def restart_and_wait(self):
         self.origin.disableSchedule(self.cfg.restart_soon_schedule_id)
         self.server.restart()
-        self.log.info(f"{self.messages.restart_action_sent}")
+        self.log.info(self.messages.restart_action_sent)
         time.sleep(self.cfg.restart_wait_seconds)
 
-        self.log.warn(f"{self.messages.log_status_check}")
+        self.log.warn(self.messages.log_status_check)
         alive = waitForOnline(
             self.server,
             timeout=self.cfg.restart_online_timeout,
@@ -84,13 +99,13 @@ class ServerWatcher:
         )
 
         if alive:
-            self.log.info(f"{self.messages.server_back_online}")
-            self.server.sendBroadcast(f"{self.messages.server_back_online_broadcast}")
+            self.log.info(self.messages.server_back_online)
+            self.server.sendBroadcast(self.messages.server_back_online_broadcast)
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
-            self.log.error(f"{self.messages.server_failed_restart}")
+            self.log.error(self.messages.server_failed_restart)
 
-    # schedule restart
+    # scheduled restart
     def schedule_restart(self, minutes):
         info = snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
@@ -98,37 +113,29 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        # Broadcast the scheduled restart time
-        self.server.sendBroadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
+        self.server.sendBroadcast(
+            self.fmt(self.messages.broadcast_restart_at, time=time_str)
+        )
 
-        # Collect all minute_* keys
-        minute_keys = [
-            k for k in vars(self.messages)
-            if k.startswith("minute_")
-        ]
-
+        # minute_* callbacks
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
                     self.server.sendBroadcast(msg)
             )
-            for k in minute_keys
+            for k in vars(self.messages)
+            if k.startswith("minute_")
         }
 
-        # Collect all second_* keys
-        second_keys = [
-            k for k in vars(self.messages)
-            if k.startswith("second_")
-        ]
-
+        # second_* callbacks
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
                     self.server.sendBroadcast(msg)
             )
-            for k in second_keys
+            for k in vars(self.messages)
+            if k.startswith("second_")
         }
-
 
         runCountdownEvents(
             target_time=scheduled,
@@ -136,12 +143,12 @@ class ServerWatcher:
             second_callbacks=second_callbacks,
         )
 
-    # main evaluation logic
+    # evaluation logic
     def evaluate(self):
-        self.log.info(f"{self.messages.log_start}")
+        self.log.info(self.messages.log_start)
 
         if not validateAll(self.panel, self.server):
-            self.log.error(f"{self.messages.log_validation_fail}")
+            self.log.error(self.messages.log_validation_fail)
             self.shutdown()
 
         self.server.refresh()
@@ -208,8 +215,9 @@ class ServerWatcher:
 
         gap = abs(pro - anti)
 
+        # decision
         if pro == 0:
-            self.log.info(f"{self.messages.log_no_restart}")
+            self.log.info(self.messages.log_no_restart)
             return
 
         if pro > anti and snap.players == 0:
@@ -228,9 +236,7 @@ class ServerWatcher:
 
         self.restart_and_wait()
 
-    # -----------------------------------------------------
-    # Main loop
-    # -----------------------------------------------------
+    # main loop
     def run(self):
         if self.cfg.clear_terminal:
             clearTerminal()

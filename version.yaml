@@ -1,4 +1,4 @@
 run: true
-version: "3.9.1"
+version: "4.0"
 description: |
-  - Fixed config imports
+  - Rewritten using HungerLib's updated configloader module
