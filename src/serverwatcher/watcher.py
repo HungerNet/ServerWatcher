@@ -112,7 +112,7 @@ class ServerWatcher:
         time_str = local_time.strftime("%I:%M %p")
 
         # Broadcast the scheduled restart time
-        self.server.sendBroadcast(self.fmt({self.messages.broadcast_restart_at, time=time_str}))
+        self.server.sendBroadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
 
         # Collect all minute_* keys
         minute_keys = [
