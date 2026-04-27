@@ -1,4 +1,7 @@
 run: true
-version: "3.3"
+version: "3.4"
 description: |
-  - Added new message fields
+  - Modified default message fields
+  - Added new watcher config fields
+  - Added config/__init__.py
+    - Used new imports in watcher.py

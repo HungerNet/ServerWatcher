@@ -15,19 +15,13 @@ from hungerlib.addons import (
     map_to_dataclass,
 )
 
-# NEW CONFIG DATACLASSES
-from serverwatcher.config.global_config import GlobalConfig
-from serverwatcher.config.messages import MessagesConfig
-from serverwatcher.config.watcher import WatcherConfig
+from serverwatcher.config import GlobalConfig, MessagesConfig, WatcherConfig
 
-# BASE DIRECTORY OF THIS PACKAGE
-# BASE_DIR = os.path.dirname(__file__)                               # OLD VERSION, may use later
-BASE_DIR = os.getcwd()                                               # NEW VERSION
+# Set directory
+BASE_DIR = os.getcwd()
 PACKAGE_DIR = os.path.dirname(__file__)   
 
-# ---------------------------------------------------------
-# Utility: load config or copy default from defaultconfigs/
-# ---------------------------------------------------------
+# Load configs
 def load_or_default(path: str, default_path: str, schema):
     """
     Loads YAML from path. If missing, copies default_path → path.
@@ -46,12 +40,9 @@ def load_or_default(path: str, default_path: str, schema):
     return map_to_dataclass(raw, schema)
 
 
-# ---------------------------------------------------------
-# Main Watcher
-# ---------------------------------------------------------
+# Main watcher
 class ServerWatcher:
     def __init__(self):
-        # Load all 3 configs
         self.global_cfg: GlobalConfig = load_or_default(
             "config/global.yaml",
             "defaultconfigs/global.yaml",
@@ -70,7 +61,7 @@ class ServerWatcher:
             WatcherConfig
         )
 
-        # PANEL
+        # panel
         p = self.global_cfg.panel
         self.panel = Panel(
             name=p["name"],
@@ -78,7 +69,7 @@ class ServerWatcher:
             api_key=p["api_key"],
         )
 
-        # ORIGIN
+        # origin
         o = self.global_cfg.origin
         self.origin = GenericServer(
             name="Origin",
@@ -86,7 +77,7 @@ class ServerWatcher:
             server_id=o["server_id"],
         )
 
-        # SERVER
+        # server
         s = self.global_cfg.server
         self.server = MinecraftServer(
             name=s["name"],
@@ -99,7 +90,7 @@ class ServerWatcher:
             tpsCommand=s["tps_command"],
         )
 
-        # LOGGER (fully configurable)
+        # logger
         logger_name = self.cfg.logger_name_template.format(
             server_name=s["name"]
         )
@@ -111,25 +102,19 @@ class ServerWatcher:
             console_backspaces=self.cfg.console_backspaces,
         )
 
-        # TIMEZONE
+        # timezone
         self.tz = ZoneInfo(self.cfg.timezone)
 
-    # -----------------------------------------------------
-    # Utility: format messages with prefix
-    # -----------------------------------------------------
+    # format messages with prefix
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.messages.prefix, **kwargs)
 
-    # -----------------------------------------------------
-    # Shutdown
-    # -----------------------------------------------------
+    # simple shutdown
     def shutdown(self):
         self.log.info("Shutting down ServerWatcher.")
         raise SystemExit
 
-    # -----------------------------------------------------
-    # Restart logic
-    # -----------------------------------------------------
+    # restart logic
     def restart_and_wait(self):
         self.origin.disableSchedule(self.cfg.restart_soon_schedule_id)
         self.server.restart()
@@ -152,9 +137,7 @@ class ServerWatcher:
         else:
             self.log.error(f"{self.messages.server_failed_restart}")
 
-    # -----------------------------------------------------
-    # Schedule restart
-    # -----------------------------------------------------
+    # schedule restart
     def schedule_restart(self, minutes):
         info = snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
@@ -184,9 +167,7 @@ class ServerWatcher:
             second_callbacks=second_callbacks,
         )
 
-    # -----------------------------------------------------
-    # Main evaluation logic
-    # -----------------------------------------------------
+    # main evaluation logic
     def evaluate(self):
         self.log.info(self.messages.log_start)
 
@@ -202,7 +183,7 @@ class ServerWatcher:
         restart_reasons = []
         no_restart_reasons = []
 
-        # PRO-RESTART
+        # pro-restart
         if self.server.getSchedule(self.cfg.restart_soon_schedule_id)["is_active"]:
             restart_reasons.append(self.messages.reason_restart_soon)
             pro += self.cfg.weight_restart_soon
@@ -232,7 +213,7 @@ class ServerWatcher:
             )
             pro += self.cfg.weight_tps
 
-        # ANTI-RESTART
+        # anti-restart
         if snap.uptime // 60 < 30:
             no_restart_reasons.append(
                 self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted)
@@ -247,7 +228,7 @@ class ServerWatcher:
             )
             anti += snap.players * self.cfg.weight_per_player
 
-        # LOGGING
+        # logging
         for r in restart_reasons:
             self.log.warn(f"- {r}")
         for r in no_restart_reasons:
@@ -282,7 +263,10 @@ class ServerWatcher:
     # Main loop
     # -----------------------------------------------------
     def run(self):
-        clearTerminal()
+        if self.cfg.clear_terminal:
+            clearTerminal()
         while True:
+            if self.cfg.clear_terminal:
+                clearTerminal()
             self.evaluate()
-            time.sleep(60)
+            time.sleep(self.cfg.watch_interval)

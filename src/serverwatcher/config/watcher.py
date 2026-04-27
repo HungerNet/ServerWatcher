@@ -30,3 +30,7 @@ class WatcherConfig:
     log_path: str
     console_backspaces: int
     timezone: str
+
+    # New values (will reorder later)
+    watch_interval: int
+    clear_terminal: bool

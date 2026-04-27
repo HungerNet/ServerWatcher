@@ -9,7 +9,7 @@ origin:
 server:
   name: My SMP
   server_id: CHANGE_ME
-  domain: mc.hungersmp.com
+  domain: mc.example.com
   port: 25565
   rcon_port: 25575
   rcon_password: password
