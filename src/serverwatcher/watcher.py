@@ -21,7 +21,8 @@ from serverwatcher.config.messages import MessagesConfig
 from serverwatcher.config.watcher import WatcherConfig
 
 # BASE DIRECTORY OF THIS PACKAGE
-BASE_DIR = os.path.dirname(__file__)
+# BASE_DIR = os.path.dirname(__file__)                               # OLD VERSION, may use later
+BASE_DIR = os.getcwd()                                               # NEW VERSION
 
 # ---------------------------------------------------------
 # Utility: load config or copy default from defaultconfigs/
