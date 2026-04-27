@@ -149,13 +149,24 @@ class ServerWatcher:
         minute_callbacks = {
             m: (lambda msg=self.fmt(self.messages.broadcast_minute[m]):
                 self.server.sendBroadcast(msg))
-            for m in self.messages.broadcast_minute
+            minute_keys = [k for k in vars(self.messages) if k.startswith("minute_")]
+            minute_callbacks = {
+                k: (lambda msg=self.fmt(getattr(self.messages, k)):
+                    self.server.sendBroadcast(msg))
+                for k in minute_keys
+            }
+
         }
 
         second_callbacks = {
             s: (lambda msg=self.fmt(self.messages.broadcast_second[s]):
                 self.server.sendBroadcast(msg))
-            for s in self.messages.broadcast_second
+            second_keys = [k for k in vars(self.messages) if k.startswith("second_")]
+            second_callbacks = {
+                k: (lambda msg=self.fmt(getattr(self.messages, k)):
+                    self.server.sendBroadcast(msg))
+                for k in second_keys
+            }
         }
 
         runCountdownEvents(
