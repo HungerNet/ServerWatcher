@@ -65,33 +65,31 @@ class ServerWatcher:
         )
 
         # panel
-        p = self.global_cfg.panel
         self.panel = Panel(
-            name=p["name"],
-            url=p["url"],
-            api_key=p["api_key"],
+            name=self.global_cfg.panel_name,
+            url=self.global_cfg.panel_url,
+            api_key=self.global_cfg.panel_api_key,
         )
 
+
         # origin
-        o = self.global_cfg.origin
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
-            server_id=o["server_id"],
+            server_id=self.global_cfg.origin_server_id
         )
 
-        # server
-        s = self.global_cfg.server
         self.server = MinecraftServer(
-            name=s["name"],
+            name=self.global_cfg.name,
             panel=self.panel,
-            server_id=s["server_id"],
-            server_domain=s["domain"],
-            server_port=s["port"],
-            rcon_port=s["rcon_port"],
-            rcon_password=s["rcon_password"],
-            tpsCommand=s["tps_command"],
+            server_id=self.global_cfg.server_id,
+            server_domain=self.global_cfg.domain,
+            server_port=self.global_cfg.port,
+            rcon_port=self.global_cfg.rcon_port,
+            rcon_password=self.global_cfg.rcon_password,
+            tpsCommand=self.global_cfg.tps_command,
         )
+
 
         # logger
         logger_name = self.cfg.logger_name_template.format(
