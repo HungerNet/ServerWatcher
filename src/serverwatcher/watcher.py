@@ -15,7 +15,6 @@ from hungerlib.addons import (
     map_to_dataclass,
 )
 
-from serverwatcher.schema import flatten_nested
 from serverwatcher.config import GlobalConfig, MessagesConfig, WatcherConfig
 from serverwatcher.helpers import load_or_default
 
