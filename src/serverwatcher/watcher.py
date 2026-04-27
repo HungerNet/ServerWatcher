@@ -133,7 +133,7 @@ class ServerWatcher:
     def restart_and_wait(self):
         self.origin.disableSchedule(self.cfg.restart_soon_schedule_id)
         self.server.restart()
-        self.log.info("Restart action sent. Waiting...")
+        self.log.info(f"{self.messages.restart_action_sent}")
         time.sleep(self.cfg.restart_wait_seconds)
 
         self.log.warn("Checking server status...")
@@ -144,13 +144,13 @@ class ServerWatcher:
         )
 
         if alive:
-            self.log.info("Server is back online!")
+            self.log.info(f"{self.messages.server_back_online}")
             self.server.sendBroadcast(
-                f"{self.messages.prefix}<green>Restart successful!"
+                f"{self.messages.server_back_online_broadcast}"
             )
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
-            self.log.error("Server failed to restart!")
+            self.log.error(f"{self.messages.server_failed_restart}")
 
     # -----------------------------------------------------
     # Schedule restart

@@ -39,3 +39,9 @@ reason_uptime: "Uptime {uptime} exceeds {threshold}h"
 reason_tps: "TPS {tps} is lower than {threshold}"
 reason_low_uptime: "Uptime {uptime} is shorter than 30m"
 reason_players: "There {verb} {count} {plural} online"
+
+# New values, will reorder later
+restart_action_sent: "Restart action sent. Waiting..."
+server_back_online: "Server is back online!"
+server_back_online_broadcast: "{prefix} <green>Restart successful!"
+server_failed_restart: "Server failed to restart!"

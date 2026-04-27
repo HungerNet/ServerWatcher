@@ -23,3 +23,8 @@ class MessagesConfig:
     reason_tps: str = ""
     reason_low_uptime: str = ""
     reason_players: str = ""
+
+    restart_action_sent: str = ""
+    server_back_online: str = ""
+    server_back_online_broadcast: str = ""
+    server_failed_restart: str = ""
