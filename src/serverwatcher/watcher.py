@@ -14,8 +14,9 @@ from hungerlib.addons import (
     loadConfig,
 )
 
-from serverwatcher import GlobalConfig, MessagesConfig, WatcherConfig
-
+from serverwatcher.configclasses.global_config import GlobalConfig
+from serverwatcher.configclasses.messages import MessagesConfig
+from serverwatcher.configclasses.watcher import WatcherConfig
 
 class ServerWatcher:
     def __init__(self):
