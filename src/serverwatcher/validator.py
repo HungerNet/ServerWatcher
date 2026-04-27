@@ -88,6 +88,32 @@ def validate_messages_config(cfg, errors):
             # Not required for every field, but warn if missing
             pass
 
+def ensure_no_defaults(cfg, errors):
+    if cfg.panel_url == "https://example.com":
+        errors.append('panel_url: must not be left default')
+    
+    if cfg.panel_api_key == 'CHANGE_ME':
+        errors.append('panel_api_key: must not be left default')
+
+    if cfg.origin_server_id == 'CHANGE_ME':
+        errors.append('origin_server_id: must not be left default')
+
+    if cfg.server_id == 'CHANGE_ME':
+        errors.append('server_id: must not be left default')
+
+    if cfg.server_domain == 'mc.example.com':
+        errors.append('server_domain: must not be left default')
+
+    if cfg.rcon_password == 'password':
+        errors.append('rcon_password: must not be left default')
+
+    if cfg.restart_soon_schedule_id <= 0:
+        errors.append(f'restart_soon_schedule_id: must be >= 1 (got {cfg.restart_soon_schedule_id})')
+
+    if cfg.origin_disable_schedule_id <= 0:
+        errors.append(f'origin_disable_schedule_id: must be >=1 (got {cfg.origin_disable_schedule_id})')
+
+
 
 # -----------------------------
 # Main validator
@@ -110,6 +136,10 @@ def validate_all():
     validate_global_config(global_cfg, errors)
     validate_messages_config(messages_cfg, errors)
     validate_watcher_config(watcher_cfg, errors)
+
+    # Check for defaults
+    ensure_no_defaults(global_cfg, errors)
+    ensure_no_defaults(watcher_cfg, errors)
 
     # Print results
     if errors:
