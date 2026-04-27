@@ -7,7 +7,7 @@ except PackageNotFoundError:
     __version__ = '0.0.0'
 
 from .watcher import ServerWatcher
-from .schema import validate_config_schema, validate_messages_schema flatten_nested
+from .schema import validate_config_schema, validate_messages_schema, flatten_nested
 
 
 __all__ = [

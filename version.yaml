@@ -1,6 +1,4 @@
 run: true
-version: "3.5"
+version: "3.5.1"
 description: |
-  - intify ram reasons
-  - Add support for nested yaml configs
-  - Reordered default yaml configs
+  - Fixed syntax errors
