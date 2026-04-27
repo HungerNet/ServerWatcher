@@ -88,32 +88,32 @@ def validate_messages_config(cfg, errors):
             # Not required for every field, but warn if missing
             pass
 
-def ensure_no_global_defaults(cfg, errors):
+def ensure_no_global_defaults(cfg, defaults):
     if cfg.panel_url == "https://example.com":
-        errors.append('panel_url: must not be left default')
+        defaults.append('panel_url')
     
     if cfg.panel_api_key == 'CHANGE_ME':
-        errors.append('panel_api_key: must not be left default')
+        defaults.append('panel_api_key')
 
     if cfg.origin_server_id == 'CHANGE_ME':
-        errors.append('origin_server_id: must not be left default')
+        defaults.append('origin_server_id')
 
     if cfg.server_id == 'CHANGE_ME':
-        errors.append('server_id: must not be left default')
+        defaults.append('server_id')
 
     if cfg.server_domain == 'mc.example.com':
-        errors.append('server_domain: must not be left default')
+        defaults.append('server_domain')
 
     if cfg.rcon_password == 'password':
-        errors.append('rcon_password: must not be left default')
+        defaults.append('rcon_password')
 
 
-def ensure_no_watcher_defaults(cfg, errors):
-    if cfg.restart_soon_schedule_id <= 0:
-        errors.append(f'restart_soon_schedule_id: must be >= 1 (got {cfg.restart_soon_schedule_id})')
+def ensure_no_watcher_defaults(cfg, defaults):
+    if cfg.restart_soon_schedule_id == 0:
+        defaults.append('restart_soon_schedule_id')
 
-    if cfg.origin_disable_schedule_id <= 0:
-        errors.append(f'origin_disable_schedule_id: must be >= 1 (got {cfg.origin_disable_schedule_id})')
+    if cfg.origin_disable_schedule_id == 0:
+        defaults.append('origin_disable_schedule_id')
 
 
 # -----------------------------
@@ -122,6 +122,7 @@ def ensure_no_watcher_defaults(cfg, errors):
 
 def validate_all():
     errors = []
+    defaults = []
 
     # Load configs
     global_cfg = loadConfig("config/global.yaml", "/defaultconfigs/global.yaml", GlobalConfig)
@@ -139,15 +140,23 @@ def validate_all():
     validate_watcher_config(watcher_cfg, errors)
 
     # Check for defaults
-    ensure_no_global_defaults(global_cfg, errors)
-    ensure_no_watcher_defaults(watcher_cfg, errors)
+    ensure_no_global_defaults(global_cfg, defaults)
+    ensure_no_watcher_defaults(watcher_cfg, defaults)
 
 
     # Print results
-    if errors:
+    if len(defaults) >= 8:
+        print("❌ CONFIG VALIDATION FAILED:\nIt looks like you haven't configured this yet! Please change these defaults:")
+        for d in defaults:
+            print(" -", d)
+        sys.exit(1)
+
+    if errors or defaults:
         print("❌ CONFIG VALIDATION FAILED:")
         for e in errors:
             print(" -", e)
+        for d in defaults:
+            print(" -", d, ": must not be left default")
         sys.exit(1)
 
     print("✅ All configs are valid.")
