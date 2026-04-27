@@ -56,6 +56,9 @@ def validate_dataclass(config_obj, schema, errors):
 # -----------------------------
 
 def validate_global_config(cfg, errors):
+    if cfg.watch_interval < 1:
+        errors.append(f"watch_interval: must be >= 1 (got {cfg.watch_interval})")
+
     # Example: ensure ports are valid
     if cfg.server_port <= 0 or cfg.server_port > 65535:
         errors.append(f"server_port: must be 1–65535 (got {cfg.server_port})")
@@ -65,9 +68,6 @@ def validate_global_config(cfg, errors):
 
 
 def validate_watcher_config(cfg, errors):
-    if cfg.watch_interval < 1:
-        errors.append(f"watch_interval: must be >= 1 (got {cfg.watch_interval})")
-
     if cfg.restart_wait_seconds < 1:
         errors.append(f"restart_wait_seconds: must be >= 1 (got {cfg.restart_wait_seconds})")
 
