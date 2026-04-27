@@ -1,4 +1,7 @@
 run: true
-version: "3.7.1"
+version: "3.8"
 description: |
-  - Fixed schedule_restart
+  - Added f string
+  - Added helpers folder for a cleaner codebase
+  - Removed schema.py
+  - Added more messages

@@ -29,8 +29,10 @@ class MessagesConfig:
 
     # logging
     log_start: str
+    log_status_check: str
     log_validation_fail: str
     log_validation_ok: str
+    log_shutdown: str
     log_immediate_restart: str
     log_no_restart: str
     log_scheduled: str

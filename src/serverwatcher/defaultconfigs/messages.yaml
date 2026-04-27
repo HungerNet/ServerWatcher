@@ -25,8 +25,10 @@ broadcast_second:
 
 logging:
   log_start: "ServerWatcher is running!"
+  log_status_check: "Checking server status..."
   log_validation_fail: "Validation FAILED."
   log_validation_ok: "All validation checks succeeded."
+  log_shutdown: "Shutting down ServerWatcher."
   log_immediate_restart: "Restarting immediately."
   log_no_restart: "The server does not need to restart."
   log_scheduled: "Restart needed, but anti-restart factors outweigh it."

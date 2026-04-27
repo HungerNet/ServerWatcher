@@ -17,26 +17,11 @@ from hungerlib.addons import (
 
 from serverwatcher.schema import flatten_nested
 from serverwatcher.config import GlobalConfig, MessagesConfig, WatcherConfig
+from serverwatcher.helpers import load_or_default
 
 # Set directory
 BASE_DIR = os.getcwd()
 PACKAGE_DIR = os.path.dirname(__file__)   
-
-# Load configs
-def load_or_default(path: str, default_path: str, schema):
-
-    abs_path = os.path.join(BASE_DIR, path)
-    abs_default = os.path.join(PACKAGE_DIR, default_path)
-
-    if not os.path.exists(abs_path):
-        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
-        with open(abs_default, "r") as src, open(abs_path, "w") as dst:
-            dst.write(src.read())
-
-    raw = load_yaml(abs_path)
-    raw = flatten_nested(raw)
-    return map_to_dataclass(raw, schema)
-    
 
 
 # Main watcher
@@ -47,34 +32,26 @@ class ServerWatcher:
             "defaultconfigs/global.yaml",
             GlobalConfig
         )
-
         self.messages: MessagesConfig = load_or_default(
             "config/messages.yaml",
             "defaultconfigs/messages.yaml",
             MessagesConfig
         )
-
         self.cfg: WatcherConfig = load_or_default(
             "config/watcher.yaml",
             "defaultconfigs/watcher.yaml",
             WatcherConfig
         )
-
-        # panel
         self.panel = Panel(
             name=self.global_cfg.panel_name,
             url=self.global_cfg.panel_url,
             api_key=self.global_cfg.panel_api_key,
         )
-
-
-        # origin
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
             server_id=self.global_cfg.origin_server_id
         )
-
         self.server = MinecraftServer(
             name=self.global_cfg.server_name,
             panel=self.panel,
@@ -85,21 +62,15 @@ class ServerWatcher:
             rcon_password=self.global_cfg.rcon_password,
             tpsCommand=self.global_cfg.tps_command,
         )
-
-
-        # logger
         logger_name = self.cfg.logger_name_template.format(
             server_name=self.global_cfg.server_name
         )
-
         self.log = HungerLogger(
             name=logger_name,
             server=self.server,
             log_path=self.cfg.log_path,
             console_backspaces=self.cfg.console_backspaces,
         )
-
-        # timezone
         self.tz = ZoneInfo(self.cfg.timezone)
 
     # format messages with prefix
@@ -108,7 +79,7 @@ class ServerWatcher:
 
     # simple shutdown
     def shutdown(self):
-        self.log.info("Shutting down ServerWatcher.")
+        self.log.info(f"{self.messages.log_shutdown}")
         raise SystemExit
 
     # restart logic
@@ -118,7 +89,7 @@ class ServerWatcher:
         self.log.info(f"{self.messages.restart_action_sent}")
         time.sleep(self.cfg.restart_wait_seconds)
 
-        self.log.warn("Checking server status...")
+        self.log.warn(f"{self.messages.log_status_check}")
         alive = waitForOnline(
             self.server,
             timeout=self.cfg.restart_online_timeout,
@@ -127,9 +98,7 @@ class ServerWatcher:
 
         if alive:
             self.log.info(f"{self.messages.server_back_online}")
-            self.server.sendBroadcast(
-                f"{self.messages.server_back_online_broadcast}"
-            )
+            self.server.sendBroadcast(f"{self.messages.server_back_online_broadcast}")
             self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error(f"{self.messages.server_failed_restart}")
@@ -143,9 +112,7 @@ class ServerWatcher:
         time_str = local_time.strftime("%I:%M %p")
 
         # Broadcast the scheduled restart time
-        self.server.sendBroadcast(
-            self.fmt(self.messages.broadcast_restart_at, time=time_str)
-        )
+        self.server.sendBroadcast(self.fmt(f"{self.messages.broadcast_restart_at, time=time_str}"))
 
         # Collect all minute_* keys
         minute_keys = [
@@ -184,10 +151,10 @@ class ServerWatcher:
 
     # main evaluation logic
     def evaluate(self):
-        self.log.info(self.messages.log_start)
+        self.log.info(f"{self.messages.log_start}")
 
         if not validateAll(self.panel, self.server):
-            self.log.error(self.messages.log_validation_fail)
+            self.log.error(f"{self.messages.log_validation_fail}")
             self.shutdown()
 
         self.server.refresh()
@@ -255,7 +222,7 @@ class ServerWatcher:
         gap = abs(pro - anti)
 
         if pro == 0:
-            self.log.info(self.messages.log_no_restart)
+            self.log.info(f"{self.messages.log_no_restart}")
             return
 
         if pro > anti and snap.players == 0:
