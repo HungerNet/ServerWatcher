@@ -18,6 +18,14 @@ from serverwatcher.configclasses.global_config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
+# Validate and autorepair configs before watcher starts
+from serverwatcher.validator import validate_all
+from serverwatcher.autorepair import autorepair_all
+
+validate_all()
+autorepair_all()
+validate_all()
+
 class ServerWatcher:
     def __init__(self):
 

@@ -1,0 +1,125 @@
+import sys
+from dataclasses import fields
+
+from hungerlib.addons.simpleloader import loadConfig
+
+from serverwatcher.configclasses.global_config import GlobalConfig
+from serverwatcher.configclasses.messages import MessagesConfig
+from serverwatcher.configclasses.watcher import WatcherConfig
+
+
+# -----------------------------
+# Generic validation helpers
+# -----------------------------
+
+def validate_type(name, value, expected_type, errors):
+    if not isinstance(value, expected_type):
+        errors.append(f"{name}: expected {expected_type.__name__}, got {type(value).__name__}")
+
+
+def validate_positive(name, value, errors):
+    if isinstance(value, (int, float)) and value < 0:
+        errors.append(f"{name}: must be >= 0 (got {value})")
+
+
+def validate_nonempty(name, value, errors):
+    if isinstance(value, str) and value.strip() == "":
+        errors.append(f"{name}: cannot be empty")
+
+
+def validate_dataclass(config_obj, schema, errors):
+    """
+    Validate all fields in a dataclass:
+    - type correctness
+    - non-negative numbers
+    - non-empty strings
+    """
+    for f in fields(schema):
+        name = f.name
+        expected_type = f.type
+        value = getattr(config_obj, name)
+
+        # Type check
+        validate_type(name, value, expected_type, errors)
+
+        # String checks
+        if expected_type is str:
+            validate_nonempty(name, value, errors)
+
+        # Numeric checks
+        if expected_type in (int, float):
+            validate_positive(name, value, errors)
+
+
+# -----------------------------
+# Config-specific validation
+# -----------------------------
+
+def validate_global_config(cfg, errors):
+    # Example: ensure ports are valid
+    if cfg.server_port <= 0 or cfg.server_port > 65535:
+        errors.append(f"server_port: must be 1–65535 (got {cfg.server_port})")
+
+    if cfg.rcon_port <= 0 or cfg.rcon_port > 65535:
+        errors.append(f"rcon_port: must be 1–65535 (got {cfg.rcon_port})")
+
+
+def validate_watcher_config(cfg, errors):
+    if cfg.watch_interval < 1:
+        errors.append(f"watch_interval: must be >= 1 (got {cfg.watch_interval})")
+
+    if cfg.restart_wait_seconds < 1:
+        errors.append(f"restart_wait_seconds: must be >= 1 (got {cfg.restart_wait_seconds})")
+
+    if cfg.cpu_threshold <= 0 or cfg.cpu_threshold > 100:
+        errors.append(f"cpu_threshold: must be 1–100 (got {cfg.cpu_threshold})")
+
+    if cfg.ram_threshold <= 0:
+        errors.append(f"ram_threshold: must be > 0 (got {cfg.ram_threshold})")
+
+    if cfg.tps_threshold <= 0 or cfg.tps_threshold > 20:
+        errors.append(f"tps_threshold: must be 1–20 (got {cfg.tps_threshold})")
+
+
+def validate_messages_config(cfg, errors):
+    # Ensure all message templates contain {prefix}
+    for name, value in vars(cfg).items():
+        if isinstance(value, str) and "{prefix}" not in value:
+            # Not required for every field, but warn if missing
+            pass
+
+
+# -----------------------------
+# Main validator
+# -----------------------------
+
+def validate_all():
+    errors = []
+
+    # Load configs
+    global_cfg = loadConfig("config/global.yaml", "/defaultconfigs/global.yaml", GlobalConfig)
+    messages_cfg = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
+    watcher_cfg = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
+
+    # Generic dataclass validation
+    validate_dataclass(global_cfg, GlobalConfig, errors)
+    validate_dataclass(messages_cfg, MessagesConfig, errors)
+    validate_dataclass(watcher_cfg, WatcherConfig, errors)
+
+    # Config-specific validation
+    validate_global_config(global_cfg, errors)
+    validate_messages_config(messages_cfg, errors)
+    validate_watcher_config(watcher_cfg, errors)
+
+    # Print results
+    if errors:
+        print("❌ CONFIG VALIDATION FAILED:")
+        for e in errors:
+            print(" -", e)
+        sys.exit(1)
+
+    print("✅ All configs are valid.")
+
+
+if __name__ == "__main__":
+    validate_all()
