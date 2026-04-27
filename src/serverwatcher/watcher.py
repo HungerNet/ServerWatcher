@@ -11,36 +11,25 @@ from hungerlib.addons import (
     waitForOnline,
     validateAll,
     runCountdownEvents,
-    load_yaml,
-    map_to_dataclass,
 )
+from hungerlib.addons.configmap import load_or_default
 
 from serverwatcher.config import GlobalConfig, MessagesConfig, WatcherConfig
-from serverwatcher.helpers import load_or_default
 
 # Set directory
 BASE_DIR = os.getcwd()
-PACKAGE_DIR = os.path.dirname(__file__)   
+PACKAGE_DIR = os.path.dirname(__file__)
 
 
-# Main watcher
 class ServerWatcher:
     def __init__(self):
-        self.global_cfg: GlobalConfig = load_or_default(
-            "config/global.yaml",
-            "defaultconfigs/global.yaml",
-            GlobalConfig
-        )
-        self.messages: MessagesConfig = load_or_default(
-            "config/messages.yaml",
-            "defaultconfigs/messages.yaml",
-            MessagesConfig
-        )
-        self.cfg: WatcherConfig = load_or_default(
-            "config/watcher.yaml",
-            "defaultconfigs/watcher.yaml",
-            WatcherConfig
-        )
+        # Load all configs in /config using configmap
+        cfgmap = load_or_default("config", skip_files=[])
+
+        self.global_cfg: GlobalConfig = cfgmap["global.yaml"]
+        self.messages: MessagesConfig = cfgmap["messages.yaml"]
+        self.cfg: WatcherConfig       = cfgmap["watcher.yaml"]
+
         self.panel = Panel(
             name=self.global_cfg.panel_name,
             url=self.global_cfg.panel_url,

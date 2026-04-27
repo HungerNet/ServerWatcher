@@ -1,4 +1,5 @@
 run: true
-version: "3.8.4"
+version: "3.9"
 description: |
-  - Removed broken schema import
+  - Removed helpers folder
+  - Rewrite to use HungerLib's new configmap addon
