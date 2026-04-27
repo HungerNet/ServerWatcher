@@ -43,3 +43,28 @@ def validate_messages_schema(raw: Dict[str, Any]) -> list[str]:
     if "prefix" not in raw:
         errors.append("[messages] Missing required key: 'prefix'")
     return errors
+
+def flatten_nested(raw: dict) -> dict:
+    """
+    Recursively flattens a nested YAML dict into a single-level dict.
+    Section names are ignored; only leaf keys matter.
+    """
+    flat = {}
+
+    def walk(node):
+        if isinstance(node, dict):
+            for v in node.values():
+                walk(v)
+        else:
+            # ignore non-dict nodes at this level
+            pass
+
+    def collect(node):
+        for key, value in node.items():
+            if isinstance(value, dict):
+                collect(value)
+            else:
+                flat[key] = value
+
+    collect(raw)
+    return flat

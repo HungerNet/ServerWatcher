@@ -1,32 +1,39 @@
-restart_soon_schedule_id: 13
-origin_disable_schedule_id: 11
+logging:
+  logger_name_template: "Server Watcher"
+  log_path: "/home/container/logs/"
+  timezone: "America/Chicago"
 
-ram_threshold: 6
-cpu_threshold: 150
-uptime_hours_threshold: 12
-tps_threshold: 19.5
+terminal_settings:
+  console_backspaces: 8
+  clear_terminal: True
 
-weight_restart_soon: 3
-weight_ram: 1
-weight_cpu: 1
-weight_uptime: 1
-weight_tps: 1
+schedules:
+  restart_soon_schedule_id: 0     # replace this with real schedule id
+  origin_disable_schedule_id: 0   # replace this with real schedule id
 
-weight_low_uptime: 5
-weight_per_player: 1
+thresolds:
+  ram_threshold: 6
+  cpu_threshold: 150
+  uptime_hours_threshold: 12
+  tps_threshold: 19.5
 
-low_gap_minutes: 120
-high_gap_minutes: 60
+weights:
+  weight_restart_soon: 3
+  weight_ram: 1
+  weight_cpu: 1
+  weight_uptime: 1
+  weight_tps: 1
+  weight_low_uptime: 5
+  weight_per_player: 1
 
-restart_wait_seconds: 45
-restart_online_timeout: 120
-restart_online_interval: 2
+gaps:
+  low_gap_minutes: 120
+  high_gap_minutes: 60
 
-logger_name_template: "Server Watcher"
-log_path: "/home/container/logs/"
-console_backspaces: 8
-timezone: "America/Chicago"
+restart_intervals:
+  restart_wait_seconds: 45
+  restart_online_timeout: 120
+  restart_online_interval: 2
 
-# New values (will reorder later)
-watch_interval: 60
-clear_terminal: True
+watcher_intervals:
+  watch_interval: 60 

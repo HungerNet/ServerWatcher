@@ -37,7 +37,9 @@ def load_or_default(path: str, default_path: str, schema):
             dst.write(src.read())
 
     raw = load_yaml(abs_path)
+    raw = flatten_nested(raw)
     return map_to_dataclass(raw, schema)
+    
 
 
 # Main watcher
@@ -192,7 +194,7 @@ class ServerWatcher:
             restart_reasons.append(
                 self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold)
             )
-            pro += round(snap.ram, 0) - 5
+            pro += int(round(snap.ram, 0) - 5)
 
         if snap.cpu >= self.cfg.cpu_threshold:
             restart_reasons.append(

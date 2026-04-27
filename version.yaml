@@ -1,7 +1,6 @@
 run: true
-version: "3.4"
+version: "3.5"
 description: |
-  - Modified default message fields
-  - Added new watcher config fields
-  - Added config/__init__.py
-    - Used new imports in watcher.py
+  - intify ram reasons
+  - Add support for nested yaml configs
+  - Reordered default yaml configs
