@@ -24,10 +24,6 @@ PACKAGE_DIR = os.path.dirname(__file__)
 
 # Load configs
 def load_or_default(path: str, default_path: str, schema):
-    """
-    Loads YAML from path. If missing, copies default_path → path.
-    Then maps YAML → dataclass.
-    """
 
     abs_path = os.path.join(BASE_DIR, path)
     abs_default = os.path.join(PACKAGE_DIR, default_path)
@@ -193,7 +189,7 @@ class ServerWatcher:
             restart_reasons.append(
                 self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold)
             )
-            pro += int(round(snap.ram, 0) - 5)
+            pro += int(round(snap.ram, 0) - (self.watcher.ram_thresold - 1))
 
         if snap.cpu >= self.cfg.cpu_threshold:
             restart_reasons.append(
