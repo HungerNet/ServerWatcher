@@ -189,7 +189,7 @@ class ServerWatcher:
             restart_reasons.append(
                 self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold)
             )
-            pro += int(round(snap.ram, 0) - (self.cfg.ram_thresold - 1))
+            pro += int(round(snap.ram, 0) - (self.cfg.ram_threshold - 1))
 
         if snap.cpu >= self.cfg.cpu_threshold:
             restart_reasons.append(
