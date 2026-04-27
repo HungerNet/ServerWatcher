@@ -1,4 +1,4 @@
 run: true
-version: "4.5"
+version: "4.5.1"
 description: |
-  - Added default value checks
+  - Seperated default value checks
