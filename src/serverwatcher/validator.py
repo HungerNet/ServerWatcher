@@ -71,8 +71,8 @@ def validate_watcher_config(cfg, errors):
     if cfg.restart_wait_seconds < 1:
         errors.append(f"restart_wait_seconds: must be >= 1 (got {cfg.restart_wait_seconds})")
 
-    if cfg.cpu_threshold <= 0 or cfg.cpu_threshold > 100:
-        errors.append(f"cpu_threshold: must be 1–100 (got {cfg.cpu_threshold})")
+    if cfg.cpu_threshold <= 0:
+        errors.append(f"cpu_threshold: must not be less than 1 (got {cfg.cpu_threshold})")
 
     if cfg.ram_threshold <= 0:
         errors.append(f"ram_threshold: must be > 0 (got {cfg.ram_threshold})")
