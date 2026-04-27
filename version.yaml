@@ -1,7 +1,4 @@
 run: true
-version: "3.8"
+version: "3.8.1"
 description: |
-  - Added f string
-  - Added helpers folder for a cleaner codebase
-  - Removed schema.py
-  - Added more messages
+  - Fixed f-string error
