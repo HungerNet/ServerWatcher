@@ -1,4 +1,5 @@
 run: true
-version: "4.3"
+version: "4.4"
 description: |
-  - Edited validator
+  - Fixed typo
+  - Removed autorepair

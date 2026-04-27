@@ -2,7 +2,7 @@ schedules:
   restart_soon_schedule_id: 0     # replace this with real schedule id
   origin_disable_schedule_id: 0   # replace this with real schedule id
 
-thresolds:
+thresholds:
   ram_threshold: 6
   cpu_threshold: 150
   uptime_hours_threshold: 12
