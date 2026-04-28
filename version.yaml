@@ -1,7 +1,4 @@
 run: true
-version: "4.7"
+version: "4.7.1"
 description: |
-  - Added formatting
-  - Changed log destionation method
-  - Changed config defaults
-  - Added new messages
+  - Bump version
