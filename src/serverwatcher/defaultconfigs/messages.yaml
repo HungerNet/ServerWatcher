@@ -48,6 +48,9 @@ reasons:
   reason_low_uptime: "Uptime {uptime} is shorter than 30m"
   reason_players: "There {verb} {count} {plural} online"
 
+  pro_restart_number: "Pro-restart: "
+  anti_restart_number: "Anti-restart:"
+
 restarts:
   restart_action_sent: "Restart action sent. Waiting..."
   server_back_online: "Server is back online!"

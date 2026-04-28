@@ -196,7 +196,7 @@ class ServerWatcher:
         if restart_reasons:
             self.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
-                self.log.warn(f"- {r}")
+                self.log.warn(f"{self.messages.bullet} {r}")
             self.log.warn("\n")
 
         if no_restart_reasons:
@@ -205,8 +205,8 @@ class ServerWatcher:
                 self.log.warn(f"{self.messages.bullet} {r}")
             self.log.warn("\n")
 
-        self.log.warn(f"Pro-restart:  {pro}")
-        self.log.warn(f"Anti-restart: {anti}")
+        self.log.warn(f"{self.messages.pro_restart_number} {pro}")
+        self.log.warn(f"{self.messages.anti_restart_number} {anti}")
 
         gap = abs(pro - anti)
 
