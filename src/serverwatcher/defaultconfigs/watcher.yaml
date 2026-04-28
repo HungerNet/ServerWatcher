@@ -1,6 +1,6 @@
 schedules:
-  restart_soon_schedule_id: 0     # replace this with real schedule id
-  origin_disable_schedule_id: 0   # replace this with real schedule id
+  schedule_control: False
+  restart_soon_id: 0     # replace this with a real schedule id
 
 thresholds:
   ram_threshold: 6

@@ -109,11 +109,8 @@ def ensure_no_global_defaults(cfg, defaults):
 
 
 def ensure_no_watcher_defaults(cfg, defaults):
-    if cfg.restart_soon_schedule_id == 0:
-        defaults.append('restart_soon_schedule_id')
-
-    if cfg.origin_disable_schedule_id == 0:
-        defaults.append('origin_disable_schedule_id')
+    if cfg.schedule_control and cfg.restart_soon_id == 0:
+        defaults.append('restart_soon_id')
 
 
 # -----------------------------
@@ -145,7 +142,7 @@ def validate_all():
 
 
     # Print results
-    if len(defaults) >= 8:
+    if len(defaults) >= 7:
         print("❌ CONFIG VALIDATION FAILED:\nIt looks like you haven't configured this yet! Please change these defaults:")
         for d in defaults:
             print(" -", d)

@@ -92,7 +92,8 @@ class ServerWatcher:
 
     # restart logic
     def restart_and_wait(self):
-        self.origin.disableSchedule(self.cfg.restart_soon_schedule_id)
+        if self.cfg.schedule_control:
+            self.origin.disableSchedule(self.cfg.restart_soon_id)
         self.server.restart()
         self.log.info(self.messages.restart_action_sent)
         time.sleep(self.cfg.restart_wait_seconds)
@@ -107,7 +108,6 @@ class ServerWatcher:
         if alive:
             self.log.info(self.messages.server_back_online)
             self.server.sendBroadcast(f"{self.messages.server_back_online_broadcast}")
-            self.origin.enableSchedule(self.cfg.origin_disable_schedule_id)
         else:
             self.log.error(self.messages.server_failed_restart)
 
@@ -166,7 +166,7 @@ class ServerWatcher:
         no_restart_reasons = []
 
         # pro-restart
-        if self.server.getSchedule(self.cfg.restart_soon_schedule_id)["is_active"]:
+        if self.cfg.schedule_control and self.server.getSchedule(self.cfg.restart_soon_id)["is_active"]:
             restart_reasons.append(self.messages.reason_restart_soon)
             pro += self.cfg.weight_restart_soon
 

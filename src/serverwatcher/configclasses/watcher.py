@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 @dataclass
 class WatcherConfig:
-    restart_soon_schedule_id: int
-    origin_disable_schedule_id: int
+    schedule_control: bool
+    restart_soon_id: int
 
     ram_threshold: int
     cpu_threshold: int

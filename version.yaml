@@ -1,4 +1,5 @@
 run: true
-version: "4.5.2"
+version: "4.6"
 description: |
-  - Smarter default value checks
+  - Removed origin scheduling
+  - Added schedule control check
