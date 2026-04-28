@@ -6,10 +6,10 @@ bullet: "-"
 broadcast_minutes:
   120: "{prefix} Restart in 2 hours!"
   60: "{prefix} Restart in 1 hour!"
-  5: "{prefix} Restart in 45 minutes!"
+  45: "{prefix} Restart in 45 minutes!"
   30: "{prefix} Restart in 30 minutes!"
   15: "{prefix} Restart in 15 minutes!"
-  10: "{prefix} Restart in 5 minutes!"
+  5: "{prefix} Restart in 5 minutes!"
   1: "{prefix} Restart in 1 minute!"
 
 broadcast_seconds:

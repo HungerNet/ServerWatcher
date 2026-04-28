@@ -15,6 +15,8 @@ class MessagesConfig:
     minute_45: str = yaml_key("broadcast_minutes.45")
     minute_30: str = yaml_key("broadcast_minutes.30")
     minute_15: str = yaml_key("broadcast_minutes.15")
+    minute_5: str = yaml_key("broadcast_minutes.5")
+    minute_1: str = yaml_key("broadcast_minutes.1")
 
     # second messages
     second_10: str = yaml_key("broadcast_seconds.10")
@@ -41,8 +43,8 @@ class MessagesConfig:
     gap_high: str = yaml_key("logging.gap_high")
 
     # reasons
-    pro_restart_splash: str = yaml_key("reasons.pro_restart_splash")
-    anti_restart_splash: str = yaml_key("reasons.anti_restart_splash")
+    pro_restart_splash: str = yaml_key("reasons.pro_splash")
+    anti_restart_splash: str = yaml_key("reasons.anti_splash")
 
     reason_restart_soon: str = yaml_key("reasons.restart_soon")
     reason_ram: str = yaml_key("reasons.ram")
