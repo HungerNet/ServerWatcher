@@ -1,58 +1,58 @@
-prefix: "<aqua>[Server Watcher]"
+prefix: '<aqua>[Server Watcher]'
 
-broadcast_restart_at: "{prefix} The server will restart at {time} CDT."
-bullet: "-"
+broadcast_restart_at: '{prefix} The server will restart at {time} CDT.'
+bullet: '-'
 
 broadcast_minutes:
-  120: "{prefix} Restart in 2 hours!"
-  60: "{prefix} Restart in 1 hour!"
-  45: "{prefix} Restart in 45 minutes!"
-  30: "{prefix} Restart in 30 minutes!"
-  15: "{prefix} Restart in 15 minutes!"
-  5: "{prefix} Restart in 5 minutes!"
-  1: "{prefix} Restart in 1 minute!"
+  '120': '{prefix} Restart in 2 hours!'
+  '60': '{prefix} Restart in 1 hour!'
+  '45': '{prefix} Restart in 45 minutes!'
+  '30': '{prefix} Restart in 30 minutes!'
+  '15': '{prefix} Restart in 15 minutes!'
+  '5': '{prefix} Restart in 5 minutes!'
+  '1': '{prefix} Restart in 1 minute!'
 
 broadcast_seconds:
-  10: "{prefix} Restart in 10 seconds!"
-  9: "{prefix} Restart in 9 seconds!"
-  8: "{prefix} Restart in 8 seconds!"
-  7: "{prefix} Restart in 7 seconds!"
-  6: "{prefix} Restart in 6 seconds!"
-  5: "{prefix} Restart in 5 seconds!"
-  4: "{prefix} Restart in 4 seconds!"
-  3: "{prefix} Restart in 3 seconds!"
-  2: "{prefix} Restart in 2 seconds!"
-  1: "{prefix} Restart in 1 second!"
+  '10': '{prefix} Restart in 10 seconds!'
+  '9': '{prefix} Restart in 9 seconds!'
+  '8': '{prefix} Restart in 8 seconds!'
+  '7': '{prefix} Restart in 7 seconds!'
+  '6': '{prefix} Restart in 6 seconds!'
+  '5': '{prefix} Restart in 5 seconds!'
+  '4': '{prefix} Restart in 4 seconds!'
+  '3': '{prefix} Restart in 3 seconds!'
+  '2': '{prefix} Restart in 2 seconds!'
+  '1': '{prefix} Restart in 1 second!'
 
 logging:
-  startup: "ServerWatcher is running!"
-  status_check: "Checking server status..."
-  validation_fail: "Validation FAILED."
-  validation_ok: "All validation checks succeeded."
-  shutdown: "Shutting down ServerWatcher."
-  immediate_restart: "Restarting immediately."
-  no_restart: "The server does not need to restart."
-  scheduled: "Restart needed, but anti-restart factors outweigh it."
-  gap_low: "Gap {gap}. Scheduling restart in 2 hours."
-  gap_high: "Gap {gap}. Scheduling restart in 1 hour."
+  startup: 'ServerWatcher is running!'
+  status_check: 'Checking server status...'
+  validation_fail: 'Validation FAILED.'
+  validation_ok: 'All validation checks succeeded.'
+  shutdown: 'Shutting down ServerWatcher.'
+  immediate_restart: 'Restarting immediately.'
+  no_restart: 'The server does not need to restart.'
+  scheduled: 'Restart needed, but anti-restart factors outweigh it.'
+  gap_low: 'Gap {gap}. Scheduling restart in 2 hours.'
+  gap_high: 'Gap {gap}. Scheduling restart in 1 hour.'
 
 reasons:
-  pro_splash: "PRO-RESTART REASONS:"
-  anti_splash: "ANTI-RESTART REASONS:"
+  pro_splash: 'PRO-RESTART REASONS:'
+  anti_splash: 'ANTI-RESTART REASONS:'
 
-  restart_soon: "The server is set to restart soon"
-  ram: "RAM usage ({ram}) is higher than {threshold} GB"
-  cpu: "CPU usage ({cpu}) is higher than {threshold}%"
-  uptime: "Uptime {uptime} exceeds {threshold}h"
-  tps: "TPS {tps} is lower than {threshold}"
-  low_uptime: "Uptime {uptime} is shorter than 30m"
-  players: "There {verb} {count} {plural} online"
+  restart_soon: 'The server is set to restart soon'
+  ram: 'RAM usage ({ram}) is higher than {threshold} GB'
+  cpu: 'CPU usage ({cpu}) is higher than {threshold}%'
+  uptime: 'Uptime {uptime} exceeds {threshold}h'
+  tps: 'TPS {tps} is lower than {threshold}'
+  low_uptime: 'Uptime {uptime} is shorter than 30m'
+  players: 'There {verb} {count} {plural} online'
 
-  pro_restart_number: "Pro-restart: "
-  anti_restart_number: "Anti-restart:"
+  pro_restart_number: 'Pro-restart: '
+  anti_restart_number: 'Anti-restart:'
 
 restarts:
-  restart_action_sent: "Restart action sent. Waiting..."
-  back_online: "Server is back online!"
-  back_online_broadcast: "{prefix} <green>Restart successful!"
-  failed_restart: "Server failed to restart!"
+  restart_action_sent: 'Restart action sent. Waiting...'
+  back_online: 'Server is back online!'
+  back_online_broadcast: '{prefix} <green>Restart successful!'
+  failed_restart: 'Server failed to restart!'

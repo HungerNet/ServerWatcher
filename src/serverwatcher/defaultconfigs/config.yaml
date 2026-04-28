@@ -1,27 +1,27 @@
 watch_interval: 300
 
 panel:
-  name: "My Panel"
-  url: "https://example.com"
-  api_key: "CHANGE_ME"
+  name: 'My Panel'
+  url: 'https://example.com'
+  api_key: 'CHANGE_ME'
 
 origin:
-  server_id: "CHANGE_ME"
+  server_id: 'CHANGE_ME'
 
 server:
-  name: "My SMP"
-  server_id: "CHANGE_ME"
-  domain: "mc.example.com"
+  name: 'My SMP'
+  server_id: 'CHANGE_ME'
+  domain: 'mc.example.com'
   port: 25565
   rcon_port: 25575
-  rcon_password: "password"
-  tps_command: "ticks"
+  rcon_password: 'password'
+  tps_command: 'ticks'
 
 logger:
   enabled: True
-  name: "Server Watcher"
-  log_path: "/home/container/logs/"
-  timezone: "America/Chicago"
+  name: 'Server Watcher'
+  log_path: '/home/container/logs/'
+  timezone: 'America/Chicago'
 
 terminal:
   backspaces: 8
