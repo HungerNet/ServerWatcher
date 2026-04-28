@@ -82,10 +82,10 @@ class ServerWatcher:
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.messages.prefix, **kwargs)
 
-    def say(self, msg, level="info", **fmt):
-        if not msg:
+    def say(self, key, level="info", **fmt):
+        if not key:
             return
-        text = self.fmt(msg, **fmt)
+        text = self.fmt(key, **fmt)
         getattr(self.log, level)(text)
 
     def shutdown(self):
