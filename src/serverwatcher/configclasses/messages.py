@@ -1,65 +1,62 @@
 from dataclasses import dataclass, field
 
-def yaml_key(name: str):
-    return field(metadata={"yaml_key": name})
+def yaml_key(path: str):
+    return field(metadata={"yaml_key": path})
 
 @dataclass
 class MessagesConfig:
     prefix: str = yaml_key("prefix")
-
     broadcast_restart_at: str = yaml_key("broadcast_restart_at")
     bullet: str = yaml_key("bullet")
 
     # minute messages
-    minute_120: str = yaml_key("minute_120")
-    minute_60: str = yaml_key("minute_60")
-    minute_45: str = yaml_key("minute_45")
-    minute_30: str = yaml_key("minute_30")
-    minute_15: str = yaml_key("minute_15")
-    minute_5: str = yaml_key("minute_5")
-    minute_1: str = yaml_key("minute_1")
+    minute_120: str = yaml_key("broadcast_minutes.120")
+    minute_60: str = yaml_key("broadcast_minutes.60")
+    minute_45: str = yaml_key("broadcast_minutes.45")
+    minute_30: str = yaml_key("broadcast_minutes.30")
+    minute_15: str = yaml_key("broadcast_minutes.15")
 
     # second messages
-    second_10: str = yaml_key("second_10")
-    second_9: str = yaml_key("second_9")
-    second_8: str = yaml_key("second_8")
-    second_7: str = yaml_key("second_7")
-    second_6: str = yaml_key("second_6")
-    second_5: str = yaml_key("second_5")
-    second_4: str = yaml_key("second_4")
-    second_3: str = yaml_key("second_3")
-    second_2: str = yaml_key("second_2")
-    second_1: str = yaml_key("second_1")
+    second_10: str = yaml_key("broadcast_seconds.10")
+    second_9: str = yaml_key("broadcast_seconds.9")
+    second_8: str = yaml_key("broadcast_seconds.8")
+    second_7: str = yaml_key("broadcast_seconds.7")
+    second_6: str = yaml_key("broadcast_seconds.6")
+    second_5: str = yaml_key("broadcast_seconds.5")
+    second_4: str = yaml_key("broadcast_seconds.4")
+    second_3: str = yaml_key("broadcast_seconds.3")
+    second_2: str = yaml_key("broadcast_seconds.2")
+    second_1: str = yaml_key("broadcast_seconds.1")
 
     # logging
-    log_start: str = yaml_key("log_start")
-    log_status_check: str = yaml_key("log_status_check")
-    log_validation_fail: str = yaml_key("log_validation_fail")
-    log_validation_ok: str = yaml_key("log_validation_ok")
-    log_shutdown: str = yaml_key("log_shutdown")
-    log_immediate_restart: str = yaml_key("log_immediate_restart")
-    log_no_restart: str = yaml_key("log_no_restart")
-    log_scheduled: str = yaml_key("log_scheduled")
-    log_gap_low: str = yaml_key("log_gap_low")
-    log_gap_high: str = yaml_key("log_gap_high")
+    startup: str = yaml_key("logging.startup")
+    status_check: str = yaml_key("logging.status_check")
+    validation_fail: str = yaml_key("logging.validation_fail")
+    validation_ok: str = yaml_key("logging.validation_ok")
+    shutdown: str = yaml_key("logging.shutdown")
+    immediate_restart: str = yaml_key("logging.immediate_restart")
+    no_restart: str = yaml_key("logging.no_restart")
+    scheduled: str = yaml_key("logging.scheduled")
+    gap_low: str = yaml_key("logging.gap_low")
+    gap_high: str = yaml_key("logging.gap_high")
 
     # reasons
-    pro_restart_splash: str = yaml_key("pro_restart_splash")
-    anti_restart_splash: str = yaml_key("anti_restart_splash")
+    pro_restart_splash: str = yaml_key("reasons.pro_restart_splash")
+    anti_restart_splash: str = yaml_key("reasons.anti_restart_splash")
 
-    reason_restart_soon: str = yaml_key("reason_restart_soon")
-    reason_ram: str = yaml_key("reason_ram")
-    reason_cpu: str = yaml_key("reason_cpu")
-    reason_uptime: str = yaml_key("reason_uptime")
-    reason_tps: str = yaml_key("reason_tps")
-    reason_low_uptime: str = yaml_key("reason_low_uptime")
-    reason_players: str = yaml_key("reason_players")
+    reasons.restart_soon: str = yaml_key("reasons.restart_soon")
+    reasons.ram: str = yaml_key("reasons.ram")
+    reasons.cpu: str = yaml_key("reasons.cpu")
+    reasons.uptime: str = yaml_key("reasons.uptime")
+    reasons.tps: str = yaml_key("reasons.tps")
+    reasons.low_uptime: str = yaml_key("reasons.low_uptime")
+    reasons.players: str = yaml_key("reasons.players")
 
-    pro_restart_number: str = yaml_key("pro_restart_number")
-    anti_restart_number: str = yaml_key("anti_restart_number")
+    pro_restart_number: str = yaml_key("reasons.pro_restart_number")
+    anti_restart_number: str = yaml_key("reasons.anti_restart_number")
 
     # restarts
-    restart_action_sent: str = yaml_key("restart_action_sent")
-    server_back_online: str = yaml_key("server_back_online")
-    server_back_online_broadcast: str = yaml_key("server_back_online_broadcast")
-    server_failed_restart: str = yaml_key("server_failed_restart")
+    restart_action_sent: str = yaml_key("restarts.restart_action_sent")
+    server_back_online: str = yaml_key("restarts.back_online")
+    server_back_online_broadcast: str = yaml_key("restarts.back_online_broadcast")
+    server_failed_restart: str = yaml_key("restarts.failed_restart")

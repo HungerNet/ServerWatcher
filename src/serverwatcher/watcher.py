@@ -14,7 +14,7 @@ from hungerlib.addons import (
     loadConfig,
 )
 
-from serverwatcher.configclasses.global_config import GlobalConfig
+from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
@@ -25,9 +25,9 @@ validate_all()
 class ServerWatcher:
     def __init__(self):
 
-        self.global_cfg = loadConfig(
-            "config/global.yaml",
-            "/defaultconfigs/global.yaml",
+        self.config = loadConfig(
+            "config/config.yaml",
+            "/defaultconfigs/config.yaml",
             GlobalConfig
         )
 
@@ -37,47 +37,47 @@ class ServerWatcher:
             MessagesConfig
         )
 
-        self.cfg = loadConfig(
+        self.watcherconfig = loadConfig(
             "config/watcher.yaml",
             "/defaultconfigs/watcher.yaml",
             WatcherConfig
         )
 
         self.panel = Panel(
-            name=self.global_cfg.panel_name,
-            url=self.global_cfg.panel_url,
-            api_key=self.global_cfg.panel_api_key,
+            name=self.config.panel_name,
+            url=self.config.panel_url,
+            api_key=self.config.panel_api_key,
         )
 
         self.origin = GenericServer(
             name="Origin",
             panel=self.panel,
-            server_id=self.global_cfg.origin_server_id
+            server_id=self.config.origin_server_id
         )
 
         self.server = MinecraftServer(
-            name=self.global_cfg.server_name,
+            name=self.config.server_name,
             panel=self.panel,
-            server_id=self.global_cfg.server_id,
-            server_domain=self.global_cfg.server_domain,
-            server_port=self.global_cfg.server_port,
-            rcon_port=self.global_cfg.rcon_port,
-            rcon_password=self.global_cfg.rcon_password,
-            tpsCommand=self.global_cfg.tps_command,
+            server_id=self.config.server_id,
+            server_domain=self.config.server_domain,
+            server_port=self.config.server_port,
+            rcon_port=self.config.rcon_port,
+            rcon_password=self.config.rcon_password,
+            tpsCommand=self.config.tps_command,
         )
 
-        logger_name = self.global_cfg.logger_name.format(
-            server_name=self.global_cfg.server_name
+        logger_name = self.config.logger_name.format(
+            server_name=self.config.server_name
         )
 
         self.log = HungerLogger(
-            name=logger_name,
+            name=self.config.logger_name,
             server=self.server,
-            log_path=self.global_cfg.log_path,
-            console_backspaces=self.global_cfg.console_backspaces,
+            log_path=self.config.log_path,
+            console_backspaces=self.config.console_backspaces,
         )
 
-        self.tz = ZoneInfo(self.global_cfg.timezone)
+        self.tz = ZoneInfo(self.config.timezone)
 
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.messages.prefix, **kwargs)
@@ -89,21 +89,21 @@ class ServerWatcher:
         getattr(self.log, level)(text)
 
     def shutdown(self):
-        self.say(self.messages.log_shutdown)
+        self.say(self.messages.shutdown)
         raise SystemExit
 
     def restart_and_wait(self):
-        if self.cfg.schedule_control:
-            self.origin.disableSchedule(self.cfg.restart_soon_id)
+        if self.watcherconfig.schedule_control:
+            self.origin.disableSchedule(self.watcherconfig.restart_soon_id)
         self.server.restart()
         self.say(self.messages.restart_action_sent)
-        time.sleep(self.cfg.restart_wait_seconds)
+        time.sleep(self.watcherconfig.restart.wait_seconds)
 
         self.say(self.messages.log_status_check, level="warn")
         alive = waitForOnline(
             self.server,
-            timeout=self.cfg.restart_online_timeout,
-            interval=self.cfg.restart_online_interval,
+            timeout=self.watcherconfig.restart.timeout,
+            interval=self.watcherconfig.restart.online_interval,
         )
 
         if alive:
@@ -146,10 +146,10 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.say(self.messages.log_start)
+        self.say(self.messages.startup)
 
         if not validateAll(self.panel, self.server):
-            self.say(self.messages.log_validation_fail, level="error")
+            self.say(self.messages.validation_fail, level="error")
             self.shutdown()
 
         self.server.refresh()
@@ -160,38 +160,38 @@ class ServerWatcher:
         restart_reasons = []
         no_restart_reasons = []
 
-        if self.cfg.schedule_control and self.server.getSchedule(self.cfg.restart_soon_id)["is_active"]:
-            restart_reasons.append(self.messages.reason_restart_soon)
-            pro += self.cfg.weight_restart_soon
+        if self.watcherconfig.schedule_control and self.server.getSchedule(self.watcherconfig.restart_soon_id)["is_active"]:
+            restart_reasons.append(self.messages.reasons.restart_soon)
+            pro += self.watcherconfig.weights.restart_soon
 
-        if snap.ram >= self.cfg.ram_threshold:
-            restart_reasons.append(self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold))
-            pro += int(round(snap.ram, 0) - (self.cfg.ram_threshold - 1))
+        if snap.ram >= self.watcherconfig.thresholds.ram:
+            restart_reasons.append(self.fmt(self.messages.reasons.ram, ram=snap.ram, threshold=self.watcherconfig.thresholds.ram))
+            pro += int(round(snap.ram, 0) - (self.watcherconfig.thresholds.ram - 1))
 
-        if snap.cpu >= self.cfg.cpu_threshold:
-            restart_reasons.append(self.fmt(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.cfg.cpu_threshold))
-            pro += self.cfg.weight_cpu
+        if snap.cpu >= self.watcherconfig.thresholds.cpu:
+            restart_reasons.append(self.fmt(self.messages.reasons.cpu, cpu=snap.cpu, threshold=self.watcherconfig.thresholds.cpu))
+            pro += self.watcherconfig.weights.cpu
 
-        if snap.uptime // 3600 >= self.cfg.uptime_hours_threshold:
+        if snap.uptime // 3600 >= self.watcherconfig.thresholds.uptime:
             restart_reasons.append(
-                self.fmt(self.messages.reason_uptime, uptime=snap.uptime_formatted,
-                         threshold=self.cfg.uptime_hours_threshold)
+                self.fmt(self.messages.reasons.uptime, uptime=snap.uptime_formatted,
+                         threshold=self.watcherconfig.thresholds.uptime)
             )
-            pro += self.cfg.weight_uptime
+            pro += self.watcherconfig.weight_uptime
 
-        if (snap.tps if snap.tps is not None else 0) <= self.cfg.tps_threshold:
-            restart_reasons.append(self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold))
-            pro += self.cfg.weight_tps
+        if (snap.tps if snap.tps is not None else 0) <= self.watcherconfig.thresholds.tps:
+            restart_reasons.append(self.fmt(self.messages.reasons.tps, tps=snap.tps, threshold=self.watcherconfig.thresholds.tps))
+            pro += self.watcherconfig.weights.tps
 
         if snap.uptime // 60 < 30:
-            no_restart_reasons.append(self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
-            anti += self.cfg.weight_low_uptime
+            no_restart_reasons.append(self.fmt(self.messages.reasons.low_uptime, uptime=snap.uptime_formatted))
+            anti += self.watcherconfig.weights.low_uptime
 
         if snap.players > 0:
             verb = "are" if snap.players != 1 else "is"
             plural = "players" if snap.players != 1 else "player"
-            no_restart_reasons.append(self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
-            anti += snap.players * self.cfg.weight_per_player
+            no_restart_reasons.append(self.fmt(self.messages.reasons.players, verb=verb, count=snap.players, plural=plural))
+            anti += snap.players * self.watcherconfig.weights.per_player
 
         if restart_reasons:
             self.say(self.messages.pro_restart_splash, level="warn")
@@ -211,30 +211,30 @@ class ServerWatcher:
         gap = abs(pro - anti)
 
         if pro == 0:
-            self.say(self.messages.log_no_restart)
+            self.say(self.messages.no_restart)
             return
 
         if pro > anti and snap.players == 0:
-            self.say(self.messages.log_immediate_restart)
+            self.say(self.messages.immediate_restart)
             self.restart_and_wait()
             return
 
-        self.say(self.messages.log_scheduled)
+        self.say(self.messages.scheduled)
 
         if gap <= 2:
-            self.say(self.messages.log_gap_low, level="warn", gap=gap)
-            self.schedule_restart(self.cfg.low_gap_minutes)
+            self.say(self.messages.gap_low, level="warn", gap=gap)
+            self.schedule_restart(self.watcherconfig.low_gap_minutes)
         else:
-            self.say(self.messages.log_gap_high, level="warn", gap=gap)
-            self.schedule_restart(self.cfg.high_gap_minutes)
+            self.say(self.messages.gap_high, level="warn", gap=gap)
+            self.schedule_restart(self.watcherconfig.high_gap_minutes)
 
         self.restart_and_wait()
 
     def run(self):
-        if self.global_cfg.clear_terminal:
+        if self.config.clear_terminal:
             clearTerminal()
         while True:
-            if self.global_cfg.clear_terminal:
+            if self.config.clear_terminal:
                 clearTerminal()
             self.evaluate()
-            time.sleep(self.global_cfg.watch_interval)
+            time.sleep(self.config.watch_interval)

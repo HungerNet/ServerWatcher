@@ -3,14 +3,20 @@ from dataclasses import fields
 
 from hungerlib.addons import loadConfig
 
-from serverwatcher.configclasses.global_config import GlobalConfig
+from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
 
-# -----------------------------
-# Generic validation helpers
-# -----------------------------
+def deep_get_attr(obj, dotted):
+    parts = dotted.split(".")
+    cur = obj
+    for p in parts:
+        if not hasattr(cur, p):
+            return None
+        cur = getattr(cur, p)
+    return cur
+
 
 def validate_type(name, value, expected_type, errors):
     if not isinstance(value, expected_type):
@@ -28,120 +34,95 @@ def validate_nonempty(name, value, errors):
 
 
 def validate_dataclass(config_obj, schema, errors):
-    """
-    Validate all fields in a dataclass:
-    - type correctness
-    - non-negative numbers
-    - non-empty strings
-    """
     for f in fields(schema):
         name = f.name
         expected_type = f.type
-        value = getattr(config_obj, name)
+        value = deep_get_attr(config_obj, name)
 
-        # Type check
         validate_type(name, value, expected_type, errors)
 
-        # String checks
         if expected_type is str:
             validate_nonempty(name, value, errors)
 
-        # Numeric checks
         if expected_type in (int, float):
             validate_positive(name, value, errors)
 
 
-# -----------------------------
-# Config-specific validation
-# -----------------------------
+def validate_global_config(config, errors):
+    if config.watch_interval < 1:
+        errors.append(f"watch_interval: must be >= 1 (got {config.watch_interval})")
 
-def validate_global_config(cfg, errors):
-    if cfg.watch_interval < 1:
-        errors.append(f"watch_interval: must be >= 1 (got {cfg.watch_interval})")
+    if config.server_port <= 0 or config.server_port > 65535:
+        errors.append(f"server_port: must be 1–65535 (got {config.server_port})")
 
-    # Example: ensure ports are valid
-    if cfg.server_port <= 0 or cfg.server_port > 65535:
-        errors.append(f"server_port: must be 1–65535 (got {cfg.server_port})")
-
-    if cfg.rcon_port <= 0 or cfg.rcon_port > 65535:
-        errors.append(f"rcon_port: must be 1–65535 (got {cfg.rcon_port})")
+    if config.rcon_port <= 0 or config.rcon_port > 65535:
+        errors.append(f"rcon_port: must be 1–65535 (got {config.rcon_port})")
 
 
-def validate_watcher_config(cfg, errors):
-    if cfg.restart_wait_seconds < 1:
-        errors.append(f"restart_wait_seconds: must be >= 1 (got {cfg.restart_wait_seconds})")
+def validate_watcher_config(watcherconfig, errors):
+    if watcherconfig.restart.wait_seconds < 1:
+        errors.append(f"restart.wait_seconds: must be >= 1 (got {watcherconfig.restart.wait_seconds})")
 
-    if cfg.cpu_threshold <= 0:
-        errors.append(f"cpu_threshold: must not be less than 1 (got {cfg.cpu_threshold})")
+    if watcherconfig.thresholds.cpu <= 0:
+        errors.append(f"thresholds.cpu: must not be less than 1 (got {watcherconfig.thresholds.cpu})")
 
-    if cfg.ram_threshold <= 0:
-        errors.append(f"ram_threshold: must be > 0 (got {cfg.ram_threshold})")
+    if watcherconfig.thresholds.ram <= 0:
+        errors.append(f"thresholds.ram: must be > 0 (got {watcherconfig.thresholds.ram})")
 
-    if cfg.tps_threshold <= 0 or cfg.tps_threshold > 20:
-        errors.append(f"tps_threshold: must be 1–20 (got {cfg.tps_threshold})")
+    if watcherconfig.thresholds.tps <= 0 or watcherconfig.thresholds.tps > 20:
+        errors.append(f"thresholds.tps: must be 1–20 (got {watcherconfig.thresholds.tps})")
 
 
-def validate_messages_config(cfg, errors):
-    # Ensure all message templates contain {prefix}
-    for name, value in vars(cfg).items():
+def validate_messages_config(messages, errors):
+    for name, value in vars(messages).items():
         if isinstance(value, str) and "{prefix}" not in value:
-            # Not required for every field, but warn if missing
             pass
 
-def ensure_no_global_defaults(cfg, defaults):
-    if cfg.panel_url == "https://example.com":
+
+def ensure_no_global_defaults(config, defaults):
+    if config.panel_url == "https://example.com":
         defaults.append('panel_url')
     
-    if cfg.panel_api_key == 'CHANGE_ME':
+    if config.panel_api_key == 'CHANGE_ME':
         defaults.append('panel_api_key')
 
-    if cfg.origin_server_id == 'CHANGE_ME':
+    if config.origin_server_id == 'CHANGE_ME':
         defaults.append('origin_server_id')
 
-    if cfg.server_id == 'CHANGE_ME':
+    if config.server_id == 'CHANGE_ME':
         defaults.append('server_id')
 
-    if cfg.server_domain == 'mc.example.com':
+    if config.server_domain == 'mc.example.com':
         defaults.append('server_domain')
 
-    if cfg.rcon_password == 'password':
+    if config.rcon_password == 'password':
         defaults.append('rcon_password')
 
 
-def ensure_no_watcher_defaults(cfg, defaults):
-    if cfg.schedule_control and cfg.restart_soon_id == 0:
+def ensure_no_watcher_defaults(watcherconfig, defaults):
+    if watcherconfig.schedule_control and watcherconfig.restart_soon_id == 0:
         defaults.append('restart_soon_id')
 
-
-# -----------------------------
-# Main validator
-# -----------------------------
 
 def validate_all():
     errors = []
     defaults = []
 
-    # Load configs
-    global_cfg = loadConfig("config/global.yaml", "/defaultconfigs/global.yaml", GlobalConfig)
-    messages_cfg = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
-    watcher_cfg = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
+    config = loadConfig("config/global.yaml", "/defaultconfigs/global.yaml", GlobalConfig)
+    messages = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
+    watcher = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
 
-    # Generic dataclass validation
-    validate_dataclass(global_cfg, GlobalConfig, errors)
-    validate_dataclass(messages_cfg, MessagesConfig, errors)
-    validate_dataclass(watcher_cfg, WatcherConfig, errors)
+    validate_dataclass(config, GlobalConfig, errors)
+    validate_dataclass(messages, MessagesConfig, errors)
+    validate_dataclass(watcher, WatcherConfig, errors)
 
-    # Config-specific validation
-    validate_global_config(global_cfg, errors)
-    validate_messages_config(messages_cfg, errors)
-    validate_watcher_config(watcher_cfg, errors)
+    validate_global_config(config, errors)
+    validate_messages_config(messages, errors)
+    validate_watcher_config(watcher, errors)
 
-    # Check for defaults
-    ensure_no_global_defaults(global_cfg, defaults)
-    ensure_no_watcher_defaults(watcher_cfg, defaults)
+    ensure_no_global_defaults(config, defaults)
+    ensure_no_watcher_defaults(watcher, defaults)
 
-
-    # Print results
     if len(defaults) >= 7:
         print("❌ CONFIG VALIDATION FAILED:\nIt looks like you haven't configured this yet! Please change these defaults:")
         for d in defaults:

@@ -1,5 +1,4 @@
 run: true
-version: "5.0"
+version: "5.1"
 description: |
-  - Removed duplicate @dataclass
-  - Revamped config system
+  - Fully revamped the config system
