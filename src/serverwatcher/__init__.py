@@ -7,7 +7,7 @@ except PackageNotFoundError:
     __version__ = '0.0.0'
 
 from .watcher import ServerWatcher
-from .configclasses.global_config import GlobalConfig
+from .configclasses.config import GlobalConfig
 from .configclasses.messages import MessagesConfig
 from .configclasses.watcher import WatcherConfig
 
