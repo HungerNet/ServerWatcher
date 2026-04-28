@@ -1,5 +1,7 @@
 run: true
-version: "4.6"
+version: "4.7"
 description: |
-  - Removed origin scheduling
-  - Added schedule control check
+  - Added formatting
+  - Changed log destionation method
+  - Changed config defaults
+  - Added new messages

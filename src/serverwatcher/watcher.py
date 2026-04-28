@@ -18,7 +18,6 @@ from serverwatcher.configclasses.global_config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
-
 from serverwatcher.validator import validate_all
 
 validate_all()
@@ -107,7 +106,7 @@ class ServerWatcher:
 
         if alive:
             self.log.info(self.messages.server_back_online)
-            self.server.sendBroadcast(f"{self.messages.server_back_online_broadcast}")
+            self.log.info(self.fmt(self.messages.server_back_online_broadcast), destination=True, origin=False, logs=False)
         else:
             self.log.error(self.messages.server_failed_restart)
 
@@ -189,7 +188,7 @@ class ServerWatcher:
             )
             pro += self.cfg.weight_uptime
 
-        if snap.tps <= self.cfg.tps_threshold:
+        if (snap.tps if snap.tps is not None else 0) <= self.cfg.tps_threshold:
             restart_reasons.append(
                 self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold)
             )
@@ -211,10 +210,17 @@ class ServerWatcher:
             anti += snap.players * self.cfg.weight_per_player
 
         # logging
-        for r in restart_reasons:
-            self.log.warn(f"- {r}")
-        for r in no_restart_reasons:
-            self.log.warn(f"- {r}")
+        if restart_reasons:
+            self.log.warn(f"{self.messages.pro_restart_splash}")
+            for r in restart_reasons:
+                self.log.warn(f"- {r}")
+            self.log.warn("\n")
+
+        if no_restart_reasons:
+            self.log.warn(f"{self.messages.anti_restart_splash}")
+            for r in no_restart_reasons:
+                self.log.warn(f"- {r}")
+            self.log.warn("\n")
 
         self.log.warn(f"Pro-restart:  {pro}")
         self.log.warn(f"Anti-restart: {anti}")

@@ -40,6 +40,9 @@ class MessagesConfig:
     log_gap_high: str
 
     # reasons
+    pro_restart_splash: str
+    anti_restart_splash: str
+
     reason_restart_soon: str
     reason_ram: str
     reason_cpu: str

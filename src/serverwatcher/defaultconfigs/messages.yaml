@@ -1,4 +1,4 @@
-prefix: "<aqua>[Server Watcher]"
+prefix: "<reset><aqua>[Server Watcher]"
 
 broadcast_restart_at: "{prefix} The server will restart at {time} CDT."
 
@@ -36,6 +36,9 @@ logging:
   log_gap_high: "Gap {gap}. Scheduling restart in 1 hour."
 
 reasons:
+  pro_restart_splash: "PRO-RESTART REASONS:"
+  anti_restart_splash: "ANTI-RESTART REASONS:"
+
   reason_restart_soon: "The server is set to restart soon"
   reason_ram: "RAM usage ({ram}) is higher than {threshold} GB"
   reason_cpu: "CPU usage ({cpu}) is higher than {threshold}%"
