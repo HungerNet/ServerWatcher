@@ -22,6 +22,6 @@ gaps:
   high_gap_minutes: 60
 
 restart_intervals:
-  restart_wait_seconds: 45
+  restart_wait_seconds: 30
   restart_online_timeout: 120
   restart_online_interval: 2

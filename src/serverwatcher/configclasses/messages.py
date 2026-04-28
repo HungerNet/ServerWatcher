@@ -4,7 +4,9 @@ from dataclasses import dataclass, field
 @dataclass
 class MessagesConfig:
     prefix: str
+    
     broadcast_restart_at: str
+    bullet: str
 
     # minute messages
     minute_120: str

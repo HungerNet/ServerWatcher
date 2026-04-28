@@ -118,9 +118,7 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.server.sendBroadcast(
-            self.fmt(self.messages.broadcast_restart_at, time=time_str)
-        )
+        self.server.sendBroadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
 
         # minute_* callbacks
         minute_callbacks = {
@@ -170,15 +168,11 @@ class ServerWatcher:
             pro += self.cfg.weight_restart_soon
 
         if snap.ram >= self.cfg.ram_threshold:
-            restart_reasons.append(
-                self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold)
-            )
+            restart_reasons.append(self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.cfg.ram_threshold))
             pro += int(round(snap.ram, 0) - (self.cfg.ram_threshold - 1))
 
         if snap.cpu >= self.cfg.cpu_threshold:
-            restart_reasons.append(
-                self.fmt(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.cfg.cpu_threshold)
-            )
+            restart_reasons.append(self.fmt(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.cfg.cpu_threshold))
             pro += self.cfg.weight_cpu
 
         if snap.uptime // 3600 >= self.cfg.uptime_hours_threshold:
@@ -189,24 +183,18 @@ class ServerWatcher:
             pro += self.cfg.weight_uptime
 
         if (snap.tps if snap.tps is not None else 0) <= self.cfg.tps_threshold:
-            restart_reasons.append(
-                self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold)
-            )
+            restart_reasons.append(self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold))
             pro += self.cfg.weight_tps
 
         # anti-restart
         if snap.uptime // 60 < 30:
-            no_restart_reasons.append(
-                self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted)
-            )
+            no_restart_reasons.append(self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
             anti += self.cfg.weight_low_uptime
 
         if snap.players > 0:
             verb = "are" if snap.players != 1 else "is"
             plural = "players" if snap.players != 1 else "player"
-            no_restart_reasons.append(
-                self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural)
-            )
+            no_restart_reasons.append(self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
             anti += snap.players * self.cfg.weight_per_player
 
         # logging
@@ -219,7 +207,7 @@ class ServerWatcher:
         if no_restart_reasons:
             self.log.warn(f"{self.messages.anti_restart_splash}")
             for r in no_restart_reasons:
-                self.log.warn(f"- {r}")
+                self.log.warn(f"{self.messages.bullet} {r}")
             self.log.warn("\n")
 
         self.log.warn(f"Pro-restart:  {pro}")
@@ -242,7 +230,6 @@ class ServerWatcher:
         if gap <= 2:
             self.log.warn(self.fmt(self.messages.log_gap_low, gap=gap))
             self.schedule_restart(self.cfg.low_gap_minutes)
-        else:
             self.log.warn(self.fmt(self.messages.log_gap_high, gap=gap))
             self.schedule_restart(self.cfg.high_gap_minutes)
 
