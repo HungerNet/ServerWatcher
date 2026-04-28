@@ -60,17 +60,17 @@ def validate_global_config(config, errors):
 
 
 def validate_watcher_config(watcherconfig, errors):
-    if watcherconfig.restart.wait_seconds < 1:
-        errors.append(f"restart.wait_seconds: must be >= 1 (got {watcherconfig.restart.wait_seconds})")
+    if watcherconfig.restart_wait_seconds < 1:
+        errors.append(f"restart_wait_seconds: must be >= 1 (got {watcherconfig.restart_wait_seconds})")
 
-    if watcherconfig.thresholds.cpu <= 0:
-        errors.append(f"thresholds.cpu: must not be less than 1 (got {watcherconfig.thresholds.cpu})")
+    if watcherconfig.threshold_cpu <= 0:
+        errors.append(f"threshold_cpu: must not be less than 1 (got {watcherconfig.threshold_cpu})")
 
-    if watcherconfig.thresholds.ram <= 0:
-        errors.append(f"thresholds.ram: must be > 0 (got {watcherconfig.thresholds.ram})")
+    if watcherconfig.threshold_ram <= 0:
+        errors.append(f"threshold_ram: must be > 0 (got {watcherconfig.threshold_ram})")
 
-    if watcherconfig.thresholds.tps <= 0 or watcherconfig.thresholds.tps > 20:
-        errors.append(f"thresholds.tps: must be 1–20 (got {watcherconfig.thresholds.tps})")
+    if watcherconfig.threshold_tps <= 0 or watcherconfig.threshold_tps > 20:
+        errors.append(f"threshold_tps: must be 1–20 (got {watcherconfig.threshold_tps})")
 
 
 def validate_messages_config(messages, errors):

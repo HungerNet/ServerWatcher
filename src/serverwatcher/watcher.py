@@ -97,13 +97,13 @@ class ServerWatcher:
             self.origin.disableSchedule(self.watcherconfig.restart_soon_id)
         self.server.restart()
         self.say(self.messages.restart_action_sent)
-        time.sleep(self.watcherconfig.restart.wait_seconds)
+        time.sleep(self.watcherconfig.restart_wait_seconds)
 
         self.say(self.messages.log_status_check, level="warn")
         alive = waitForOnline(
             self.server,
-            timeout=self.watcherconfig.restart.timeout,
-            interval=self.watcherconfig.restart.online_interval,
+            timeout=self.watcherconfig.restart_timeout,
+            interval=self.watcherconfig.restart_online_interval,
         )
 
         if alive:
@@ -161,37 +161,37 @@ class ServerWatcher:
         no_restart_reasons = []
 
         if self.watcherconfig.schedule_control and self.server.getSchedule(self.watcherconfig.restart_soon_id)["is_active"]:
-            restart_reasons.append(self.messages.reasons.restart_soon)
-            pro += self.watcherconfig.weights.restart_soon
+            restart_reasons.append(self.messages.reason_restart_soon)
+            pro += self.watcherconfig.weight_restart_soon
 
-        if snap.ram >= self.watcherconfig.thresholds.ram:
-            restart_reasons.append(self.fmt(self.messages.reasons.ram, ram=snap.ram, threshold=self.watcherconfig.thresholds.ram))
-            pro += int(round(snap.ram, 0) - (self.watcherconfig.thresholds.ram - 1))
+        if snap.ram >= self.watcherconfig.threshold_ram:
+            restart_reasons.append(self.fmt(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
+            pro += int(round(snap.ram, 0) - (self.watcherconfig.threshold_ram - 1))
 
-        if snap.cpu >= self.watcherconfig.thresholds.cpu:
-            restart_reasons.append(self.fmt(self.messages.reasons.cpu, cpu=snap.cpu, threshold=self.watcherconfig.thresholds.cpu))
-            pro += self.watcherconfig.weights.cpu
+        if snap.cpu >= self.watcherconfig.threshold_cpu:
+            restart_reasons.append(self.fmt(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu))
+            pro += self.watcherconfig.weight_cpu
 
-        if snap.uptime // 3600 >= self.watcherconfig.thresholds.uptime:
+        if snap.uptime // 3600 >= self.watcherconfig.threshold_uptime:
             restart_reasons.append(
-                self.fmt(self.messages.reasons.uptime, uptime=snap.uptime_formatted,
-                         threshold=self.watcherconfig.thresholds.uptime)
+                self.fmt(self.messages.reason_uptime, uptime=snap.uptime_formatted,
+                         threshold=self.watcherconfig.threshold_uptime)
             )
             pro += self.watcherconfig.weight_uptime
 
-        if (snap.tps if snap.tps is not None else 0) <= self.watcherconfig.thresholds.tps:
-            restart_reasons.append(self.fmt(self.messages.reasons.tps, tps=snap.tps, threshold=self.watcherconfig.thresholds.tps))
-            pro += self.watcherconfig.weights.tps
+        if (snap.tps if snap.tps is not None else 0) <= self.watcherconfig.threshold_tps:
+            restart_reasons.append(self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.watcherconfig.threshold_tps))
+            pro += self.watcherconfig.weight_tps
 
         if snap.uptime // 60 < 30:
-            no_restart_reasons.append(self.fmt(self.messages.reasons.low_uptime, uptime=snap.uptime_formatted))
-            anti += self.watcherconfig.weights.low_uptime
+            no_restart_reasons.append(self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
+            anti += self.watcherconfig.weight_low_uptime
 
         if snap.players > 0:
             verb = "are" if snap.players != 1 else "is"
             plural = "players" if snap.players != 1 else "player"
-            no_restart_reasons.append(self.fmt(self.messages.reasons.players, verb=verb, count=snap.players, plural=plural))
-            anti += snap.players * self.watcherconfig.weights.per_player
+            no_restart_reasons.append(self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
+            anti += snap.players * self.watcherconfig.weight_per_player
 
         if restart_reasons:
             self.say(self.messages.pro_restart_splash, level="warn")

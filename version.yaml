@@ -1,4 +1,4 @@
 run: true
-version: "5.1"
+version: "5.1.1"
 description: |
-  - Fully revamped the config system
+  - Fixed namespaces
