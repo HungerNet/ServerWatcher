@@ -10,7 +10,7 @@ class WatcherConfig:
 
     threshold_ram: int = yaml_key("thresholds.ram")
     threshold_cpu: int = yaml_key("thresholds.cpu")
-    threshold_uptime_hours: int = yaml_key("thresholds.uptime")
+    threshold_uptime: int = yaml_key("thresholds.uptime")
     threshold_tps: float = yaml_key("thresholds.tps")
 
     weight_restart_soon: int = yaml_key("weights.restart_soon")
