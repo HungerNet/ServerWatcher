@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
-def yaml_key(path: str):
-    return field(metadata={"yaml_key": path})
+def yaml_key(path: str, default=None):
+    return field(default=default, metadata={"yaml_key": path})
 
 @dataclass
 class WatcherConfig:
