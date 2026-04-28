@@ -1,5 +1,4 @@
 run: true
-version: "5.2"
+version: "5.2.1"
 description: |
-  - Properly quote timestamps
-  - Switched from double quotes to single quotes
+  - Fixed various bugs

@@ -99,7 +99,7 @@ class ServerWatcher:
         self.say(self.messages.restart_action_sent)
         time.sleep(self.watcherconfig.restart_wait_seconds)
 
-        self.say(self.messages.log_status_check, level="warn")
+        self.say(self.messages.status_check, level="warn")
         alive = waitForOnline(
             self.server,
             timeout=self.watcherconfig.restart_timeout,
@@ -179,7 +179,7 @@ class ServerWatcher:
             )
             pro += self.watcherconfig.weight_uptime
 
-        if (snap.tps if snap.tps is not None else 0) <= self.watcherconfig.threshold_tps:
+        if (snap.tps if snap.tps is not None else 20) <= self.watcherconfig.threshold_tps:
             restart_reasons.append(self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.watcherconfig.threshold_tps))
             pro += self.watcherconfig.weight_tps
 
