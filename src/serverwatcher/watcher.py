@@ -25,7 +25,6 @@ validate_all()
 class ServerWatcher:
     def __init__(self):
 
-        # load configs
         self.global_cfg = loadConfig(
             "config/global.yaml",
             "/defaultconfigs/global.yaml",
@@ -44,7 +43,6 @@ class ServerWatcher:
             WatcherConfig
         )
 
-        # initialize panels and servers
         self.panel = Panel(
             name=self.global_cfg.panel_name,
             url=self.global_cfg.panel_url,
@@ -81,23 +79,27 @@ class ServerWatcher:
 
         self.tz = ZoneInfo(self.global_cfg.timezone)
 
-    # utility
     def fmt(self, template: str, **kwargs):
         return template.format(prefix=self.messages.prefix, **kwargs)
 
+    def say(self, msg, level="info", **fmt):
+        if not msg:
+            return
+        text = self.fmt(msg, **fmt)
+        getattr(self.log, level)(text)
+
     def shutdown(self):
-        self.log.info(self.messages.log_shutdown)
+        self.say(self.messages.log_shutdown)
         raise SystemExit
 
-    # restart logic
     def restart_and_wait(self):
         if self.cfg.schedule_control:
             self.origin.disableSchedule(self.cfg.restart_soon_id)
         self.server.restart()
-        self.log.info(self.messages.restart_action_sent)
+        self.say(self.messages.restart_action_sent)
         time.sleep(self.cfg.restart_wait_seconds)
 
-        self.log.warn(self.messages.log_status_check)
+        self.say(self.messages.log_status_check, level="warn")
         alive = waitForOnline(
             self.server,
             timeout=self.cfg.restart_online_timeout,
@@ -105,12 +107,11 @@ class ServerWatcher:
         )
 
         if alive:
-            self.log.info(self.messages.server_back_online)
-            self.log.info(self.fmt(self.messages.server_back_online_broadcast), destination=True, origin=False, logs=False)
+            self.say(self.messages.server_back_online)
+            self.say(self.messages.server_back_online_broadcast)
         else:
-            self.log.error(self.messages.server_failed_restart)
+            self.say(self.messages.server_failed_restart, level="error")
 
-    # scheduled restart
     def schedule_restart(self, minutes):
         info = snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
@@ -120,7 +121,6 @@ class ServerWatcher:
 
         self.server.sendBroadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
 
-        # minute_* callbacks
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
@@ -130,7 +130,6 @@ class ServerWatcher:
             if k.startswith("minute_")
         }
 
-        # second_* callbacks
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
@@ -146,12 +145,11 @@ class ServerWatcher:
             second_callbacks=second_callbacks,
         )
 
-    # evaluation logic
     def evaluate(self):
-        self.log.info(self.messages.log_start)
+        self.say(self.messages.log_start)
 
         if not validateAll(self.panel, self.server):
-            self.log.error(self.messages.log_validation_fail)
+            self.say(self.messages.log_validation_fail, level="error")
             self.shutdown()
 
         self.server.refresh()
@@ -162,7 +160,6 @@ class ServerWatcher:
         restart_reasons = []
         no_restart_reasons = []
 
-        # pro-restart
         if self.cfg.schedule_control and self.server.getSchedule(self.cfg.restart_soon_id)["is_active"]:
             restart_reasons.append(self.messages.reason_restart_soon)
             pro += self.cfg.weight_restart_soon
@@ -186,7 +183,6 @@ class ServerWatcher:
             restart_reasons.append(self.fmt(self.messages.reason_tps, tps=snap.tps, threshold=self.cfg.tps_threshold))
             pro += self.cfg.weight_tps
 
-        # anti-restart
         if snap.uptime // 60 < 30:
             no_restart_reasons.append(self.fmt(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
             anti += self.cfg.weight_low_uptime
@@ -197,15 +193,14 @@ class ServerWatcher:
             no_restart_reasons.append(self.fmt(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
             anti += snap.players * self.cfg.weight_per_player
 
-        # logging
         if restart_reasons:
-            self.log.warn(f"{self.messages.pro_restart_splash}")
+            self.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
                 self.log.warn(f"- {r}")
             self.log.warn("\n")
 
         if no_restart_reasons:
-            self.log.warn(f"{self.messages.anti_restart_splash}")
+            self.say(self.messages.anti_restart_splash, level="warn")
             for r in no_restart_reasons:
                 self.log.warn(f"{self.messages.bullet} {r}")
             self.log.warn("\n")
@@ -215,27 +210,26 @@ class ServerWatcher:
 
         gap = abs(pro - anti)
 
-        # decision
         if pro == 0:
-            self.log.info(self.messages.log_no_restart)
+            self.say(self.messages.log_no_restart)
             return
 
         if pro > anti and snap.players == 0:
-            self.log.info(self.messages.log_immediate_restart)
+            self.say(self.messages.log_immediate_restart)
             self.restart_and_wait()
             return
 
-        self.log.info(self.messages.log_scheduled)
+        self.say(self.messages.log_scheduled)
 
         if gap <= 2:
-            self.log.warn(self.fmt(self.messages.log_gap_low, gap=gap))
+            self.say(self.messages.log_gap_low, level="warn", gap=gap)
             self.schedule_restart(self.cfg.low_gap_minutes)
-            self.log.warn(self.fmt(self.messages.log_gap_high, gap=gap))
+        else:
+            self.say(self.messages.log_gap_high, level="warn", gap=gap)
             self.schedule_restart(self.cfg.high_gap_minutes)
 
         self.restart_and_wait()
 
-    # main loop
     def run(self):
         if self.global_cfg.clear_terminal:
             clearTerminal()
