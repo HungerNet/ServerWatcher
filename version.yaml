@@ -1,4 +1,5 @@
 run: true
-version: "5.2.1"
+version: "5.3-dev"
 description: |
-  - Fixed various bugs
+  - Rewrote watcher to use t-strings
+  - Updated .gitignore

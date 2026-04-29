@@ -80,12 +80,13 @@ class ServerWatcher:
         self.tz = ZoneInfo(self.config.timezone)
 
     def fmt(self, template: str, **kwargs):
-        return template.format(prefix=self.messages.prefix, **kwargs)
+        prefix = self.messages.prefix
+        return t(template)
 
-    def say(self, key, level="info", **fmt):
-        if not key:
+    def say(self, template, level="info", **fmt):
+        if not template:
             return
-        text = self.fmt(key, **fmt)
+        text = self.fmt(template, **fmt)
         getattr(self.log, level)(text)
 
     def shutdown(self):
