@@ -7,7 +7,7 @@ name = "serverwatcher"
 version = "0.0.0"
 description = "A HungerLib-powered Minecraft server automation engine."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 license = { text = "GPL-3.0" }
 
 authors = [
@@ -28,6 +28,7 @@ dependencies = [
     "requests",
     "mcrcon",
     "hungerlib",
+    "PyYaml",
 ]
 
 classifiers = [
@@ -50,7 +51,7 @@ Source = "https://github.com/iFamishedX/ServerWatcher"
 Issues = "https://github.com/iFamishedX/ServerWatcher/issues"
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"": "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

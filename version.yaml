@@ -1,5 +1,4 @@
 run: true
-version: "5.3-dev"
+version: "5.4-dev"
 description: |
-  - Rewrote watcher to use t-strings
-  - Updated .gitignore
+  - Updated pyproject.toml
