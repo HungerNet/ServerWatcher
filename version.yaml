@@ -1,5 +1,4 @@
 run: true
-version: "5.6-dev"
+version: "5.6.1"
 description: |
-  - Removed broken t-string formatting
-  - Added custom parsing
+  - Made stable
