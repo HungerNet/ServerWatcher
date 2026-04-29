@@ -1,6 +1,7 @@
 import os
 import time
 from zoneinfo import ZoneInfo
+from string import t
 
 from hungerlib import Panel, HungerLogger
 from hungerlib.servers import MinecraftServer, GenericServer
