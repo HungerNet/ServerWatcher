@@ -26,11 +26,6 @@ validate_all()
 _T_EXPR = re.compile(r"{([^{}]+)}")
 
 def t_eval(template: str, /, **ctx):
-    """
-    Evaluate a t-string-like template with Python expressions inside { }.
-    Example:
-        t_eval("CPU: {snap.cpu}%", snap=snap)
-    """
     def repl(match):
         expr = match.group(1).strip()
         try:

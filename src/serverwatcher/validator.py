@@ -1,12 +1,13 @@
 import sys
 from dataclasses import fields
 
-from hungerlib.addons import loadConfig
+from hungerlib.addons import loadConfig, clearTerminal
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
+clearTerminal()
 
 def deep_get_attr(obj, dotted):
     parts = dotted.split(".")
@@ -123,7 +124,7 @@ def validate_all():
     ensure_no_global_defaults(config, defaults)
     ensure_no_watcher_defaults(watcher, defaults)
 
-    if len(defaults) >= 7:
+    if len(defaults) >= 5:
         print("❌ CONFIG VALIDATION FAILED:\nIt looks like you haven't configured this yet! Please change these defaults:")
         for d in defaults:
             print(" -", d)
