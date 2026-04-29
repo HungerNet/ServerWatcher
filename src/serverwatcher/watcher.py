@@ -1,7 +1,7 @@
 import os
 import time
+import re
 from zoneinfo import ZoneInfo
-from string import t
 
 from hungerlib import Panel, HungerLogger
 from hungerlib.servers import MinecraftServer, GenericServer
@@ -22,6 +22,23 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 from serverwatcher.validator import validate_all
 
 validate_all()
+
+_T_EXPR = re.compile(r"{([^{}]+)}")
+
+def t_eval(template: str, /, **ctx):
+    """
+    Evaluate a t-string-like template with Python expressions inside { }.
+    Example:
+        t_eval("CPU: {snap.cpu}%", snap=snap)
+    """
+    def repl(match):
+        expr = match.group(1).strip()
+        try:
+            return str(eval(expr, {}, ctx))
+        except Exception as e:
+            return f"<err:{e}>"
+
+    return _T_EXPR.sub(repl, template)
 
 class ServerWatcher:
     def __init__(self):
@@ -80,9 +97,8 @@ class ServerWatcher:
 
         self.tz = ZoneInfo(self.config.timezone)
 
-    def fmt(self, template: str, **kwargs):
-        prefix = self.messages.prefix
-        return t(template)
+    def fmt(self, template: str, **fmt):
+        return t_eval(template, self=self, **fmt)
 
     def say(self, template, level="info", **fmt):
         if not template:
