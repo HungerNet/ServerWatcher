@@ -1,4 +1,5 @@
 run: true
-version: "5.4-dev"
+version: "5.5"
 description: |
   - Updated pyproject.toml
+  - Removed unnecessary newlines

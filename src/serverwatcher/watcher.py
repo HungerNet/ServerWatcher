@@ -198,13 +198,11 @@ class ServerWatcher:
             self.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
                 self.log.warn(f"{self.messages.bullet} {r}")
-            self.log.warn("\n")
 
         if no_restart_reasons:
             self.say(self.messages.anti_restart_splash, level="warn")
             for r in no_restart_reasons:
                 self.log.warn(f"{self.messages.bullet} {r}")
-            self.log.warn("\n")
 
         self.log.warn(f"{self.messages.pro_restart_number} {pro}")
         self.log.warn(f"{self.messages.anti_restart_number} {anti}")
