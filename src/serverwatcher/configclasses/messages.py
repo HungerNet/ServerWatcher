@@ -6,8 +6,9 @@ def yaml_key(path: str, default=None):
 @dataclass
 class MessagesConfig:
     prefix: str = yaml_key("prefix", default="<aqua>[Server Watcher]")
-    broadcast_restart_at: str = yaml_key("broadcast_restart_at")
     bullet: str = yaml_key("bullet")
+    
+    broadcast_restart_at: str = yaml_key("broadcast_restart_at")
 
     # minute messages
     minute_120: str = yaml_key("broadcast_minutes.120", default="{prefix} Restart in 2 hours!")
@@ -31,13 +32,13 @@ class MessagesConfig:
     second_1:  str = yaml_key("broadcast_seconds.1",  default="{prefix} Restart in 1 second!")
 
     # logging
-    startup: str = yaml_key("logging.startup", default="{prefix} Default test logging.startup")
+    startup: str = yaml_key("logging.startup")
     status_check: str = yaml_key("logging.status_check")
     validation_fail: str = yaml_key("logging.validation_fail")
     validation_ok: str = yaml_key("logging.validation_ok")
     shutdown: str = yaml_key("logging.shutdown")
     immediate_restart: str = yaml_key("logging.immediate_restart")
-    no_restart: str = yaml_key("logging.no_restart", default="{prefix} Default test logging.no_restart")
+    no_restart: str = yaml_key("logging.no_restart")
     scheduled: str = yaml_key("logging.scheduled")
     gap_low: str = yaml_key("logging.gap_low")
     gap_high: str = yaml_key("logging.gap_high")

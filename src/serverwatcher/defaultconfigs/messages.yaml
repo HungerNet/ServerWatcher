@@ -1,7 +1,7 @@
 prefix: '<aqua>[Server Watcher]'
+bullet: '-'
 
 broadcast_restart_at: '{prefix} The server will restart at {time} CDT.'
-bullet: '-'
 
 broadcast_minutes:
   '120': '{prefix} Restart in 2 hours!'

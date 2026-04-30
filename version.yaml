@@ -1,4 +1,4 @@
 run: true
-version: "5.8.dev10"
+version: "5.8.dev11"
 description: |
   - Test new defaultconfigs
