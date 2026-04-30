@@ -96,23 +96,18 @@ class ServerWatcher:
     def fmt(self, template: str, **fmt):
         return t_eval(template, self=self, **fmt)
 
-    def say(self, template, level="info", **fmt):
-        if not template:
-            return
-        self.router.say(template, level=level, **fmt)
-
     def shutdown(self):
-        self.say(self.messages.shutdown)
+        self.router.say(self.messages.shutdown)
         raise SystemExit
 
     def restart_and_wait(self):
         if self.watcherconfig.schedule_control:
             self.origin.disableSchedule(self.watcherconfig.restart_soon_id)
         self.server.restart()
-        self.say(self.messages.restart_action_sent)
+        self.router.say(self.messages.restart_action_sent)
         time.sleep(self.watcherconfig.restart_wait_seconds)
 
-        self.say(self.messages.status_check, level="warn")
+        self.router.say(self.messages.status_check, level="warn")
         alive = waitForOnline(
             self.server,
             timeout=self.watcherconfig.restart_timeout,
@@ -120,10 +115,10 @@ class ServerWatcher:
         )
 
         if alive:
-            self.say(self.messages.server_back_online)
-            self.say(self.messages.server_back_online_broadcast, broadcast=True)
+            self.router.say(self.messages.server_back_online)
+            self.router.say(self.messages.server_back_online_broadcast, broadcast=True)
         else:
-            self.say(self.messages.server_failed_restart, level="error")
+            self.router.say(self.messages.server_failed_restart, level="error")
 
     def schedule_restart(self, minutes):
         info = snapSchedule(minimumMinutes=minutes)
@@ -159,10 +154,10 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.say(self.messages.startup)
+        self.router.say(self.messages.startup)
 
         if not validateAll(self.panel, self.server):
-            self.say(self.messages.validation_fail, level="error")
+            self.router.say(self.messages.validation_fail, level="error")
             self.shutdown()
 
         self.server.refresh()
@@ -207,36 +202,36 @@ class ServerWatcher:
             anti += snap.players * self.watcherconfig.weight_per_player
 
         if restart_reasons:
-            self.say(self.messages.pro_restart_splash, level="warn")
+            self.router.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
-                self.say(f"{self.messages.bullet} {r}", level="warn")
+                self.router.say(f"{self.messages.bullet} {r}", level="warn")
 
         if no_restart_reasons:
-            self.say(self.messages.anti_restart_splash, level="warn")
+            self.router.say(self.messages.anti_restart_splash, level="warn")
             for r in no_restart_reasons:
-                self.say(f"{self.messages.bullet} {r}", level="warn")
+                self.router.say(f"{self.messages.bullet} {r}", level="warn")
 
-        self.say(f"{self.messages.pro_restart_number} {pro}", level="warn")
-        self.say(f"{self.messages.anti_restart_number} {anti}", level="warn")
+        self.router.say(f"{self.messages.pro_restart_number} {pro}", level="warn")
+        self.router.say(f"{self.messages.anti_restart_number} {anti}", level="warn")
 
         gap = abs(pro - anti)
 
         if pro == 0:
-            self.say(self.messages.no_restart)
+            self.router.say(self.messages.no_restart)
             return
 
         if pro > anti and snap.players == 0:
-            self.say(self.messages.immediate_restart)
+            self.router.say(self.messages.immediate_restart)
             self.restart_and_wait()
             return
 
-        self.say(self.messages.scheduled)
+        self.router.say(self.messages.scheduled)
 
         if gap <= 2:
-            self.say(self.messages.gap_low, level="warn", gap=gap)
+            self.router.say(self.messages.gap_low, level="warn", gap=gap)
             self.schedule_restart(self.watcherconfig.low_gap_minutes)
         else:
-            self.say(self.messages.gap_high, level="warn", gap=gap)
+            self.router.say(self.messages.gap_high, level="warn", gap=gap)
             self.schedule_restart(self.watcherconfig.high_gap_minutes)
 
         self.restart_and_wait()
