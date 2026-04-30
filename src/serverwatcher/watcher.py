@@ -96,7 +96,12 @@ class ServerWatcher:
         self.tz = ZoneInfo(self.config.timezone)
 
     def fmt(self, template: str, **fmt):
-        # apply t-eval formatting to templates
+        simple = {
+            "prefix": self.messages.prefix,
+            "bullet": self.messages.bullet,
+        }
+        for key, value in simple.items():
+            template = template.replace(f"{{{key}}}", value)
         return t_eval(template, self=self, **fmt)
     
     def say(self, template, level="info", **fmt):
@@ -108,8 +113,6 @@ class ServerWatcher:
             log=self.config.enable_logging,
             **fmt
         )
-
-
 
     def shutdown(self):
         self.say(self.messages.shutdown)
@@ -281,7 +284,6 @@ class ServerWatcher:
 
         # perform restart
         self.restart_and_wait()
-
 
     # main loop
     def run(self):
