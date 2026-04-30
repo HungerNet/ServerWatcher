@@ -1,4 +1,6 @@
 run: true
-version: "5.8.dev1"
+version: "5.8.dev2"
 description: |
   - Test using new MessageRouter
+  - Removed unused publish.yml
+  - Update release.yml
