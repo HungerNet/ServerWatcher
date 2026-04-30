@@ -1,3 +1,4 @@
+# serverwatcher.py
 import os
 import time
 import re
@@ -32,7 +33,6 @@ def t_eval(template: str, /, **ctx):
             return str(eval(expr, {}, ctx))
         except Exception as e:
             return f"<err:{e}>"
-
     return _T_EXPR.sub(repl, template)
 
 class ServerWatcher:
@@ -209,15 +209,15 @@ class ServerWatcher:
         if restart_reasons:
             self.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
-                self.router.warn(f"{self.messages.bullet} {r}")
+                self.say(f"{self.messages.bullet} {r}", level="warn")
 
         if no_restart_reasons:
             self.say(self.messages.anti_restart_splash, level="warn")
             for r in no_restart_reasons:
-                self.router.warn(f"{self.messages.bullet} {r}")
+                self.say(f"{self.messages.bullet} {r}", level="warn")
 
-        self.router.warn(f"{self.messages.pro_restart_number} {pro}")
-        self.router.warn(f"{self.messages.anti_restart_number} {anti}")
+        self.say(f"{self.messages.pro_restart_number} {pro}", level="warn")
+        self.say(f"{self.messages.anti_restart_number} {anti}", level="warn")
 
         gap = abs(pro - anti)
 
