@@ -37,7 +37,7 @@ class MessagesConfig:
     validation_ok: str = yaml_key("logging.validation_ok")
     shutdown: str = yaml_key("logging.shutdown")
     immediate_restart: str = yaml_key("logging.immediate_restart")
-    no_restart: str = yaml_key("logging.no_restart")
+    no_restart: str = yaml_key("logging.no_restart", default="{prefix} Default test logging.no_restart")
     scheduled: str = yaml_key("logging.scheduled")
     gap_low: str = yaml_key("logging.gap_low")
     gap_high: str = yaml_key("logging.gap_high")
