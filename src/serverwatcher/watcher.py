@@ -83,7 +83,7 @@ class ServerWatcher:
             server_name=self.config.server_name
         )
 
-        self.router = ServerRouter(
+        self.router = MessageRouter(
             name=logger_name,
             server=self.server,
             log_path=self.config.log_path,
