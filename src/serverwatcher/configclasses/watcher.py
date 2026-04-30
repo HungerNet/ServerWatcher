@@ -1,9 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import field
+from hungerlib.datamap import datamap, Syntax
 
 def yaml_key(path: str, default=None):
     return field(default=default, metadata={"yaml_key": path})
 
-@dataclass
+@datamap(syntax=Syntax.braces)
 class WatcherConfig:
     watch_interval: int = yaml_key("watch_interval")
     schedule_control: bool = yaml_key("schedule_control.enabled")
