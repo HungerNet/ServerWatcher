@@ -5,6 +5,7 @@ def yaml_key(path: str, default=None):
 
 @dataclass
 class WatcherConfig:
+    watch_interval: int = yaml_key("watch_interval")
     schedule_control: bool = yaml_key("schedule_control.enabled")
     restart_soon_id: int = yaml_key("schedule_control.restart_soon_id")
 

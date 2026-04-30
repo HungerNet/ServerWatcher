@@ -5,7 +5,6 @@ def yaml_key(path: str, default=None):
 
 @dataclass
 class GlobalConfig:
-    watch_interval: int = yaml_key("watch_interval")
     timezone: str = yaml_key("timezone")
 
     panel_name: str = yaml_key("panel.name")
