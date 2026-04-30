@@ -1,4 +1,5 @@
 watch_interval: 300
+timezone: 'America/Chicago'
 
 panel:
   name: 'My Panel'
@@ -21,7 +22,6 @@ logger:
   enabled: True
   name: 'Server Watcher'
   log_path: '/home/container/logs/'
-  timezone: 'America/Chicago'
 
 terminal:
   backspaces: 8

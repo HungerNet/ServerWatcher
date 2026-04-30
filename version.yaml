@@ -1,5 +1,4 @@
 run: true
-version: "5.8.dev6"
+version: "5.8.dev7"
 description: |
-  - Added say() helper method
-  - Added logging toggle
+  - Test new defaultconfigs

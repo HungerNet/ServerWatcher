@@ -6,6 +6,7 @@ def yaml_key(path: str, default=None):
 @dataclass
 class GlobalConfig:
     watch_interval: int = yaml_key("watch_interval")
+    timezone: str = yaml_key("timezone")
 
     panel_name: str = yaml_key("panel.name")
     panel_url: str = yaml_key("panel.url")
@@ -25,7 +26,6 @@ class GlobalConfig:
     enable_logging: bool = yaml_key("logger.enabled")
     logger_name: str = yaml_key("logger.name")
     log_path: str = yaml_key("logger.log_path")
-    timezone: str = yaml_key("logger.timezone")
 
     console_backspaces: int = yaml_key("terminal.backspaces")
     clear_terminal: bool = yaml_key("terminal.enable_clearing")

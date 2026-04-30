@@ -46,7 +46,7 @@ reasons:
   uptime: 'Uptime {uptime} exceeds {threshold}h'
   tps: 'TPS {tps} is lower than {threshold}'
   low_uptime: 'Uptime {uptime} is shorter than 30m'
-  players: 'There {verb} {count} {plural} online'
+  players: 'There {verb} {count} {plural} online'         # produces: "There are 2 players online" or "There is 1 player online"
 
   pro_restart_number: 'Pro-restart: '
   anti_restart_number: 'Anti-restart:'

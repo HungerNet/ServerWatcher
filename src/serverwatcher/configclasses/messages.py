@@ -19,16 +19,16 @@ class MessagesConfig:
     minute_1: str = yaml_key("broadcast_minutes.1")
 
     # second messages
-    second_10: str = yaml_key("broadcast_seconds.10")
-    second_9: str = yaml_key("broadcast_seconds.9")
-    second_8: str = yaml_key("broadcast_seconds.8")
-    second_7: str = yaml_key("broadcast_seconds.7")
-    second_6: str = yaml_key("broadcast_seconds.6")
-    second_5: str = yaml_key("broadcast_seconds.5")
-    second_4: str = yaml_key("broadcast_seconds.4")
-    second_3: str = yaml_key("broadcast_seconds.3")
-    second_2: str = yaml_key("broadcast_seconds.2")
-    second_1: str = yaml_key("broadcast_seconds.1")
+    second_10: str = yaml_key("broadcast_seconds.10", default="{prefix} Restart in 10 seconds!")
+    second_9:  str = yaml_key("broadcast_seconds.9",  default="{prefix} Restart in 9 seconds!")
+    second_8:  str = yaml_key("broadcast_seconds.8",  default="{prefix} Restart in 8 seconds!")
+    second_7:  str = yaml_key("broadcast_seconds.7",  default="{prefix} Restart in 7 seconds!")
+    second_6:  str = yaml_key("broadcast_seconds.6",  default="{prefix} Restart in 6 seconds!")
+    second_5:  str = yaml_key("broadcast_seconds.5",  default="{prefix} Restart in 5 seconds!")
+    second_4:  str = yaml_key("broadcast_seconds.4",  default="{prefix} Restart in 4 seconds!")
+    second_3:  str = yaml_key("broadcast_seconds.3",  default="{prefix} Restart in 3 seconds!")
+    second_2:  str = yaml_key("broadcast_seconds.2",  default="{prefix} Restart in 2 seconds!")
+    second_1:  str = yaml_key("broadcast_seconds.1",  default="{prefix} Restart in 1 second!")
 
     # logging
     startup: str = yaml_key("logging.startup")
