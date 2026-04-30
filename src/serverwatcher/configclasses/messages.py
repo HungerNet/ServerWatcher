@@ -5,18 +5,18 @@ def yaml_key(path: str, default=None):
 
 @dataclass
 class MessagesConfig:
-    prefix: str = yaml_key("prefix")
+    prefix: str = yaml_key("prefix", default="<aqua>[Server Watcher]")
     broadcast_restart_at: str = yaml_key("broadcast_restart_at")
     bullet: str = yaml_key("bullet")
 
     # minute messages
-    minute_120: str = yaml_key("broadcast_minutes.120")
-    minute_60: str = yaml_key("broadcast_minutes.60")
-    minute_45: str = yaml_key("broadcast_minutes.45")
-    minute_30: str = yaml_key("broadcast_minutes.30")
-    minute_15: str = yaml_key("broadcast_minutes.15")
-    minute_5: str = yaml_key("broadcast_minutes.5")
-    minute_1: str = yaml_key("broadcast_minutes.1")
+    minute_120: str = yaml_key("broadcast_minutes.120", default="{prefix} Restart in 2 hours!")
+    minute_60: str = yaml_key("broadcast_minutes.60", default="{prefix} Restart in 1 hour!")
+    minute_45: str = yaml_key("broadcast_minutes.45", default="{prefix} Restart in 45 minutes!")
+    minute_30: str = yaml_key("broadcast_minutes.30", default="{prefix} Restart in 30 minutes!")
+    minute_15: str = yaml_key("broadcast_minutes.15", default="{prefix} Restart in 15 minutes!")
+    minute_5: str = yaml_key("broadcast_minutes.5", default="{prefix} Restart in 5 minutes!")
+    minute_1: str = yaml_key("broadcast_minutes.1", default="{prefix} Restart in 1 minute!")
 
     # second messages
     second_10: str = yaml_key("broadcast_seconds.10", default="{prefix} Restart in 10 seconds!")
@@ -31,7 +31,7 @@ class MessagesConfig:
     second_1:  str = yaml_key("broadcast_seconds.1",  default="{prefix} Restart in 1 second!")
 
     # logging
-    startup: str = yaml_key("logging.startup")
+    startup: str = yaml_key("logging.startup", default="{prefix} Default test logging.startup")
     status_check: str = yaml_key("logging.status_check")
     validation_fail: str = yaml_key("logging.validation_fail")
     validation_ok: str = yaml_key("logging.validation_ok")
