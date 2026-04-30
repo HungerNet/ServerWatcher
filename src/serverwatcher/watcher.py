@@ -3,7 +3,7 @@ import time
 import re
 from zoneinfo import ZoneInfo
 
-from hungerlib import Panel, HungerLogger
+from hungerlib import Panel, MessageRouter
 from hungerlib.servers import MinecraftServer, GenericServer
 from hungerlib.addons import (
     clearTerminal,
@@ -83,10 +83,11 @@ class ServerWatcher:
             server_name=self.config.server_name
         )
 
-        self.log = HungerLogger(
-            name=self.config.logger_name,
+        self.router = ServerRouter(
+            name=logger_name,
             server=self.server,
             log_path=self.config.log_path,
+            formatter=self.fmt,
             console_backspaces=self.config.console_backspaces,
         )
 
@@ -98,8 +99,7 @@ class ServerWatcher:
     def say(self, template, level="info", **fmt):
         if not template:
             return
-        text = self.fmt(template, **fmt)
-        getattr(self.log, level)(text)
+        self.router.say(template, level=level, **fmt)
 
     def shutdown(self):
         self.say(self.messages.shutdown)
@@ -121,7 +121,7 @@ class ServerWatcher:
 
         if alive:
             self.say(self.messages.server_back_online)
-            self.say(self.messages.server_back_online_broadcast)
+            self.say(self.messages.server_back_online_broadcast, broadcast=True)
         else:
             self.say(self.messages.server_failed_restart, level="error")
 
@@ -132,12 +132,12 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.server.sendBroadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
+        self.router.broadcast(self.fmt(self.messages.broadcast_restart_at, time=time_str))
 
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
-                    self.server.sendBroadcast(msg)
+                    self.router.broadcast(msg)
             )
             for k in vars(self.messages)
             if k.startswith("minute_")
@@ -146,7 +146,7 @@ class ServerWatcher:
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=self.fmt(getattr(self.messages, k)):
-                    self.server.sendBroadcast(msg)
+                    self.router.broadcast(msg)
             )
             for k in vars(self.messages)
             if k.startswith("second_")
@@ -209,15 +209,15 @@ class ServerWatcher:
         if restart_reasons:
             self.say(self.messages.pro_restart_splash, level="warn")
             for r in restart_reasons:
-                self.log.warn(f"{self.messages.bullet} {r}")
+                self.router.warn(f"{self.messages.bullet} {r}")
 
         if no_restart_reasons:
             self.say(self.messages.anti_restart_splash, level="warn")
             for r in no_restart_reasons:
-                self.log.warn(f"{self.messages.bullet} {r}")
+                self.router.warn(f"{self.messages.bullet} {r}")
 
-        self.log.warn(f"{self.messages.pro_restart_number} {pro}")
-        self.log.warn(f"{self.messages.anti_restart_number} {anti}")
+        self.router.warn(f"{self.messages.pro_restart_number} {pro}")
+        self.router.warn(f"{self.messages.anti_restart_number} {anti}")
 
         gap = abs(pro - anti)
 

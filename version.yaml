@@ -1,5 +1,4 @@
 run: true
-version: "5.7"
+version: "5.8.dev1"
 description: |
-  - Removed docstring
-  - Added clearTerminal to validator.py
+  - Test using new MessageRouter
