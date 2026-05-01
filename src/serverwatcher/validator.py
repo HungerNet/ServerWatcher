@@ -1,6 +1,6 @@
 import sys
 from dataclasses import fields
-from hungerlib import configloader, utils
+from hungerlib import configloader, clearTerminal
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
