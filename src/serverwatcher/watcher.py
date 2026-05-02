@@ -2,13 +2,14 @@ import os
 import time
 from zoneinfo import ZoneInfo
 
-from hungerlib import Panel, GenericServer, MinecraftServer, MessageRouter, configloader, utils
+from hungerlib import load, panel, servers, messagerouter, configloader, utils
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 from serverwatcher.validator import validate_all
 
+load()
 validate_all()
 
 

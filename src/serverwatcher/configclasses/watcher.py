@@ -1,5 +1,6 @@
 from dataclasses import field
-from hungerlib import datamap, Syntax
+from hungerlib import load, datamap
+load()
 
 def yaml_key(path: str, default=None):
     return field(default=default, metadata={"yaml_key": path})
