@@ -127,7 +127,7 @@ class ServerWatcher:
                 lambda msg=mapit(getattr(self.messages, k)):
                     self.router.broadcast(msg)
             )
-            for k in vars(self.messages.__dataclass_fields__)
+            for k in vars(self.messages)
             if k.startswith("minute_")
         }
 
@@ -136,7 +136,7 @@ class ServerWatcher:
                 lambda msg=mapit(getattr(self.messages, k)):
                     self.router.broadcast(msg)
             )
-            for k in vars(self.messages.__dataclass_fields__)
+            for k in vars(self.messages)
             if k.startswith("second_")
         }
 
