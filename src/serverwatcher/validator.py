@@ -17,21 +17,17 @@ def deep_get_attr(obj, dotted):
         cur = getattr(cur, p)
     return cur
 
-
 def validate_type(name, value, expected_type, errors):
     if not isinstance(value, expected_type):
         errors.append(f"{name}: expected {expected_type.__name__}, got {type(value).__name__}")
-
 
 def validate_positive(name, value, errors):
     if isinstance(value, (int, float)) and value < 0:
         errors.append(f"{name}: must be >= 0 (got {value})")
 
-
 def validate_nonempty(name, value, errors):
     if isinstance(value, str) and value.strip() == "":
         errors.append(f"{name}: cannot be empty")
-
 
 def validate_dataclass(config_obj, schema, errors):
     for f in fields(schema):
@@ -47,17 +43,12 @@ def validate_dataclass(config_obj, schema, errors):
         if expected_type in (int, float):
             validate_positive(name, value, errors)
 
-
 def validate_global_config(config, errors):
-    if config.watch_interval < 1:
-        errors.append(f"watch_interval: must be >= 1 (got {watcher.watch_interval})")
-
     if config.server_port <= 0 or config.server_port > 65535:
         errors.append(f"server_port: must be 1–65535 (got {config.server_port})")
 
     if config.rcon_port <= 0 or config.rcon_port > 65535:
         errors.append(f"rcon_port: must be 1–65535 (got {config.rcon_port})")
-
 
 def validate_watcher_config(watcherconfig, errors):
     if watcherconfig.restart_wait_seconds < 1:
@@ -72,12 +63,10 @@ def validate_watcher_config(watcherconfig, errors):
     if watcherconfig.threshold_tps <= 0 or watcherconfig.threshold_tps > 20:
         errors.append(f"threshold_tps: must be 1–20 (got {watcherconfig.threshold_tps})")
 
-
 def validate_messages_config(messages, errors):
     for name, value in vars(messages).items():
         if isinstance(value, str) and "{prefix}" not in value:
             pass
-
 
 def ensure_no_global_defaults(config, defaults):
     if config.panel_url == "https://example.com":
@@ -98,11 +87,9 @@ def ensure_no_global_defaults(config, defaults):
     if config.rcon_password == 'password':
         defaults.append('rcon_password')
 
-
 def ensure_no_watcher_defaults(watcherconfig, defaults):
     if watcherconfig.schedule_control and watcherconfig.restart_soon_id == 0:
         defaults.append('restart_soon_id')
-
 
 def validate_all():
     errors = []
@@ -138,7 +125,6 @@ def validate_all():
         sys.exit(1)
 
     print("✅ All configs are valid.")
-
 
 if __name__ == "__main__":
     validate_all()
