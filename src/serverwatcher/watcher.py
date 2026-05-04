@@ -96,6 +96,12 @@ class ServerWatcher:
             **ctx
         )
 
+def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
+    disable = (disable or []) + [utils.ASCII_COLOR_MAP]
+    enable = (enable or []) + [utils.MC_COLOR_MAP]
+    msg = mapit(template, only_maps=only_maps, disable=disable, enable=enable, **ctx)
+    self.router.broadcast(msg)
+
     def shutdown(self):
         self.say(self.messages.shutdown)
         raise SystemExit
@@ -117,7 +123,7 @@ class ServerWatcher:
 
         if alive:
             self.say(self.messages.server_back_online)
-            self.say(self.messages.server_back_online_broadcast, broadcast=True, disable=[utils.ASCII_COLOR_MAP], enable=[utils.MC_COLOR_MAP])
+            self.say_mc(self.messages.server_back_online_broadcast)
         else:
             self.say(self.messages.server_failed_restart, level="error")
 
@@ -128,12 +134,12 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.router.broadcast(mapit(self.messages.broadcast_restart_at, time=time_str))
+        self.say_mc(self.messages.broadcast_restart_at, time=time_str)
 
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=mapit(getattr(self.messages, k)):
-                    self.router.broadcast(msg)
+                    self.say_mc(msg)
             )
             for k in vars(self.messages)
             if k.startswith("minute_")
@@ -142,7 +148,7 @@ class ServerWatcher:
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=mapit(getattr(self.messages, k)):
-                    self.router.broadcast(msg)
+                    self.say_mc(msg)
             )
             for k in vars(self.messages)
             if k.startswith("second_")
