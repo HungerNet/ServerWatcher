@@ -13,6 +13,7 @@ from hungerlib import (
     ASCII_COLOR_MAP,
     mapit,
     validateAll,
+    Snapshot,
 )
 
 from serverwatcher.configclasses.config import GlobalConfig
