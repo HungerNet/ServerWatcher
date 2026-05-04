@@ -1,10 +1,6 @@
-from dataclasses import field
 from hungerlib import datamap, datamap_api
 
-def yaml_key(path: str, default=None):
-    return field(default=default, metadata={"yaml_key": path})
-
-@datamap(syntax=datamap_api.braces)
+@datamap(syntax=datamap_api.braces, mode=cl)
 class GlobalConfig:
     timezone: str = yaml_key("timezone")
 
