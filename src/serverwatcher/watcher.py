@@ -2,20 +2,7 @@ import os
 import time
 from zoneinfo import ZoneInfo
 
-from hungerlib import (
-    Panel,
-    GenericServer,
-    MinecraftServer,
-    MessageRouter,
-    loadConfig,
-    clearTerminal,
-    set_default_maps,
-    ASCII_COLOR_MAP,
-    mapit,
-    validateAll,
-    Snapshot,
-    waitForOnline,
-)
+from hungerlib import servers, MessageRouter, loadConfig, utils, datamap_api, mapit
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
@@ -45,26 +32,26 @@ class ServerWatcher:
             WatcherConfig
         )
 
-        set_default_maps(
-            ASCII_COLOR_MAP,
+        datamap_api.set_default_maps(
+            utils.ASCII_COLOR_MAP,
             self.config,
             self.messages,
             self.watcherconfig
         )
 
-        self.panel = Panel(
+        self.panel = servers.Panel(
             name=self.config.panel_name,
             url=self.config.panel_url,
             api_key=self.config.panel_api_key,
         )
 
-        self.origin = GenericServer(
+        self.origin = servers.Generic(
             name="Origin",
             panel=self.panel,
             server_id=self.config.origin_server_id
         )
 
-        self.server = MinecraftServer(
+        self.server = servers.Minecraft(
             name=self.config.server_name,
             panel=self.panel,
             server_id=self.config.server_id,
@@ -114,7 +101,7 @@ class ServerWatcher:
         time.sleep(self.watcherconfig.restart_wait_seconds)
 
         self.say(self.messages.status_check, level="warn")
-        alive = waitForOnline(
+        alive = utils.waitForOnline(
             self.server,
             timeout=self.watcherconfig.restart_timeout,
             interval=self.watcherconfig.restart_online_interval,
@@ -162,12 +149,12 @@ class ServerWatcher:
     def evaluate(self):
         self.say(self.messages.startup)
 
-        if not validateAll(self.panel, self.server):
+        if not utils.validateAll(self.panel, self.server):
             self.say(self.messages.validation_fail, level="error")
             self.shutdown()
 
         self.server.refresh()
-        snap = Snapshot(self.server, 2, True)
+        snap = utils.Snapshot(self.server, 2, True)
 
         pro = 0
         anti = 0
@@ -243,9 +230,9 @@ class ServerWatcher:
 
     def run(self):
         if self.config.clear_terminal:
-            clearTerminal()
+            utils.clearTerminal()
         while True:
             if self.config.clear_terminal:
-                clearTerminal()
+                utils.clearTerminal()
             self.evaluate()
             time.sleep(self.watcherconfig.watch_interval)

@@ -1,12 +1,12 @@
 import sys
 from dataclasses import fields
-from hungerlib import loadConfig, clearTerminal
+from hungerlib import utils
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
 
-clearTerminal()
+utils.clearTerminal()
 
 def deep_get_attr(obj, dotted):
     parts = dotted.split(".")
@@ -96,9 +96,9 @@ def validate_all():
     errors = []
     defaults = []
 
-    config = loadConfig("config/config.yaml", "/defaultconfigs/config.yaml", GlobalConfig)
-    messages = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
-    watcher = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
+    config = utils.loadConfig("config/config.yaml", "/defaultconfigs/config.yaml", GlobalConfig)
+    messages = utils.loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
+    watcher = utils.loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
 
     validate_dataclass(config, GlobalConfig, errors)
     validate_dataclass(messages, MessagesConfig, errors)
