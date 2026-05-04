@@ -96,8 +96,6 @@ class ServerWatcher:
             **ctx
         )
 
-
-
     def shutdown(self):
         self.say(self.messages.shutdown)
         raise SystemExit
@@ -119,7 +117,7 @@ class ServerWatcher:
 
         if alive:
             self.say(self.messages.server_back_online)
-            self.say(self.messages.server_back_online_broadcast, broadcast=True)
+            self.say(self.messages.server_back_online_broadcast, broadcast=True, disable=[utils.ASCII_COLOR_MAP], enable=[utils.MC_COLOR_MAP])
         else:
             self.say(self.messages.server_failed_restart, level="error")
 
