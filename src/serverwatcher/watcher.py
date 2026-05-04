@@ -2,7 +2,7 @@ import os
 import time
 from zoneinfo import ZoneInfo
 
-from hungerlib import Panel, GenericServer, MinecraftServer, MessageRouter, loadConfig, clearTerminal
+from hungerlib import Panel, GenericServer, MinecraftServer, MessageRouter, loadConfig, clearTerminal, set_default_maps
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
