@@ -1,6 +1,6 @@
-from hungerlib import datamap, datamap_api, CONFIG_MODE
+from hungerlib import datamap, datamap_api
 
-@datamap(syntax=datamap_api.braces, mode=CONFIG_MODE)
+@datamap(syntax=datamap_api.braces, mode="config")
 class GlobalConfig:
     timezone: str = "timezone"
 
