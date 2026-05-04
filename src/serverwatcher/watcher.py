@@ -89,12 +89,13 @@ class ServerWatcher:
             **ctx
         )
 
-    self.router.say(
-        msg,
-        level=level,
-        log=self.config.enable_logging,
-        **ctx
-    )
+        self.router.say(
+            msg,
+            level=level,
+            log=self.config.enable_logging,
+            **ctx
+        )
+
 
 
     def shutdown(self):
