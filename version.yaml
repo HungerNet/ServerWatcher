@@ -1,4 +1,4 @@
 run: true
-version: "5.8.dev35"
+version: "5.8"
 description: |
-  - Fix
+  - Update to stable
