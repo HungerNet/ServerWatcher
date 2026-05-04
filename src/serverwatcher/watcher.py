@@ -14,6 +14,7 @@ from hungerlib import (
     mapit,
     validateAll,
     Snapshot,
+    waitForOnline,
 )
 
 from serverwatcher.configclasses.config import GlobalConfig
