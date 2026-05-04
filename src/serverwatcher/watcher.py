@@ -140,7 +140,7 @@ class ServerWatcher:
             if k.startswith("second_")
         }
 
-        runCountdownEvents(
+        utils.runCountdownEvents(
             target_time=scheduled,
             minute_callbacks=minute_callbacks,
             second_callbacks=second_callbacks,
