@@ -1,6 +1,6 @@
 import sys
 from dataclasses import fields
-from hungerlib import utils
+from hungerlib import utils, loadConfig
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
@@ -96,9 +96,9 @@ def validate_all():
     errors = []
     defaults = []
 
-    config = utils.loadConfig("config/config.yaml", "/defaultconfigs/config.yaml", GlobalConfig)
-    messages = utils.loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
-    watcher = utils.loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
+    config = loadConfig("config/config.yaml", "/defaultconfigs/config.yaml", GlobalConfig)
+    messages = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
+    watcher = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
 
     validate_dataclass(config, GlobalConfig, errors)
     validate_dataclass(messages, MessagesConfig, errors)
