@@ -248,4 +248,4 @@ class ServerWatcher:
             if self.config.clear_terminal:
                 clearTerminal()
             self.evaluate()
-            time.sleep(self.watcher.watch_interval)
+            time.sleep(self.watcherconfig.watch_interval)
