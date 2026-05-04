@@ -77,16 +77,25 @@ class ServerWatcher:
     def _fmt(self, template: str, **ctx):
         return mapit(template, **ctx)
 
-    def say(self, template, level="info", **ctx):
+    def say(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
         if not template:
             return
-        msg = mapit(template, **ctx)
-        self.router.say(
-            msg,
-            level=level,
-            log=self.config.enable_logging,
+
+        msg = mapit(
+            template,
+            only_maps=only_maps,
+            disable=disable,
+            enable=enable,
             **ctx
         )
+
+    self.router.say(
+        msg,
+        level=level,
+        log=self.config.enable_logging,
+        **ctx
+    )
+
 
     def shutdown(self):
         self.say(self.messages.shutdown)
