@@ -49,7 +49,7 @@ def validate_dataclass(config_obj, schema, errors):
 
 
 def validate_global_config(config, errors):
-    if watcher.watch_interval < 1:
+    if config.watch_interval < 1:
         errors.append(f"watch_interval: must be >= 1 (got {watcher.watch_interval})")
 
     if config.server_port <= 0 or config.server_port > 65535:
