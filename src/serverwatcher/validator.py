@@ -64,7 +64,8 @@ def validate_watcher_config(watcherconfig, errors):
         errors.append(f"threshold_tps: must be 1–20 (got {watcherconfig.threshold_tps})")
 
 def validate_messages_config(messages, errors):
-    for name, value in vars(messages).items():
+    for f in fields(MessagesConfig):
+        value = getattr(messages, f.name)
         if isinstance(value, str) and "{prefix}" not in value:
             pass
 
