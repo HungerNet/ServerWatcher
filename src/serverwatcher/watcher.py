@@ -114,7 +114,7 @@ class ServerWatcher:
             self.say(self.messages.server_failed_restart, level="error")
 
     def schedule_restart(self, minutes):
-        info = snapSchedule(minimumMinutes=minutes)
+        info = utils.snapSchedule(minimumMinutes=minutes)
         scheduled = info["scheduled"]
 
         local_time = scheduled.astimezone(self.tz)
