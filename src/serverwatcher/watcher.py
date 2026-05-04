@@ -96,11 +96,11 @@ class ServerWatcher:
             **ctx
         )
 
-def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
-    disable = (disable or []) + [utils.ASCII_COLOR_MAP]
-    enable = (enable or []) + [utils.MC_COLOR_MAP]
-    msg = mapit(template, only_maps=only_maps, disable=disable, enable=enable, **ctx)
-    self.router.broadcast(msg)
+    def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
+        disable = (disable or []) + [utils.ASCII_COLOR_MAP]
+        enable = (enable or []) + [utils.MC_COLOR_MAP]
+        msg = mapit(template, only_maps=only_maps, disable=disable, enable=enable, **ctx)
+        self.router.broadcast(msg)
 
     def shutdown(self):
         self.say(self.messages.shutdown)
