@@ -1,11 +1,10 @@
 import sys
 from dataclasses import fields
-from hungerlib import load, configloader, utils
+from hungerlib import loadConfig, clearTerminal
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
-load()
 
 clearTerminal()
 
