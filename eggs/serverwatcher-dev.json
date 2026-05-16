@@ -1,19 +1,18 @@
 {
-    "_comment": "A Pterodactyl Egg to automatically start and restart",
     "meta": {
         "version": "PTDL_v2",
         "update_url": null
     },
     "exported_at": "2026-05-16T01:27:47+00:00",
-    "name": "ServerWatcher",
+    "name": "ServerWatcher [Dev]",
     "author": "me@ifamished.com",
-    "description": "Automatically installs and updates ServerWatcher on every boot.",
+    "description": "Automatically runs and installs ServerWatcher",
     "features": [],
     "docker_images": {
         "Python 3.14": "ghcr.io\/red-shadows-rs\/pterodactyl-containers\/python:v3.14"
     },
     "file_denylist": [],
-    "startup": "pip install --upgrade pip && pip install -U serverwatcher && python3 -m serverwatcher --init || true && python3 -m serverwatcher",
+    "startup": "pip install --upgrade pip && pip install -U --pre serverwatcher && pip install -U --pre hungerlib && python3 -m serverwatcher --init || true && python3 -m serverwatcher",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"ServerWatcher is running!\"\r\n}",
