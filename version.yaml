@@ -1,4 +1,4 @@
 run: true
-version: "5.9.1"
+version: "5.9.2"
 description: |
-  - Fix HungerLib dependency
+  - Fix stray rcon_port reference

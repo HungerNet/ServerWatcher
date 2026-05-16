@@ -47,7 +47,7 @@ def validate_global_config(config, errors):
     if config.server_port <= 0 or config.server_port > 65535:
         errors.append(f"server_port: must be 1–65535 (got {config.server_port})")
 
-    if config.bridge_port <= 0 or config.rcon_port > 65535:
+    if config.bridge_port <= 0 or config.bridge_port > 65535:
         errors.append(f"bridge_port: must be 1–65535 (got {config.bridge_port})")
 
 def validate_watcher_config(watcherconfig, errors):
