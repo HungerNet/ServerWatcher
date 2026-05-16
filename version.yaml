@@ -1,5 +1,5 @@
 run: true
-version: "5.9.dev15"
+version: "5.9"
 description: |
   - Added __main__.py
   - Added Pterodactyl Egg
