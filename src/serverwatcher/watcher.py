@@ -7,9 +7,7 @@ from hungerlib import servers, MessageRouter, loadConfig, utils, datamap_api, ma
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
-from serverwatcher.validator import validate_all
 
-validate_all()
 
 
 class ServerWatcher:
@@ -57,8 +55,8 @@ class ServerWatcher:
             server_id=self.config.server_id,
             server_domain=self.config.server_domain,
             server_port=self.config.server_port,
-            rcon_port=self.config.rcon_port,
-            rcon_password=self.config.rcon_password,
+            bridge_url=self.config.bridge_url.rstrip("/") + ":" + self.config.bridge_port,
+            bridge_token=self.config.bridge_token,
             tpsCommand=self.config.tps_command,
         )
 
@@ -69,7 +67,6 @@ class ServerWatcher:
             server=self.server,
             log_path=self.config.log_path,
             formatter=self._fmt,
-            console_backspaces=self.config.console_backspaces,
         )
 
         self.tz = ZoneInfo(self.config.timezone)
@@ -77,16 +74,28 @@ class ServerWatcher:
     def _fmt(self, template: str, **ctx):
         return mapit(template, **ctx)
 
-    def say(self, template, level="info", **ctx):
+    def say(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
         if not template:
             return
-        msg = mapit(template, **ctx)
+
+        msg = mapit(
+            template,
+            only_maps=only_maps,
+            disable=disable,
+            enable=enable,
+        )
+
         self.router.say(
             msg,
             level=level,
             log=self.config.enable_logging,
-            **ctx
         )
+
+    def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
+        disable = (disable or []) + [utils.ASCII_COLOR_MAP]
+        enable = (enable or []) + [utils.MC_COLOR_MAP]
+        msg = mapit(template, only_maps=only_maps, disable=disable, enable=enable, **ctx)
+        self.router.broadcast(msg)
 
     def shutdown(self):
         self.say(self.messages.shutdown)
@@ -109,7 +118,7 @@ class ServerWatcher:
 
         if alive:
             self.say(self.messages.server_back_online)
-            self.say(self.messages.server_back_online_broadcast, broadcast=True)
+            self.say_mc(self.messages.server_back_online_broadcast)
         else:
             self.say(self.messages.server_failed_restart, level="error")
 
@@ -120,12 +129,12 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.router.broadcast(mapit(self.messages.broadcast_restart_at, time=time_str))
+        self.say_mc(self.messages.broadcast_restart_at, time=time_str)
 
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=mapit(getattr(self.messages, k)):
-                    self.router.broadcast(msg)
+                    self.say_mc(msg)
             )
             for k in vars(self.messages)
             if k.startswith("minute_")
@@ -134,20 +143,20 @@ class ServerWatcher:
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda msg=mapit(getattr(self.messages, k)):
-                    self.router.broadcast(msg)
+                    self.say_mc(msg)
             )
             for k in vars(self.messages)
             if k.startswith("second_")
         }
 
-        runCountdownEvents(
+        utils.runCountdownEvents(
             target_time=scheduled,
             minute_callbacks=minute_callbacks,
             second_callbacks=second_callbacks,
         )
 
     def evaluate(self):
-        self.say(self.messages.startup)
+        self.say("ServerWatcher is running!")
 
         if not utils.validateAll(self.panel, self.server):
             self.say(self.messages.validation_fail, level="error")

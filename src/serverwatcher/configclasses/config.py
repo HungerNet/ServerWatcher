@@ -1,31 +1,28 @@
-from dataclasses import field
 from hungerlib import datamap, datamap_api
 
-def yaml_key(path: str, default=None):
-    return field(default=default, metadata={"yaml_key": path})
-
-@datamap(syntax=datamap_api.braces)
+@datamap(syntax=datamap_api.braces, mode="config")
 class GlobalConfig:
-    timezone: str = yaml_key("timezone")
+    timezone: str = "timezone"
 
-    panel_name: str = yaml_key("panel.name")
-    panel_url: str = yaml_key("panel.url")
-    panel_api_key: str = yaml_key("panel.api_key")
+    panel_name: str = "panel.name"
+    panel_url: str = "panel.url"
+    panel_api_key: str = "panel.api_key"
 
-    origin_server_id: str = yaml_key("origin.server_id")
+    origin_server_id: str = "origin.server_id"
 
-    server_name: str = yaml_key("server.name")
-    server_id: str = yaml_key("server.server_id")
-    server_domain: str = yaml_key("server.domain")
-    server_port: int = yaml_key("server.port")
+    server_name: str = "server.name"
+    server_id: str = "server.server_id"
+    server_domain: str = "server.domain"
+    server_port: int = "server.port"
 
-    rcon_port: int = yaml_key("server.rcon_port")
-    rcon_password: str = yaml_key("server.rcon_password")
-    tps_command: str = yaml_key("server.tps_command")
+    tps_command: str = "server.tps_command"
 
-    enable_logging: bool = yaml_key("logger.enabled")
-    logger_name: str = yaml_key("logger.name")
-    log_path: str = yaml_key("logger.log_path")
+    bridge_token: str = "hungerbridge.token"
+    bridge_url: str = "hungerbridge.url"
+    bridge_port: int = "hungerbridge.port"
 
-    console_backspaces: int = yaml_key("terminal.backspaces")
-    clear_terminal: bool = yaml_key("terminal.enable_clearing")
+    enable_logging: bool = "logger.enabled"
+    logger_name: str = "logger.name"
+    log_path: str = "logger.log_path"
+
+    clear_terminal: bool = "terminal.enable_clearing"

@@ -1,4 +1,7 @@
 run: true
-version: "5.8.1"
+version: "5.9"
 description: |
-  - Bugfix
+  - Added __main__.py
+  - Added Pterodactyl Egg
+  - Updated validator.py
+  - Updated watcher.py

@@ -7,7 +7,6 @@ broadcast_minutes: {}
 broadcast_seconds: {}
 
 logging:
-  startup: 'ServerWatcher is running!'
   status_check: 'Checking server status...'
   validation_fail: 'Validation FAILED.'
   validation_ok: 'All validation checks succeeded.'
