@@ -1,4 +1,4 @@
 run: true
-version: "5.9.2"
+version: "5.9.3"
 description: |
-  - Fix old rcon_password reference
+  - Bump version
