@@ -13,9 +13,12 @@ server:
   server_id: 'CHANGE_ME'
   domain: 'mc.example.com'
   port: 25565
-  rcon_port: 25575
-  rcon_password: 'password'
   tps_command: 'ticks'
+
+hungerbridge:
+  token: 'CHANGE_ME'
+  url: 'http://example.com'
+  port: 1913
 
 logger:
   enabled: True
@@ -23,5 +26,4 @@ logger:
   log_path: '/home/container/logs/'
 
 terminal:
-  backspaces: 8
   enable_clearing: True

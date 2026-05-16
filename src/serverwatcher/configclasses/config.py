@@ -15,13 +15,14 @@ class GlobalConfig:
     server_domain: str = "server.domain"
     server_port: int = "server.port"
 
-    rcon_port: int = "server.rcon_port"
-    rcon_password: str = "server.rcon_password"
     tps_command: str = "server.tps_command"
+
+    bridge_token: str = "hungerbridge.token"
+    bridge_url: str = "hungerbridge.url"
+    bridge_port: int = "hungerbridge.port"
 
     enable_logging: bool = "logger.enabled"
     logger_name: str = "logger.name"
     log_path: str = "logger.log_path"
 
-    console_backspaces: int = "terminal.backspaces"
     clear_terminal: bool = "terminal.enable_clearing"

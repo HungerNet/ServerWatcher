@@ -57,8 +57,8 @@ class ServerWatcher:
             server_id=self.config.server_id,
             server_domain=self.config.server_domain,
             server_port=self.config.server_port,
-            rcon_port=self.config.rcon_port,
-            rcon_password=self.config.rcon_password,
+            bridge_url=self.config.bridge_url.rstrip("/") + ":" + self.config.bridge_port,
+            bridge_token=self.config.bridge_token,
             tpsCommand=self.config.tps_command,
         )
 
@@ -69,7 +69,6 @@ class ServerWatcher:
             server=self.server,
             log_path=self.config.log_path,
             formatter=self._fmt,
-            console_backspaces=self.config.console_backspaces,
         )
 
         self.tz = ZoneInfo(self.config.timezone)
@@ -86,14 +85,12 @@ class ServerWatcher:
             only_maps=only_maps,
             disable=disable,
             enable=enable,
-            **ctx
         )
 
         self.router.say(
             msg,
             level=level,
             log=self.config.enable_logging,
-            **ctx
         )
 
     def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
