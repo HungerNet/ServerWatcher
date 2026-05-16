@@ -85,8 +85,8 @@ def ensure_no_global_defaults(config, defaults):
     if config.server_domain == 'mc.example.com':
         defaults.append('server_domain')
 
-    if config.rcon_password == 'password':
-        defaults.append('rcon_password')
+    if config.bridge_token == 'CHANGE_ME':
+        defaults.append('bridge_token')
 
 def ensure_no_watcher_defaults(watcherconfig, defaults):
     if watcherconfig.schedule_control and watcherconfig.restart_soon_id == 0:

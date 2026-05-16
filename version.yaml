@@ -1,4 +1,4 @@
 run: true
 version: "5.9.2"
 description: |
-  - Fix stray rcon_port reference
+  - Fix old rcon_password reference
