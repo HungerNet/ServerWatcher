@@ -12,7 +12,7 @@
         "Python 3.14": "ghcr.io\/red-shadows-rs\/pterodactyl-containers\/python:v3.14"
     },
     "file_denylist": [],
-    "startup": "pip install --upgrade pip && pip install -U serverwatcher && pip install -U --pre hungerlib && python3 -m serverwatcher --init || true && python3 -m serverwatcher",
+    "startup": "pip install --upgrade pip && pip install -U serverwatcher && pip install -U hungerlib && python3 -m serverwatcher --init || true && python3 -m serverwatcher",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"ServerWatcher is running!\"\r\n}",

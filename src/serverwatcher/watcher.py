@@ -74,31 +74,8 @@ class ServerWatcher:
     def _fmt(self, template: str, **ctx):
         return mapit(template, **ctx)
 
-    def say(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
-        if not template:
-            return
-
-        msg = mapit(
-            template,
-            only_maps=only_maps,
-            disable=disable,
-            enable=enable,
-        )
-
-        self.router.say(
-            msg,
-            level=level,
-            log=self.config.enable_logging,
-        )
-
-    def say_mc(self, template, level="info", only_maps=None, disable=None, enable=None, **ctx):
-        disable = (disable or []) + [utils.ASCII_COLOR_MAP]
-        enable = (enable or []) + [utils.MC_COLOR_MAP]
-        msg = mapit(template, only_maps=only_maps, disable=disable, enable=enable, **ctx)
-        self.router.broadcast(msg)
-
     def shutdown(self):
-        self.say(self.messages.shutdown)
+        self.router.say(self.messages.shutdown, log=self.config.enable_logging)
         raise SystemExit
 
     def restart_and_wait(self):
@@ -106,10 +83,10 @@ class ServerWatcher:
             self.origin.disableSchedule(self.watcherconfig.restart_soon_id)
 
         self.server.restart()
-        self.say(self.messages.restart_action_sent)
+        self.router.say(self.messages.restart_action_sent, log=self.config.enable_logging)
         time.sleep(self.watcherconfig.restart_wait_seconds)
 
-        self.say(self.messages.status_check, level="warn")
+        self.router.say(self.messages.status_check, level="warn", log=self.config.enable_logging)
         alive = utils.waitForOnline(
             self.server,
             timeout=self.watcherconfig.restart_timeout,
@@ -117,10 +94,14 @@ class ServerWatcher:
         )
 
         if alive:
-            self.say(self.messages.server_back_online)
-            self.say_mc(self.messages.server_back_online_broadcast)
+            self.router.say(self.messages.server_back_online, log=self.config.enable_logging)
+            self.router.say(
+                mapit(self.messages.server_back_online_broadcast, enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]),
+                broadcast=True,
+                log=self.config.enable_logging
+            )
         else:
-            self.say(self.messages.server_failed_restart, level="error")
+            self.router.say(self.messages.server_failed_restart, level="error", log=self.config.enable_logging)
 
     def schedule_restart(self, minutes):
         info = utils.snapSchedule(minimumMinutes=minutes)
@@ -129,12 +110,16 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.say_mc(self.messages.broadcast_restart_at, time=time_str)
+        self.router.say(
+            mapit(self.messages.broadcast_restart_at, time=time_str, enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]),
+            broadcast=True,
+            log=self.config.enable_logging
+        )
 
         minute_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=mapit(getattr(self.messages, k)):
-                    self.say_mc(msg)
+                lambda msg=mapit(getattr(self.messages, k), enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]):
+                    self.router.say(msg, broadcast=True, log=self.config.enable_logging)
             )
             for k in vars(self.messages)
             if k.startswith("minute_")
@@ -142,8 +127,8 @@ class ServerWatcher:
 
         second_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=mapit(getattr(self.messages, k)):
-                    self.say_mc(msg)
+                lambda msg=mapit(getattr(self.messages, k), enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]):
+                    self.router.say(msg, broadcast=True, log=self.config.enable_logging)
             )
             for k in vars(self.messages)
             if k.startswith("second_")
@@ -156,10 +141,10 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.say("ServerWatcher is running!")
+        self.router.say("ServerWatcher is running!", log=self.config.enable_logging)
 
         if not utils.validateAll(self.panel, self.server):
-            self.say(self.messages.validation_fail, level="error")
+            self.router.say(self.messages.validation_fail, level="error", log=self.config.enable_logging)
             self.shutdown()
 
         self.server.refresh()
@@ -203,36 +188,36 @@ class ServerWatcher:
             anti += snap.players * self.watcherconfig.weight_per_player
 
         if restart_reasons:
-            self.say(self.messages.pro_restart_splash, level="warn")
+            self.router.say(self.messages.pro_restart_splash, level="warn", log=self.config.enable_logging)
             for r in restart_reasons:
-                self.say(f"{self.messages.bullet} {r}", level="warn")
+                self.router.say(f"{self.messages.bullet} {r}", level="warn", log=self.config.enable_logging)
 
         if no_restart_reasons:
-            self.say(self.messages.anti_restart_splash, level="warn")
+            self.router.say(self.messages.anti_restart_splash, level="warn", log=self.config.enable_logging)
             for r in no_restart_reasons:
-                self.say(f"{self.messages.bullet} {r}", level="warn")
+                self.router.say(f"{self.messages.bullet} {r}", level="warn", log=self.config.enable_logging)
 
-        self.say(f"{self.messages.pro_restart_number} {pro}", level="warn")
-        self.say(f"{self.messages.anti_restart_number} {anti}", level="warn")
+        self.router.say(f"{self.messages.pro_restart_number} {pro}", level="warn", log=self.config.enable_logging)
+        self.router.say(f"{self.messages.anti_restart_number} {anti}", level="warn", log=self.config.enable_logging)
 
         gap = abs(pro - anti)
 
         if pro == 0:
-            self.say(self.messages.no_restart)
+            self.router.say(self.messages.no_restart, log=self.config.enable_logging)
             return
 
         if pro > anti and snap.players == 0:
-            self.say(self.messages.immediate_restart)
+            self.router.say(self.messages.immediate_restart, log=self.config.enable_logging)
             self.restart_and_wait()
             return
 
-        self.say(self.messages.scheduled)
+        self.router.say(self.messages.scheduled, log=self.config.enable_logging)
 
         if gap <= 2:
-            self.say(self.messages.gap_low, level="warn", gap=gap)
+            self.router.say(self.messages.gap_low, level="warn", gap=gap, log=self.config.enable_logging)
             self.schedule_restart(self.watcherconfig.low_gap_minutes)
         else:
-            self.say(self.messages.gap_high, level="warn", gap=gap)
+            self.router.say(self.messages.gap_high, level="warn", gap=gap, log=self.config.enable_logging)
             self.schedule_restart(self.watcherconfig.high_gap_minutes)
 
         self.restart_and_wait()

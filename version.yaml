@@ -1,4 +1,5 @@
 run: true
-version: "5.10"
+version: "5.11"
 description: |
-  - Updated egg structure
+  - Rewrite watcher.py to use MessageRouter's say() method
+  - Fixed main egg
