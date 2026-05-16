@@ -1,4 +1,7 @@
 run: true
-version: "5.9.dev14"
+version: "5.9.dev15"
 description: |
-  - Rewritten to use HungerLib's new BridgeClient class structure
+  - Added __main__.py
+  - Added Pterodactyl Egg
+  - Updated validator.py
+  - Updated watcher.py

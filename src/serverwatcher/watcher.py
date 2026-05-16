@@ -7,9 +7,7 @@ from hungerlib import servers, MessageRouter, loadConfig, utils, datamap_api, ma
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
-from serverwatcher.validator import validate_all
 
-validate_all()
 
 
 class ServerWatcher:
@@ -158,7 +156,7 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.say(self.messages.startup)
+        self.say("ServerWatcher is running!")
 
         if not utils.validateAll(self.panel, self.server):
             self.say(self.messages.validation_fail, level="error")
