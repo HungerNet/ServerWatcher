@@ -55,7 +55,7 @@ class ServerWatcher:
             server_id=self.config.server_id,
             server_domain=self.config.server_domain,
             server_port=self.config.server_port,
-            bridge_url=self.config.bridge_url.rstrip("/") + ":" + self.config.bridge_port,
+            bridge_url=self.config.bridge_url.rstrip("/") + ":" + str(self.config.bridge_port),
             bridge_token=self.config.bridge_token,
             tpsCommand=self.config.tps_command,
         )
