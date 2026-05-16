@@ -1,4 +1,4 @@
 run: true
 version: "5.9.1"
 description: |
-  - Bump version
+  - Fix HungerLib dependency
