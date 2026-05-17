@@ -23,5 +23,8 @@ class GlobalConfig:
     enable_logging: bool = "logger.enabled"
     logger_name: str = "logger.name"
     log_path: str = "logger.log_path"
+    info_prefix: str = "logger.prefixes.info"
+    warn_prefix: str = "logger.prefixes.warn"
+    error_prefix: str = "logger.prefixes.error"
 
     clear_terminal: bool = "terminal.enable_clearing"

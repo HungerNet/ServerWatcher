@@ -23,6 +23,11 @@ logger:
   enabled: True
   name: 'Server Watcher'
   log_path: '/home/container/logs/'
+  
+  prefixes:
+    info: "<white>[INFO]: "
+    warn: "<yellow>[WARN]: "
+    error: "<red>[ERROR]: "
 
 terminal:
   enable_clearing: True

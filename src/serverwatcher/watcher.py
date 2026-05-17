@@ -66,6 +66,10 @@ class ServerWatcher:
             name=logger_name,
             Servers=[self.server],
             log_path=self.config.log_path,
+
+            info_prefix=self.messages.info_prefix,
+            warn_prefix=self.messages.warn_prefix,
+            error_prefix=self.messages.error_prefix,
         )
 
         self.tz = ZoneInfo(self.config.timezone)
