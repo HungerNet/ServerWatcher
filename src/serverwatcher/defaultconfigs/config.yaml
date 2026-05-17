@@ -17,7 +17,6 @@ server:
 
 hungerbridge:
   token: 'CHANGE_ME'
-  url: 'http://example.com'
   port: 1913
 
 logger:

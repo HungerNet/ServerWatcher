@@ -18,7 +18,6 @@ class GlobalConfig:
     tps_command: str = "server.tps_command"
 
     bridge_token: str = "hungerbridge.token"
-    bridge_url: str = "hungerbridge.url"
     bridge_port: int = "hungerbridge.port"
 
     enable_logging: bool = "logger.enabled"
