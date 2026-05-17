@@ -1,4 +1,4 @@
 run: true
-version: "5.11"
+version: "5.12"
 description: |
   - Rewrite watcher.py to use MessageRouter's new structure
