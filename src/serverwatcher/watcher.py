@@ -30,7 +30,7 @@ class ServerWatcher:
             WatcherConfig
         )
 
-        datamap_api.set_default_maps(
+        datamap_api.setGlobalMaps(
             utils.ASCII_COLOR_MAP,
             self.config,
             self.messages,
@@ -67,6 +67,11 @@ class ServerWatcher:
             Servers=[self.server],
             log_path=self.config.log_path,
 
+            origin_maps = [utils.ASCII_COLOR_MAP],
+            destination_maps = [utils.ASCII_COLOR_MAP],
+            broadcast_maps = [utils.MC_COLOR_MAP],
+            file_maps = [utils.STRIP_COLOR_MAP],
+
             info_prefix=self.messages.info_prefix,
             warn_prefix=self.messages.warn_prefix,
             error_prefix=self.messages.error_prefix,
@@ -95,13 +100,7 @@ class ServerWatcher:
 
         if alive:
             self.router.info(self.messages.server_back_online)
-            self.router.broadcast(
-                mapit(
-                    self.messages.server_back_online_broadcast,
-                    enable=[utils.MC_COLOR_MAP],
-                    disable=[utils.ASCII_COLOR_MAP]
-                )
-            )
+            self.router.broadcast(self.messages.server_back_online_broadcast)
         else:
             self.router.error(self.messages.server_failed_restart)
 
@@ -112,18 +111,11 @@ class ServerWatcher:
         local_time = scheduled.astimezone(self.tz)
         time_str = local_time.strftime("%I:%M %p")
 
-        self.router.broadcast(
-            mapit(
-                self.messages.broadcast_restart_at,
-                time=time_str,
-                enable=[utils.MC_COLOR_MAP],
-                disable=[utils.ASCII_COLOR_MAP]
-            )
-        )
+        self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
 
         minute_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=mapit(getattr(self.messages, k), enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]):
+                lambda msg=getattr(self.messages, k):
                     self.router.broadcast(msg)
             )
             for k in vars(self.messages)
@@ -132,7 +124,7 @@ class ServerWatcher:
 
         second_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=mapit(getattr(self.messages, k), enable=[utils.MC_COLOR_MAP], disable=[utils.ASCII_COLOR_MAP]):
+                lambda msg=getattr(self.messages, k):
                     self.router.broadcast(msg)
             )
             for k in vars(self.messages)

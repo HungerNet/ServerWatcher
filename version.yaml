@@ -1,4 +1,5 @@
 run: true
-version: "5.13"
+version: "5.14"
 description: |
-  - Added configurable prefixes
+  - Removed unused --init flag support
+  - Updated watcher to use HungerLib's new structure
