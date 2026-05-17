@@ -1,5 +1,4 @@
 run: true
 version: "5.11"
 description: |
-  - Rewrite watcher.py to use MessageRouter's say() method
-  - Fixed main egg
+  - Rewrite watcher.py to use MessageRouter's new structure
