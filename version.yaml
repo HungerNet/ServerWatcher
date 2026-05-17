@@ -1,5 +1,4 @@
 run: true
-version: "5.14"
+version: "5.14.1"
 description: |
-  - Removed unused --init flag support
-  - Updated watcher to use HungerLib's new structure
+  - Fixed wrong namespace name

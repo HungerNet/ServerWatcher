@@ -72,9 +72,9 @@ class ServerWatcher:
             broadcast_maps = [utils.MC_COLOR_MAP],
             file_maps = [utils.STRIP_COLOR_MAP],
 
-            info_prefix=self.messages.info_prefix,
-            warn_prefix=self.messages.warn_prefix,
-            error_prefix=self.messages.error_prefix,
+            info_prefix=self.config.info_prefix,
+            warn_prefix=self.config.warn_prefix,
+            error_prefix=self.config.error_prefix,
         )
 
         self.tz = ZoneInfo(self.config.timezone)
