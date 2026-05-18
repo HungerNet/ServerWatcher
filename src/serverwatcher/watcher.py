@@ -12,23 +12,9 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 
 class ServerWatcher:
     def __init__(self):
-        self.config = loadConfig(
-            "config/config.yaml",
-            "/defaultconfigs/config.yaml",
-            GlobalConfig
-        )
-
-        self.messages = loadConfig(
-            "config/messages.yaml",
-            "/defaultconfigs/messages.yaml",
-            MessagesConfig
-        )
-
-        self.watcherconfig = loadConfig(
-            "config/watcher.yaml",
-            "/defaultconfigs/watcher.yaml",
-            WatcherConfig
-        )
+        self.config = loadConfig(GlobalConfig)
+        self.messages = loadConfig(MessagesConfig)
+        self.watcherconfig = loadConfig(WatcherConfig)
 
         datamap_api.setGlobalMaps(
             utils.ASCII_COLOR_MAP,
@@ -115,19 +101,19 @@ class ServerWatcher:
 
         minute_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=getattr(self.messages, k):
-                    self.router.broadcast(msg)
+                lambda raw=self.messages.as_map()[k]:
+                    self.router.broadcast(mapit(raw))
             )
-            for k in vars(self.messages)
+            for k in self.messages.as_map()
             if k.startswith("minute_")
         }
 
         second_callbacks = {
             int(k.split("_")[1]): (
-                lambda msg=getattr(self.messages, k):
-                    self.router.broadcast(msg)
+                lambda raw=self.messages.as_map()[k]:
+                    self.router.broadcast(mapit(raw))
             )
-            for k in vars(self.messages)
+            for k in self.messages.as_map()
             if k.startswith("second_")
         }
 
@@ -138,7 +124,7 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        # Lets Pterodactyl know the server is online
+        # Lets Pterodactyl know the server is online, then clears terminal and uses user-defined startup key
         self.router.info("ServerWatcher is running!")
         utils.clearTerminal()
 

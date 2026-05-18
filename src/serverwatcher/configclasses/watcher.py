@@ -2,6 +2,8 @@ from hungerlib import datamap, datamap_api
 
 @datamap(syntax=datamap_api.braces, mode="config")
 class WatcherConfig:
+    __config_path__ = "/defaultconfigs/watcher.yaml"
+
     watch_interval: int = "watch_interval"
     schedule_control: bool = "schedule_control.enabled"
     restart_soon_id: int = "schedule_control.restart_soon_id"
@@ -26,3 +28,5 @@ class WatcherConfig:
     restart_wait_seconds: int = "restart.wait_seconds"
     restart_timeout: int = "restart.online_timeout"
     restart_online_interval: int = "restart.online_interval"
+
+mapit("<green>[%hh%:%mm%]: ", [ASCII_COLOR_MAP])
