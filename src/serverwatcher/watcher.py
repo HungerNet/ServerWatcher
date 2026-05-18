@@ -67,10 +67,10 @@ class ServerWatcher:
             Servers=[self.server],
             log_path=self.config.log_path,
 
-            origin_maps = [utils.ASCII_COLOR_MAP],
-            destination_maps = [utils.ASCII_COLOR_MAP],
-            broadcast_maps = [utils.MC_COLOR_MAP],
-            file_maps = [utils.STRIP_COLOR_MAP],
+            origin_maps = [utils.ASCII_COLOR_MAP, self.config, self.messages, self.watcherconfig],
+            destination_maps = [utils.ASCII_COLOR_MAP, self.config, self.messages, self.watcherconfig],
+            broadcast_maps = [utils.MC_COLOR_MAP, self.config, self.messages, self.watcherconfig],
+            file_maps = [utils.STRIP_COLOR_MAP, self.config, self.messages, self.watcherconfig],
 
             info_prefix=self.config.info_prefix,
             warn_prefix=self.config.warn_prefix,
@@ -138,7 +138,12 @@ class ServerWatcher:
         )
 
     def evaluate(self):
+        # Lets Pterodactyl know the server is online
         self.router.info("ServerWatcher is running!")
+        utils.clearTerminal()
+
+        # Configurable start message
+        self.router.info(self.messages.startup)
 
         if not utils.validateAll(self.panel, self.server):
             self.router.error(self.messages.validation_fail)

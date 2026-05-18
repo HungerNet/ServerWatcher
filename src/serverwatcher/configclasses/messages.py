@@ -26,6 +26,7 @@ class MessagesConfig:
     second_2:  str = "broadcast_seconds.2"
     second_1:  str = "broadcast_seconds.1"
 
+    startup: str = "logging.startup"
     status_check: str = "logging.status_check"
     validation_fail: str = "logging.validation_fail"
     validation_ok: str = "logging.validation_ok"

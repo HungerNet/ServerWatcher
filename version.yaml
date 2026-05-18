@@ -1,4 +1,5 @@
 run: true
-version: "5.14.1"
+version: "5.15"
 description: |
-  - Fixed wrong namespace name
+  - Readded startup message configurablilty
+  - Allowed usage of internal datamaps in configs
