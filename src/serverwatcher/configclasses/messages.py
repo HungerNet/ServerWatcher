@@ -2,7 +2,8 @@ from hungerlib import datamap, datamap_api
 
 @datamap(syntax=datamap_api.braces, mode="config")
 class MessagesConfig:
-    __config_path__ = "/defaultconfigs/messages.yaml"
+    __user_config_path__ = "/defaultconfigs/messages.yaml"
+    __default_config_path__ = "config/messages.yaml"
 
     prefix: str = "prefix"
     bullet: str = "bullet"
