@@ -1,4 +1,4 @@
 run: true
-version: "5.17.5"
+version: "5.17.6"
 description: |
   - Uses HungerLib's new structure
