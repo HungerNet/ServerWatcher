@@ -96,9 +96,9 @@ def validate_all():
     errors = []
     defaults = []
 
-    config = loadConfig("config/config.yaml", "/defaultconfigs/config.yaml", GlobalConfig)
-    messages = loadConfig("config/messages.yaml", "/defaultconfigs/messages.yaml", MessagesConfig)
-    watcher = loadConfig("config/watcher.yaml", "/defaultconfigs/watcher.yaml", WatcherConfig)
+    config = loadConfig(GlobalConfig)
+    messages = loadConfig(MessagesConfig)
+    watcher = loadConfig(WatcherConfig)
 
     validate_dataclass(config, GlobalConfig, errors)
     validate_dataclass(messages, MessagesConfig, errors)
