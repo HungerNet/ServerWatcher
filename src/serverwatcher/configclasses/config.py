@@ -2,7 +2,7 @@ from hungerlib import datamap, datamap_api
 
 @datamap(syntax=datamap_api.braces, mode="config")
 class GlobalConfig:
-    __user_config_path__ = "/defaultconfigs/config.yaml"
+    __user_config_path__ = "defaultconfigs/config.yaml"
     __default_config_path__ = "config/config.yaml"
 
     timezone: str = "timezone"
