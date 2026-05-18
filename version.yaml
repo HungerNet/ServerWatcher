@@ -1,4 +1,4 @@
 run: true
-version: "5.17.1"
+version: "5.17.2"
 description: |
-  - Fix loading configs
+  - Fix swapped keys
