@@ -3,7 +3,7 @@ from hungerlib import datamap, datamap_api
 @datamap(syntax=datamap_api.braces, mode="config")
 class WatcherConfig:
     __user_config_path__ = "config/watcher.yaml"
-    __default_config_path__ = "defaultconfigs/watcher.yaml"
+    __default_config_path__ = "/defaultconfigs/watcher.yaml"
 
     watch_interval: int = "watch_interval"
     schedule_control: bool = "schedule_control.enabled"
