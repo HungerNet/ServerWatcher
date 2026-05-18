@@ -28,5 +28,3 @@ class WatcherConfig:
     restart_wait_seconds: int = "restart.wait_seconds"
     restart_timeout: int = "restart.online_timeout"
     restart_online_interval: int = "restart.online_interval"
-
-mapit("<green>[%hh%:%mm%]: ", [ASCII_COLOR_MAP])
