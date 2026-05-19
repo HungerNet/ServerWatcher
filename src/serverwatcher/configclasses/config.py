@@ -1,4 +1,4 @@
-from hungerlib import datamap, datamap_api
+from mapres import datamap, datamap_api
 
 @datamap(syntax=datamap_api.braces, mode='config')
 class GlobalConfig:

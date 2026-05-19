@@ -2,12 +2,12 @@ import os
 import time
 from zoneinfo import ZoneInfo
 
-from hungerlib import servers, MessageRouter, loadConfig, utils, datamap_api, mapit
+from hungerlib import servers, MessageRouter, loadConfig, utils
+from mapres import MapResolver, maps
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.messages import MessagesConfig
 from serverwatcher.configclasses.watcher import WatcherConfig
-
 
 
 class ServerWatcher:
@@ -16,14 +16,11 @@ class ServerWatcher:
         self.messages = loadConfig(MessagesConfig)
         self.watcherconfig = loadConfig(WatcherConfig)
 
-        datamap_api.setGlobalMaps(
-            utils.ASCII_COLOR_MAP,
-            utils.TIME_MAP(self.config.timezone),
-            self.config,
-            self.messages,
-            self.watcherconfig,
-        )
+        # resolver for internal mapping
+        self.resolver = MapResolver()
+        self.res = self.resolver.res
 
+        # panel + server
         self.panel = servers.Panel(
             name=self.config.panel_name,
             url=self.config.panel_url,
@@ -41,18 +38,54 @@ class ServerWatcher:
             tpsCommand=self.config.tps_command,
         )
 
-        logger_name = mapit(self.config.logger_name, server_name=self.config.server_name)
-        
+        # logger name
+        logger_name = self.res(
+            self.config.logger_name,
+            server_name=self.config.server_name
+        )
+
+        # router using mapres
         self.router = MessageRouter(
             name=logger_name,
             Servers=[self.server],
             log_path=self.config.log_path,
 
-            origin_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
-            destination_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
-            broadcast_maps = [utils.MC_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
-            file_maps = [utils.STRIP_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
-            prefix_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone)],
+            origin_maps=[
+                maps.ascii_colors,
+                maps.time_tk(self.config.timezone),
+                self.config,
+                self.messages,
+                self.watcherconfig
+            ],
+
+            destination_maps=[
+                maps.ascii_colors,
+                maps.time_tk(self.config.timezone),
+                self.config,
+                self.messages,
+                self.watcherconfig
+            ],
+
+            broadcast_maps=[
+                maps.mc_colors,
+                maps.time_tk(self.config.timezone),
+                self.config,
+                self.messages,
+                self.watcherconfig
+            ],
+
+            file_maps=[
+                maps.strip_colors,
+                maps.time_tk(self.config.timezone),
+                self.config,
+                self.messages,
+                self.watcherconfig
+            ],
+
+            prefix_maps=[
+                maps.ascii_colors,
+                maps.time_tk(self.config.timezone)
+            ],
 
             info_prefix=self.config.info_prefix,
             warn_prefix=self.config.warn_prefix,
@@ -84,7 +117,10 @@ class ServerWatcher:
             self.router.error(self.messages.server_failed_restart)
 
     def schedule_restart(self, minutes):
-        info = utils.snapSchedule(minimumMinutes=minutes, snapMinutes=tuple(sorted(self.watcherconfig.snap_minutes)))
+        info = utils.snapSchedule(
+            minimumMinutes=minutes,
+            snapMinutes=tuple(sorted(self.watcherconfig.snap_minutes))
+        )
         scheduled = info["scheduled"]
 
         local_time = scheduled.astimezone(self.tz)
@@ -92,34 +128,38 @@ class ServerWatcher:
 
         self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
 
+        # minute callbacks
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda raw=self.messages.as_map()[k]:
-                    self.router.broadcast(mapit(raw)),
-                    self.router.origin(raw)
+                    (self.router.broadcast(self.res(raw)),
+                     self.router.origin(raw))
             )
             for k in self.messages.as_map()
             if k.startswith("minute_")
         }
 
+        # second callbacks
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda raw=self.messages.as_map()[k]:
-                    self.router.broadcast(mapit(raw)),
-                    self.router.origin(raw)
+                    (self.router.broadcast(self.res(raw)),
+                     self.router.origin(raw))
             )
             for k in self.messages.as_map()
             if k.startswith("second_")
         }
 
-        utils.runCountdownEvents(target_time=scheduled, minute_callbacks=minute_callbacks, second_callbacks=second_callbacks)
+        utils.runCountdownEvents(
+            target_time=scheduled,
+            minute_callbacks=minute_callbacks,
+            second_callbacks=second_callbacks
+        )
 
     def evaluate(self):
-        # Lets Pterodactyl know the server is online, then clears terminal and uses user-defined startup key
         self.router.info("ServerWatcher is running!")
         utils.clearTerminal()
 
-        # Configurable start message
         self.router.info(self.messages.startup)
 
         if not utils.validateAll(self.panel, self.server):
@@ -135,31 +175,35 @@ class ServerWatcher:
         no_restart_reasons = []
 
         if snap.ram >= self.watcherconfig.threshold_ram:
-            restart_reasons.append(mapit(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
+            restart_reasons.append(
+                self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram)
+            )
             pro += int(round(snap.ram, 0) - (self.watcherconfig.threshold_ram - 1))
 
         if snap.cpu >= self.watcherconfig.threshold_cpu:
-            restart_reasons.append(mapit(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu))
+            restart_reasons.append(
+                self.res(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu)
+            )
             pro += self.watcherconfig.weight_cpu
 
         if snap.uptime // 3600 >= self.watcherconfig.threshold_uptime:
             restart_reasons.append(
-                mapit(self.messages.reason_uptime, uptime=snap.uptime_formatted, threshold=self.watcherconfig.threshold_uptime)
+                self.res(self.messages.reason_uptime, uptime=snap.uptime_formatted, threshold=self.watcherconfig.threshold_uptime)
             )
             pro += self.watcherconfig.weight_uptime
 
         if (snap.tps if snap.tps is not None else 20) <= self.watcherconfig.threshold_tps:
-            restart_reasons.append(mapit(self.messages.reason_tps, tps=snap.tps, threshold=self.watcherconfig.threshold_tps))
+            restart_reasons.append(self.res(self.messages.reason_tps, tps=snap.tps, threshold=self.watcherconfig.threshold_tps))
             pro += self.watcherconfig.weight_tps
 
         if snap.uptime // 60 < self.watcherconfig.threshold_min_uptime:
-            no_restart_reasons.append(mapit(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
+            no_restart_reasons.append(self.res(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
             anti += self.watcherconfig.weight_low_uptime
 
         if snap.players > 0:
             verb = "are" if snap.players != 1 else "is"
             plural = "players" if snap.players != 1 else "player"
-            no_restart_reasons.append(mapit(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
+            no_restart_reasons.append(self.res(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
             anti += snap.players * self.watcherconfig.weight_per_player
 
         if restart_reasons:
