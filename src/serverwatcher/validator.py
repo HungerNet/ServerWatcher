@@ -50,12 +50,15 @@ def validate_global_config(config, errors):
     if config.bridge_port <= 0 or config.bridge_port > 65535:
         errors.append(f'bridge_port: must be 1–65535 (got {config.bridge_port})')
 
+    if len(config.bridge_token) < 8:
+        errors.append(f'bridge_token: must be 8 or more characters (got {config.bridge_token}, {len(config.bridge_token)} characters)')
+
 def validate_watcher_config(watcherconfig, errors):
     if watcherconfig.restart_wait_seconds < 1:
-        errors.append(f'restart_wait_seconds: must be >= 1 (got {watcherconfig.restart_wait_seconds})')
+        errors.append(f'restart_wait_seconds: must be > 0 (got {watcherconfig.restart_wait_seconds})')
 
     if watcherconfig.threshold_cpu <= 0:
-        errors.append(f'threshold_cpu: must not be less than 1 (got {watcherconfig.threshold_cpu})')
+        errors.append(f'threshold_cpu: must be > 0 (got {watcherconfig.threshold_cpu})')
 
     if watcherconfig.threshold_ram <= 0:
         errors.append(f'threshold_ram: must be > 0 (got {watcherconfig.threshold_ram})')
@@ -79,9 +82,6 @@ def ensure_no_global_defaults(config, defaults):
 
     if config.panel_api_key == fb.panel_api_key:
         defaults.append('panel_api_key')
-
-    if config.origin_server_id == fb.origin_server_id:
-        defaults.append('origin_server_id')
 
     if config.server_id == fb.server_id:
         defaults.append('server_id')

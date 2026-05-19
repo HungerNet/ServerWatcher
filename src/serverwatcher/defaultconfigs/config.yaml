@@ -5,9 +5,6 @@ panel:
   url: 'https://example.com'
   api_key: 'CHANGE_ME'
 
-origin:
-  server_id: 'CHANGE_ME'
-
 server:
   name: 'My SMP'
   server_id: 'CHANGE_ME'
@@ -31,3 +28,4 @@ logger:
 
 terminal:
   enable_clearing: True
+  handle_keyboard_interrupt: True

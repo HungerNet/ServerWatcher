@@ -1,4 +1,6 @@
 run: true
-version: "5.19"
+version: "5.20"
 description: |
-  - Added KeyboardInterrupt handler
+  - Modified validator
+  - Added new config options
+  - Added new watcherconfig options

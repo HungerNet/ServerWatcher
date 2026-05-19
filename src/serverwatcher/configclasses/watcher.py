@@ -14,6 +14,8 @@ class WatcherConfig:
     threshold_cpu: int = 'thresholds.cpu'
     threshold_uptime: int = 'thresholds.uptime'
     threshold_tps: float = 'thresholds.tps'
+    threshold_min_uptime: int = 'thresholds.min_uptime'
+    threshold_low_gap: int = 'thresholds.low_gap'
 
     weight_restart_soon: int = 'weights.restart_soon'
     weight_ram: int = 'weights.ram'
@@ -26,6 +28,8 @@ class WatcherConfig:
 
     low_gap_minutes: int = 'gaps.low_gap_minutes'
     high_gap_minutes: int = 'gaps.high_gap_minutes'
+
+    snap_minutes: list = 'snap_minutes'
 
     restart_wait_seconds: int = 'restart.wait_seconds'
     restart_timeout: int = 'restart.online_timeout'
@@ -42,6 +46,8 @@ class fallbacks:
     threshold_cpu = 150
     threshold_uptime = 12
     threshold_tps = 19.5
+    threshold_min_uptime = 30
+    threshold_low_gap = 2
 
     weight_restart_soon = 3
     weight_ram = 1
@@ -54,6 +60,8 @@ class fallbacks:
 
     low_gap_minutes = 120
     high_gap_minutes = 60
+
+    snap_minutes = [0, 30]
 
     restart_wait_seconds = 30
     restart_timeout = 120

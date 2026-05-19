@@ -1,4 +1,4 @@
-watch_interval: 300
+watch_interval: 300      # in seconds
 
 schedule_control:
   enabled: False
@@ -9,6 +9,8 @@ thresholds:
   cpu: 150
   uptime: 12
   tps: 19.5
+  min_uptime: 30         # will not restart the server if the total uptime is less than 30 minutes
+  low_gap: 2
 
 weights:
   restart_soon: 3
@@ -22,6 +24,8 @@ weights:
 gaps:
   low_gap_minutes: 120
   high_gap_minutes: 60
+
+snap_minutes: [0, 30]    # will snap the scheduled time to the nearest hour or half hour
 
 restart:
   wait_seconds: 30

@@ -93,7 +93,7 @@ class ServerWatcher:
             self.router.error(self.messages.server_failed_restart)
 
     def schedule_restart(self, minutes):
-        info = utils.snapSchedule(minimumMinutes=minutes)
+        info = utils.snapSchedule(minimumMinutes=minutes, snapMinutes=tuple(sorted(self.watcherconfig.snap_minutes)))
         scheduled = info["scheduled"]
 
         local_time = scheduled.astimezone(self.tz)
@@ -104,7 +104,8 @@ class ServerWatcher:
         minute_callbacks = {
             int(k.split("_")[1]): (
                 lambda raw=self.messages.as_map()[k]:
-                    self.router.broadcast(mapit(raw))
+                    self.router.broadcast(mapit(raw)),
+                    self.router.origin(raw)
             )
             for k in self.messages.as_map()
             if k.startswith("minute_")
@@ -113,17 +114,14 @@ class ServerWatcher:
         second_callbacks = {
             int(k.split("_")[1]): (
                 lambda raw=self.messages.as_map()[k]:
-                    self.router.broadcast(mapit(raw))
+                    self.router.broadcast(mapit(raw)),
+                    self.router.origin(raw)
             )
             for k in self.messages.as_map()
             if k.startswith("second_")
         }
 
-        utils.runCountdownEvents(
-            target_time=scheduled,
-            minute_callbacks=minute_callbacks,
-            second_callbacks=second_callbacks,
-        )
+        utils.runCountdownEvents(target_time=scheduled, minute_callbacks=minute_callbacks, second_callbacks=second_callbacks)
 
     def evaluate(self):
         # Lets Pterodactyl know the server is online, then clears terminal and uses user-defined startup key
@@ -167,7 +165,7 @@ class ServerWatcher:
             restart_reasons.append(mapit(self.messages.reason_tps, tps=snap.tps, threshold=self.watcherconfig.threshold_tps))
             pro += self.watcherconfig.weight_tps
 
-        if snap.uptime // 60 < 30:
+        if snap.uptime // 60 < self.watcherconfig.threshold_min_uptime:
             no_restart_reasons.append(mapit(self.messages.reason_low_uptime, uptime=snap.uptime_formatted))
             anti += self.watcherconfig.weight_low_uptime
 
@@ -203,7 +201,7 @@ class ServerWatcher:
 
         self.router.info(self.messages.scheduled)
 
-        if gap <= 2:
+        if gap <= self.watcherconfig.threshold_low_gap:
             self.router.warn(self.messages.gap_low, gap=gap)
             self.schedule_restart(self.watcherconfig.low_gap_minutes)
         else:
@@ -213,13 +211,18 @@ class ServerWatcher:
         self.restart_and_wait()
 
     def run(self):
-        try:
-            if self.config.clear_terminal:
-                utils.clearTerminal()
+        if self.config.handle_keyboard_interrupt:
+            try:
+                while True:
+                    if self.config.clear_terminal:
+                        utils.clearTerminal()
+                    self.evaluate()
+                    time.sleep(self.watcherconfig.watch_interval)
+            except KeyboardInterrupt:
+                self.shutdown()
+        else:
             while True:
                 if self.config.clear_terminal:
                     utils.clearTerminal()
                 self.evaluate()
                 time.sleep(self.watcherconfig.watch_interval)
-        except KeyboardInterrupt:
-            self.shutdown()

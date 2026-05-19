@@ -11,8 +11,6 @@ class GlobalConfig:
     panel_url: str = 'panel.url'
     panel_api_key: str = 'panel.api_key'
 
-    origin_server_id: str = 'origin.server_id'
-
     server_name: str = 'server.name'
     server_id: str = 'server.server_id'
     server_domain: str = 'server.domain'
@@ -32,6 +30,7 @@ class GlobalConfig:
     error_prefix: str = 'logger.prefixes.error'
 
     clear_terminal: bool = 'terminal.enable_clearing'
+    handle_keyboard_interrupt: bool = 'terminal.handle_keyboard_interrupt'
 
 
 class fallbacks:
@@ -40,8 +39,6 @@ class fallbacks:
     panel_name = 'My Panel'
     panel_url = 'https://example.com'
     panel_api_key = 'CHANGE_ME'
-
-    origin_server_id = 'CHANGE_ME'
 
     server_name = 'My SMP'
     server_id = 'CHANGE_ME'
@@ -62,3 +59,4 @@ class fallbacks:
     error_prefix = '<red>[ERROR]: '
 
     clear_terminal = True
+    handle_keyboard_interrupt = True
