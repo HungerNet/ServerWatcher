@@ -1,6 +1,4 @@
 run: true
-version: "5.18"
+version: "5.19"
 description: |
-  - Added TIME_MAP to list of default maps
-  - Updated to match MessageRouter's new structure
-  - Changed default config files
+  - Added KeyboardInterrupt handler

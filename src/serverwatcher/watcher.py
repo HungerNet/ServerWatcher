@@ -213,10 +213,13 @@ class ServerWatcher:
         self.restart_and_wait()
 
     def run(self):
-        if self.config.clear_terminal:
-            utils.clearTerminal()
-        while True:
+        try:
             if self.config.clear_terminal:
                 utils.clearTerminal()
-            self.evaluate()
-            time.sleep(self.watcherconfig.watch_interval)
+            while True:
+                if self.config.clear_terminal:
+                    utils.clearTerminal()
+                self.evaluate()
+                time.sleep(self.watcherconfig.watch_interval)
+        except KeyboardInterrupt:
+            self.shutdown()
