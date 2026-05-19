@@ -1,6 +1,6 @@
 run: true
-version: "5.20"
+version: "5.21"
 description: |
-  - Modified validator
-  - Added new config options
-  - Added new watcherconfig options
+  - Removed schedule control
+  - Removed unused origin server configuration
+  - Overhauled validator

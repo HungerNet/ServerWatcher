@@ -30,12 +30,6 @@ class ServerWatcher:
             api_key=self.config.panel_api_key,
         )
 
-        self.origin = servers.Generic(
-            name="Origin",
-            panel=self.panel,
-            server_id=self.config.origin_server_id
-        )
-
         self.server = servers.Minecraft(
             name=self.config.server_name,
             panel=self.panel,
@@ -72,9 +66,6 @@ class ServerWatcher:
         raise SystemExit
 
     def restart_and_wait(self):
-        if self.watcherconfig.schedule_control:
-            self.origin.disableSchedule(self.watcherconfig.restart_soon_id)
-
         self.server.restart()
         self.router.info(self.messages.restart_action_sent)
         time.sleep(self.watcherconfig.restart_wait_seconds)
@@ -142,10 +133,6 @@ class ServerWatcher:
         anti = 0
         restart_reasons = []
         no_restart_reasons = []
-
-        if self.watcherconfig.schedule_control and self.server.getSchedule(self.watcherconfig.restart_soon_id)["is_active"]:
-            restart_reasons.append(self.messages.reason_restart_soon)
-            pro += self.watcherconfig.weight_restart_soon
 
         if snap.ram >= self.watcherconfig.threshold_ram:
             restart_reasons.append(mapit(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))

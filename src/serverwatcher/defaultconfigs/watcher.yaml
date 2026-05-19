@@ -1,9 +1,5 @@
 watch_interval: 300      # in seconds
 
-schedule_control:
-  enabled: False
-  restart_soon_id: 0     # replace this with a real schedule id
-
 thresholds:
   ram: 6
   cpu: 150

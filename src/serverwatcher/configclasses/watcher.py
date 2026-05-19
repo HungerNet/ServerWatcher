@@ -7,9 +7,6 @@ class WatcherConfig:
 
     watch_interval: int = 'watch_interval'
 
-    schedule_control: bool = 'schedule_control.enabled'
-    restart_soon_id: int = 'schedule_control.restart_soon_id'
-
     threshold_ram: int = 'thresholds.ram'
     threshold_cpu: int = 'thresholds.cpu'
     threshold_uptime: int = 'thresholds.uptime'
@@ -38,9 +35,6 @@ class WatcherConfig:
 
 class fallbacks:
     watch_interval = 300
-
-    schedule_control = False
-    restart_soon_id = 0
 
     threshold_ram = 6
     threshold_cpu = 150
