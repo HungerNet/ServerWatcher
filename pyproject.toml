@@ -27,7 +27,7 @@ keywords = [
 dependencies = [
     "requests",
     "mcrcon",
-    "hungerlib",
+    "hungerlib>=3.1",
     "PyYaml",
 ]
 

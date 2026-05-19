@@ -1,7 +1,4 @@
 run: true
-version: "5.9"
+version: "5.19"
 description: |
-  - Added __main__.py
-  - Added Pterodactyl Egg
-  - Updated validator.py
-  - Updated watcher.py
+  - Added KeyboardInterrupt handler

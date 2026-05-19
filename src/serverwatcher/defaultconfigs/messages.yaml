@@ -1,3 +1,43 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#                               MAP USAGE GUIDE
+# ─────────────────────────────────────────────────────────────────────────────
+# The maps below provide different kinds of placeholders.
+#
+# 1. ColorMap  (static)
+#   Provides color codes. Syntax: <color>
+#   Examples:
+#     <red> <green> <yellow> <reset>
+#
+# 2. GlobalConfig  (config)
+#   Provides server-wide configuration values. Syntax: {field}
+#   Examples:
+#     {server_name}
+#     {panel_url}
+#
+# 3. MessagesConfig  (keys)
+#   Provides message templates. Syntax: {field}
+#   Examples:
+#     {prefix}
+#     {broadcast_restart_at}
+#
+# 4. WatcherConfig  (config)
+#   Provides thresholds, weights, and timing values. Syntax: {field}
+#   Examples:
+#     {threshold_ram}
+#     {low_gap_minutes}
+#
+# 5. TimeMap  (dynamic)
+#   Provides live timestamps. Syntax: %field%
+# Examples:
+#   %hh%   hour (00–23)
+#   %mm%   minute (00–59)
+#   %ss%   second (00–59)
+#   %ms%   millisecond (000–999)
+#   %YYYY% year
+#   %MM%   month
+#   %DD%   day
+#   %weekday%
+
 prefix: '<aqua>[Server Watcher]'
 bullet: '-'
 
@@ -7,6 +47,7 @@ broadcast_minutes: {}
 broadcast_seconds: {}
 
 logging:
+  startup: 'ServerWatcher is running!'
   status_check: 'Checking server status...'
   validation_fail: 'Validation FAILED.'
   validation_ok: 'All validation checks succeeded.'

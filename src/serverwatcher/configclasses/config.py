@@ -1,28 +1,64 @@
 from hungerlib import datamap, datamap_api
 
-@datamap(syntax=datamap_api.braces, mode="config")
+@datamap(syntax=datamap_api.braces, mode='config')
 class GlobalConfig:
-    timezone: str = "timezone"
+    __user_config_path__ = 'config/config.yaml'
+    __default_config_path__ = 'defaultconfigs/config.yaml'
 
-    panel_name: str = "panel.name"
-    panel_url: str = "panel.url"
-    panel_api_key: str = "panel.api_key"
+    timezone: str = 'timezone'
 
-    origin_server_id: str = "origin.server_id"
+    panel_name: str = 'panel.name'
+    panel_url: str = 'panel.url'
+    panel_api_key: str = 'panel.api_key'
 
-    server_name: str = "server.name"
-    server_id: str = "server.server_id"
-    server_domain: str = "server.domain"
-    server_port: int = "server.port"
+    origin_server_id: str = 'origin.server_id'
 
-    tps_command: str = "server.tps_command"
+    server_name: str = 'server.name'
+    server_id: str = 'server.server_id'
+    server_domain: str = 'server.domain'
+    server_port: int = 'server.port'
 
-    bridge_token: str = "hungerbridge.token"
-    bridge_url: str = "hungerbridge.url"
-    bridge_port: int = "hungerbridge.port"
+    tps_command: str = 'server.tps_command'
 
-    enable_logging: bool = "logger.enabled"
-    logger_name: str = "logger.name"
-    log_path: str = "logger.log_path"
+    bridge_token: str = 'hungerbridge.token'
+    bridge_port: int = 'hungerbridge.port'
 
-    clear_terminal: bool = "terminal.enable_clearing"
+    enable_logging: bool = 'logger.enabled'
+    logger_name: str = 'logger.name'
+    log_path: str = 'logger.log_path'
+
+    info_prefix: str = 'logger.prefixes.info'
+    warn_prefix: str = 'logger.prefixes.warn'
+    error_prefix: str = 'logger.prefixes.error'
+
+    clear_terminal: bool = 'terminal.enable_clearing'
+
+
+class fallbacks:
+    timezone = 'America/Chicago'
+
+    panel_name = 'My Panel'
+    panel_url = 'https://example.com'
+    panel_api_key = 'CHANGE_ME'
+
+    origin_server_id = 'CHANGE_ME'
+
+    server_name = 'My SMP'
+    server_id = 'CHANGE_ME'
+    server_domain = 'mc.example.com'
+    server_port = 25565
+
+    tps_command = 'ticks'
+
+    bridge_token = 'CHANGE_ME'
+    bridge_port = 1913
+
+    enable_logging = True
+    logger_name = 'Server Watcher'
+    log_path = '/home/container/logs/'
+
+    info_prefix = '<white>[INFO]: '
+    warn_prefix = '<yellow>[WARN]: '
+    error_prefix = '<red>[ERROR]: '
+
+    clear_terminal = True

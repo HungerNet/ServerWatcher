@@ -17,13 +17,17 @@ server:
 
 hungerbridge:
   token: 'CHANGE_ME'
-  url: 'http://example.com'
   port: 1913
 
 logger:
   enabled: True
   name: 'Server Watcher'
   log_path: '/home/container/logs/'
+  
+  prefixes:
+    info: "<white>[%hh%:%mm%:%ss%] [INFO]: "
+    warn: "<yellow>[%hh%:%mm%:%ss%] [WARN]: "
+    error: "<red>[%hh%:%mm%:%ss%] [ERROR]: "
 
 terminal:
   enable_clearing: True
