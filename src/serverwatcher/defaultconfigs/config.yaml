@@ -25,9 +25,9 @@ logger:
   log_path: '/home/container/logs/'
   
   prefixes:
-    info: "<white>[INFO]: "
-    warn: "<yellow>[WARN]: "
-    error: "<red>[ERROR]: "
+    info: "<white>[%hh%:%mm%:%ss%] [INFO]: "
+    warn: "<yellow>[%hh%:%mm%:%ss%] [WARN]: "
+    error: "<red>[%hh%:%mm%:%ss%] [ERROR]: "
 
 terminal:
   enable_clearing: True

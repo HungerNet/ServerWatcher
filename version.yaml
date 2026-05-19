@@ -1,4 +1,6 @@
 run: true
-version: "5.17.6"
+version: "5.18"
 description: |
-  - Uses HungerLib's new structure
+  - Added TIME_MAP to list of default maps
+  - Updated to match MessageRouter's new structure
+  - Changed default config files

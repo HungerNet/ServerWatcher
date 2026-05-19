@@ -18,9 +18,10 @@ class ServerWatcher:
 
         datamap_api.setGlobalMaps(
             utils.ASCII_COLOR_MAP,
+            utils.TIME_MAP(self.config.timezone),
             self.config,
             self.messages,
-            self.watcherconfig
+            self.watcherconfig,
         )
 
         self.panel = servers.Panel(
@@ -53,10 +54,11 @@ class ServerWatcher:
             Servers=[self.server],
             log_path=self.config.log_path,
 
-            origin_maps = [utils.ASCII_COLOR_MAP, self.config, self.messages, self.watcherconfig],
-            destination_maps = [utils.ASCII_COLOR_MAP, self.config, self.messages, self.watcherconfig],
-            broadcast_maps = [utils.MC_COLOR_MAP, self.config, self.messages, self.watcherconfig],
-            file_maps = [utils.STRIP_COLOR_MAP, self.config, self.messages, self.watcherconfig],
+            origin_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
+            destination_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
+            broadcast_maps = [utils.MC_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
+            file_maps = [utils.STRIP_COLOR_MAP, utils.TIME_MAP(self.config.timezone), self.config, self.messages, self.watcherconfig],
+            prefix_maps = [utils.ASCII_COLOR_MAP, utils.TIME_MAP(self.config.timezone)],
 
             info_prefix=self.config.info_prefix,
             warn_prefix=self.config.warn_prefix,
