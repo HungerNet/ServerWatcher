@@ -56,7 +56,6 @@ class ServerWatcher:
                 self.config,
                 self.messages,
                 self.watcherconfig,
-                maps.math,
             ],
 
             destination_maps=[
@@ -65,7 +64,6 @@ class ServerWatcher:
                 self.config,
                 self.messages,
                 self.watcherconfig,
-                maps.math,
             ],
 
             broadcast_maps=[
@@ -74,7 +72,6 @@ class ServerWatcher:
                 self.config,
                 self.messages,
                 self.watcherconfig,
-                maps.math,
             ],
 
             file_maps=[
@@ -83,13 +80,11 @@ class ServerWatcher:
                 self.config,
                 self.messages,
                 self.watcherconfig,
-                maps.math,
             ],
 
             prefix_maps=[
                 maps.ascii_colors,
                 maps.time(self.config.timezone),
-                maps.math,
             ],
 
             info_prefix=self.config.info_prefix,

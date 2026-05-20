@@ -1,5 +1,4 @@
 run: true
-version: "5.24"
+version: "5.24.1"
 description: |
-  - Renamed time_tk to time
-  - Added math map to default maps
+  - Removed math map from default maps
