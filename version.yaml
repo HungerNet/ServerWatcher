@@ -1,4 +1,5 @@
 run: true
-version: "5.23.3"
+version: "5.24"
 description: |
-  - Updated validator to use HungerLib's base class
+  - Renamed time_tk to time
+  - Added math map to default maps

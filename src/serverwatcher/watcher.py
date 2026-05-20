@@ -52,39 +52,44 @@ class ServerWatcher:
 
             origin_maps=[
                 maps.ascii_colors,
-                maps.time_tk(self.config.timezone),
+                maps.time(self.config.timezone),
                 self.config,
                 self.messages,
-                self.watcherconfig
+                self.watcherconfig,
+                maps.math,
             ],
 
             destination_maps=[
                 maps.ascii_colors,
-                maps.time_tk(self.config.timezone),
+                maps.time(self.config.timezone),
                 self.config,
                 self.messages,
-                self.watcherconfig
+                self.watcherconfig,
+                maps.math,
             ],
 
             broadcast_maps=[
                 maps.mc_colors,
-                maps.time_tk(self.config.timezone),
+                maps.time(self.config.timezone),
                 self.config,
                 self.messages,
-                self.watcherconfig
+                self.watcherconfig,
+                maps.math,
             ],
 
             file_maps=[
                 maps.strip_colors,
-                maps.time_tk(self.config.timezone),
+                maps.time(self.config.timezone),
                 self.config,
                 self.messages,
-                self.watcherconfig
+                self.watcherconfig,
+                maps.math,
             ],
 
             prefix_maps=[
                 maps.ascii_colors,
-                maps.time_tk(self.config.timezone)
+                maps.time(self.config.timezone),
+                maps.math,
             ],
 
             info_prefix=self.config.info_prefix,
@@ -223,6 +228,7 @@ class ServerWatcher:
 
         if pro == 0:
             self.router.info(self.messages.no_restart)
+            # will add something here later
             return
 
         if pro > anti and snap.players == 0:
