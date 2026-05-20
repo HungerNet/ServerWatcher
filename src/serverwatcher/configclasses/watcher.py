@@ -1,4 +1,4 @@
-from hungerlib import datamap, syntax
+from mapres import datamap, syntax
 
 @datamap(mode='config')
 class WatcherConfig:

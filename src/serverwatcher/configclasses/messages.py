@@ -1,4 +1,4 @@
-from hungerlib import datamap, syntax
+from mapres import datamap, syntax
 
 @datamap(syntax=syntax.braces, mode='config')
 class MessagesConfig:

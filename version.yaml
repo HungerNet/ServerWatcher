@@ -1,4 +1,4 @@
 run: true
-version: "5.23"
+version: "5.23.1"
 description: |
   - Fixed import error
