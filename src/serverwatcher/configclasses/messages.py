@@ -1,6 +1,6 @@
-from hungerlib import datamap, datamap_api
+from hungerlib import datamap, syntax
 
-@datamap(syntax=datamap_api.braces, mode='config')
+@datamap(syntax=syntax.braces, mode='config')
 class MessagesConfig:
     __user_config_path__ = 'config/messages.yaml'
     __default_config_path__ = 'defaultconfigs/messages.yaml'
