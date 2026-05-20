@@ -1,5 +1,5 @@
 from .watcher import ServerWatcher
-from serverwatcher.validator import validate_all
+from .validator import validate_all
 
 def main():
     validate_all()
