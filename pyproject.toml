@@ -29,6 +29,7 @@ dependencies = [
     "mcrcon",
     "hungerlib>=3.1",
     "PyYaml",
+    "mapres",
 ]
 
 classifiers = [
