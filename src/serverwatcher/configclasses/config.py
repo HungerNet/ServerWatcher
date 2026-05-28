@@ -16,8 +16,6 @@ class GlobalConfig:
     server_domain: str = 'server.domain'
     server_port: int = 'server.port'
 
-    tps_command: str = 'server.tps_command'
-
     bridge_token: str = 'hungerbridge.token'
     bridge_port: int = 'hungerbridge.port'
 
@@ -44,8 +42,6 @@ class fallbacks:
     server_id = 'CHANGE_ME'
     server_domain = 'mc.example.com'
     server_port = 25565
-
-    tps_command = 'ticks'
 
     bridge_token = 'CHANGE_ME'
     bridge_port = 1913

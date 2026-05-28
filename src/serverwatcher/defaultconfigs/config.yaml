@@ -10,7 +10,6 @@ server:
   server_id: 'CHANGE_ME'
   domain: 'mc.example.com'
   port: 25565
-  tps_command: 'ticks'
 
 hungerbridge:
   token: 'CHANGE_ME'

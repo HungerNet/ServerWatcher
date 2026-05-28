@@ -45,9 +45,6 @@ def validate_global_config(config):
     if c.server_port is not None and not (1 <= c.server_port <= 65535):
         v.errors.append(f'server_port: must be 1–65535 (got "{c.server_port}")')
 
-    # tps_command
-    v.check_field(c, "tps_command")
-
     # hungerbridge
     v.check_field(c, "bridge_token", allow_fallback=False)
     v.check_field(c, "bridge_port")

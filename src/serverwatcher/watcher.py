@@ -35,7 +35,6 @@ class ServerWatcher:
             server_port=self.config.server_port,
             bridge_port=self.config.bridge_port,
             bridge_token=self.config.bridge_token,
-            tpsCommand=self.config.tps_command,
         )
 
         # logger name

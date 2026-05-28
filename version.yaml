@@ -1,4 +1,4 @@
 run: true
-version: "5.24.1"
+version: "5.24.2"
 description: |
-  - Removed math map from default maps
+  - Update for hungerlib
