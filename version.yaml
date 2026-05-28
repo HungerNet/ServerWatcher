@@ -1,5 +1,4 @@
 run: true
-version: "5.27.1"
+version: "5.27.2"
 description: |
-  - Refactored clear logic
-  - Fix bugs
+  - Refactor validator

@@ -56,3 +56,18 @@ class fallbacks:
 
     clear_terminal = True
     handle_keyboard_interrupt = True
+
+
+class rules:
+    panel_url = "required"
+    panel_api_key = "required"
+    server_id = "required"
+    server_domain = "required"
+    bridge_token = "required"
+
+    timezone = "recommended"
+    panel_name = "recommended"
+    server_port = "recommended"
+    bridge_port = "recommended"
+
+    # everything else defaults to optional

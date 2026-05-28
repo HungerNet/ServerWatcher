@@ -68,3 +68,32 @@ class fallbacks:
     restart_wait_seconds = 30
     restart_timeout = 120
     restart_online_interval = 2
+
+
+class rules:
+    threshold_ram = "required"
+    threshold_cpu = "required"
+    threshold_uptime = "required"
+    threshold_tps = "required"
+
+    restart_wait_seconds = "required"
+    restart_timeout = "required"
+    restart_online_interval = "required"
+
+    watch_interval = "recommended"
+    sample_duration = "recommended"
+    sample_interval = "recommended"
+    sample_outlier_drop = "recommended"
+    threshold_min_uptime = "recommended"
+    threshold_low_gap = "recommended"
+    snap_minutes = "recommended"
+    low_gap_minutes = "recommended"
+    high_gap_minutes = "recommended"
+
+    weight_restart_soon = "optional"
+    weight_ram = "optional"
+    weight_cpu = "optional"
+    weight_uptime = "optional"
+    weight_tps = "optional"
+    weight_low_uptime = "optional"
+    weight_per_player = "optional"

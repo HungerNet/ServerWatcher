@@ -33,6 +33,7 @@ class MessagesConfig:
     status_check: str = 'logging.status_check'
     validation_fail: str = 'logging.validation_fail'
     validation_ok: str = 'logging.validation_ok'
+    sampling_start: str = 'logging.sampling_start'
     shutdown: str = 'logging.shutdown'
     immediate_restart: str = 'logging.immediate_restart'
     no_restart: str = 'logging.no_restart'
@@ -88,6 +89,7 @@ class fallbacks:
     status_check = 'Checking server status...'
     validation_fail = 'Validation FAILED.'
     validation_ok = 'All validation checks succeeded.'
+    sampling_start = 'Starting sampling process...'
     shutdown = 'Shutting down ServerWatcher.'
     immediate_restart = 'Restarting immediately.'
     no_restart = 'The server does not need to restart.'
@@ -113,3 +115,6 @@ class fallbacks:
     server_back_online = 'Server is back online!'
     server_back_online_log = 'ServerWatcher successfully restarted the server.'
     server_failed_restart = 'Server failed to restart!'
+
+class rules:
+    pass
