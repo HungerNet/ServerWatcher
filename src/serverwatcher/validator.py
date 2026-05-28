@@ -106,52 +106,15 @@ def validate_all():
     messages = loadConfig(MessagesConfig)
     watcherconfig = loadConfig(WatcherConfig)
 
-    # type checks
     v.validate_key_types(config, GlobalConfig)
     v.validate_key_types(messages, MessagesConfig)
     v.validate_key_types(watcherconfig, WatcherConfig)
 
-    # semantic checks
     validate_global_config(config)
     validate_watcher_config(watcherconfig)
     validate_messages_config(messages)
 
-    critical_default_keys = [
-        "panel_url",
-        "panel_api_key",
-        "server_id",
-        "server_domain",
-        "bridge_token",
-    ]
-    critical_defaults_used = [
-        d for d in v.defaults
-        if any(d.startswith(k) for k in critical_default_keys)
-    ]
-
-    if len(critical_defaults_used) >= 3:
-        print('❌ CONFIG VALIDATION FAILED:\nIt looks like you haven\'t configured this yet! Please change these defaults:')
-        for d in critical_defaults_used:
-            print(' -', d)
-        sys.exit(1)
-
-    if v.errors or v.defaults:
-        print('❌ CONFIG VALIDATION FAILED:')
-        for e in v.errors:
-            print(' -', e)
-        for d in v.defaults:
-            print(' -', d)
-        if v.warnings:
-            print('\nWarnings:')
-            for w in v.warnings:
-                print(' -', w)
-        sys.exit(1)
-
-    if v.warnings:
-        print('⚠️  CONFIG VALIDATION WARNINGS:')
-        for w in v.warnings:
-            print(' -', w)
-
-    print('✅ All configs are valid.')
+    return v.run(config, messages, watcherconfig)
 
 
 if __name__ == '__main__':

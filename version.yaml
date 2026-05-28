@@ -1,4 +1,6 @@
 run: true
-version: "5.24.2"
+version: "5.25"
 description: |
-  - Update for hungerlib
+  - Updated validator
+    - Matches hungerlib
+    - Moved some logic into __main__.py
