@@ -1,5 +1,5 @@
 run: true
-version: "5.27"
+version: "5.27.1"
 description: |
-  - Changed configs
-  - Added sampling options to watcher.yaml
+  - Refactored clear logic
+  - Fix bugs

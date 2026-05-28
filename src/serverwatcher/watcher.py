@@ -93,6 +93,10 @@ class ServerWatcher:
 
         self.tz = ZoneInfo(self.config.timezone)
 
+    def clearTerminal(self):
+        if self.config.clear_terminal:
+            utils.clearTerminal()
+
     def shutdown(self):
         self.router.info(self.messages.shutdown)
         raise SystemExit
@@ -166,7 +170,7 @@ class ServerWatcher:
             self.shutdown()
 
         self.server.refresh()
-        snap = utils.Snapshot(self.server, duration=self.watcherconfig.sample_duration, interval=self.watcher_config.sample_interval, drop_outliers=self.watcher_config.sample_outlier_drop, gb=True)
+        snap = utils.Snapshot(self.server, duration=self.watcherconfig.sample_duration, interval=self.watcherconfig.sample_interval, drop_outliers=self.watcherconfig.sample_outlier_drop, gb=True)
 
         pro = 0
         anti = 0
@@ -245,15 +249,13 @@ class ServerWatcher:
         if self.config.handle_keyboard_interrupt:
             try:
                 while True:
-                    if self.config.clear_terminal:
-                        utils.clearTerminal()
+                    self.clearTerminal()
                     self.evaluate()
                     time.sleep(self.watcherconfig.watch_interval)
             except KeyboardInterrupt:
                 self.shutdown()
         else:
             while True:
-                if self.config.clear_terminal:
-                    utils.clearTerminal()
+                self.clearTerminal()
                 self.evaluate()
                 time.sleep(self.watcherconfig.watch_interval)
