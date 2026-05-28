@@ -76,5 +76,5 @@ reasons:
 restarts:
   restart_action_sent: 'Restart action sent. Waiting...'
   back_online: 'Server is back online!'
-  back_online_broadcast: '{prefix} <green>Restart successful!'
+  back_online_log: 'ServerWatcher successfully restarted the server.'
   failed_restart: 'Server failed to restart!'

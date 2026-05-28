@@ -7,6 +7,10 @@ class WatcherConfig:
 
     watch_interval: int = 'watch_interval'
 
+    sample_duration: float = 'sampling.duration'
+    sample_interval: float = 'sampling.interval'
+    sample_outlier_drop: int = 'sampling.drop_outliers'
+
     threshold_ram: int = 'thresholds.ram'
     threshold_cpu: int = 'thresholds.cpu'
     threshold_uptime: int = 'thresholds.uptime'
@@ -35,6 +39,10 @@ class WatcherConfig:
 
 class fallbacks:
     watch_interval = 300
+
+    sample_duration = 5.0
+    sample_interval = 1.0
+    sample_outlier_drop = 1
 
     threshold_ram = 6
     threshold_cpu = 150

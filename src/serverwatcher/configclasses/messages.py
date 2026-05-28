@@ -56,7 +56,6 @@ class MessagesConfig:
 
     restart_action_sent: str = 'restarts.restart_action_sent'
     server_back_online: str = 'restarts.back_online'
-    server_back_online_broadcast: str = 'restarts.back_online_broadcast'
     server_failed_restart: str = 'restarts.failed_restart'
 
 
@@ -112,5 +111,5 @@ class fallbacks:
 
     restart_action_sent = 'Restart action sent. Waiting...'
     server_back_online = 'Server is back online!'
-    server_back_online_broadcast = '{prefix} <green>Restart successful!'
+    server_back_online_log = 'ServerWatcher successfully restarted the server.'
     server_failed_restart = 'Server failed to restart!'

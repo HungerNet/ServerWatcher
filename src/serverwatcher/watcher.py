@@ -111,7 +111,7 @@ class ServerWatcher:
 
         if alive:
             self.router.info(self.messages.server_back_online)
-            self.router.broadcast(self.messages.server_back_online_broadcast)
+            self.router.destination(self.messages.server_back_online_log)
         else:
             self.router.error(self.messages.server_failed_restart)
 
@@ -166,7 +166,7 @@ class ServerWatcher:
             self.shutdown()
 
         self.server.refresh()
-        snap = utils.Snapshot(self.server, duration=2.0, interval=1.0, drop_outliers=1, gb=True)
+        snap = utils.Snapshot(self.server, duration=self.watcherconfig.sample_duration, interval=self.watcher_config.sample_interval, drop_outliers=self.watcher_config.sample_outlier_drop, gb=True)
 
         pro = 0
         anti = 0

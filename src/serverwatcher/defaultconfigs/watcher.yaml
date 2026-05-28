@@ -1,5 +1,10 @@
 watch_interval: 300      # in seconds
 
+sampling:
+  duration: 5.0          # total seconds to sample
+  interval: 1.0          # delay between samples (0 = no smoothing)
+  drop_outliers: 1       # number of highest and lowest samples to drop
+
 thresholds:
   ram: 6
   cpu: 150

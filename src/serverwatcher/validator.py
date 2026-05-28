@@ -92,7 +92,7 @@ def validate_watcher_config(watcherconfig):
 
 
 def validate_messages_config(messages):
-    pass
+    pass # may add validation later
     # for f in fields(MessagesConfig):
     #     if f.name.startswith("__"):
     #         continue
