@@ -166,7 +166,7 @@ class ServerWatcher:
             self.shutdown()
 
         self.server.refresh()
-        snap = utils.Snapshot(self.server, 2, True)
+        snap = utils.Snapshot(self.server, duration=2.0, interval=1.0, drop_outliers=1, gb=True)
 
         pro = 0
         anti = 0
