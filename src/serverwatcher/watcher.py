@@ -131,26 +131,35 @@ class ServerWatcher:
 
         self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
 
-        # minute callbacks
+        def plural(n):
+            return '' if n == 1 else 's'
+
+        # minute message generator
+        def minute_msg(n):
+            raw = self.messages.minute_template
+            return self.res(raw, n=n, s=plural(n))
+
+        # second message generator
+        def second_msg(n):
+            raw = self.messages.second_template
+            return self.res(raw, n=n, s=plural(n))
+
+        # minute callbacks using template
         minute_callbacks = {
-            int(k.split("_")[1]): (
-                lambda raw=self.messages.as_map()[k]:
-                    (self.router.broadcast(self.res(raw)),
-                     self.router.origin(raw))
-            )
-            for k in self.messages.as_map()
-            if k.startswith("minute_")
+            n: (lambda n=n: (
+                self.router.broadcast(minute_msg(n)),
+                self.router.origin(minute_msg(n))
+            ))
+            for n in self.watcherconfig.snap_minutes
         }
 
-        # second callbacks
+        # second callbacks using template
         second_callbacks = {
-            int(k.split("_")[1]): (
-                lambda raw=self.messages.as_map()[k]:
-                    (self.router.broadcast(self.res(raw)),
-                     self.router.origin(raw))
-            )
-            for k in self.messages.as_map()
-            if k.startswith("second_")
+            n: (lambda n=n: (
+                self.router.broadcast(second_msg(n)),
+                self.router.origin(second_msg(n))
+            ))
+            for n in range(1, 11)
         }
 
         utils.runCountdownEvents(
@@ -180,21 +189,15 @@ class ServerWatcher:
         no_restart_reasons = []
 
         if snap.ram >= self.watcherconfig.threshold_ram:
-            restart_reasons.append(
-                self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram)
-            )
+            restart_reasons.append(self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
             pro += int(round(snap.ram, 0) - (self.watcherconfig.threshold_ram - 1))
 
         if snap.cpu >= self.watcherconfig.threshold_cpu:
-            restart_reasons.append(
-                self.res(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu)
-            )
+            restart_reasons.append(self.res(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu))
             pro += self.watcherconfig.weight_cpu
 
         if snap.uptime // 3600 >= self.watcherconfig.threshold_uptime:
-            restart_reasons.append(
-                self.res(self.messages.reason_uptime, uptime=snap.uptime_formatted, threshold=self.watcherconfig.threshold_uptime)
-            )
+            restart_reasons.append(self.res(self.messages.reason_uptime, uptime=snap.uptime_formatted, threshold=self.watcherconfig.threshold_uptime))
             pro += self.watcherconfig.weight_uptime
 
         if (snap.tps if snap.tps is not None else 20) <= self.watcherconfig.threshold_tps:

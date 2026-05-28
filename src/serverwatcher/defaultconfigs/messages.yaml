@@ -43,6 +43,10 @@ bullet: '-'
 
 broadcast_restart_at: '{prefix} The server will restart at {time} CDT.'
 
+broadcast_templates:
+  minutes: '{prefix} Restart in {n} minute{s}!'
+  seconds: '{prefix} <red>Restarting in {n} second{s}!'
+
 broadcast_minutes: {}
 broadcast_seconds: {}
 
