@@ -89,7 +89,7 @@ class fallbacks:
     status_check = 'Checking server status...'
     validation_fail = 'Validation FAILED.'
     validation_ok = 'All validation checks succeeded.'
-    sampling_start = 'Starting sampling process...'
+    sampling_start = 'Starting sampling process. This should take about {duration} seconds...'
     shutdown = 'Shutting down ServerWatcher.'
     immediate_restart = 'Restarting immediately.'
     no_restart = 'The server does not need to restart.'

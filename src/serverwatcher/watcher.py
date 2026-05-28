@@ -169,7 +169,8 @@ class ServerWatcher:
             self.router.error(self.messages.validation_fail)
             self.shutdown()
 
-        self.router.info(self.messages.sampling_start)
+        sample_duration_formatted = int(self.watcherconfig.sample_duration) if self.watcherconfig.sample_duration.is_integer() else self.watcherconfig.sample_duration
+        self.router.info(self.messages.sampling_start, duration=sample_duration_formatted)
         self.server.refresh()
         snap = utils.Snapshot(self.server, duration=self.watcherconfig.sample_duration, interval=self.watcherconfig.sample_interval, drop_outliers=self.watcherconfig.sample_outlier_drop, gb=True)
 
