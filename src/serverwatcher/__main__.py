@@ -1,6 +1,6 @@
 from .watcher import ServerWatcher
 from .validator import validate_all
-from hungerlib import (
+from hungerlib.validator import (
     ValidationError,
     FatalError,
     TypeMismatchError,
