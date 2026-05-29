@@ -1,9 +1,11 @@
 from .watcher import ServerWatcher
 from .validator import validate_all
-from hungerlib.utils.exceptions import (
+from hungerlib import (
     ValidationError,
-    FatalValidationError,
-    ValidationFallbacks,
+    FatalError,
+    TypeMismatchError,
+    FallbackError,
+    RecommendedError,
 )
 import time
 
@@ -11,13 +13,24 @@ def main():
     try:
         validate_all()
 
-    except FatalValidationError as e:
+    except FatalError as e:
         print("❌ FATAL CONFIG ERROR:")
         print(e)
-        return  # fully cancel
+        return
 
-    except ValidationFallbacks as e:
-        print("⚠️ CONFIG DEFAULTS IN USE:")
+    except TypeMismatchError as e:
+        print("❌ TYPE MISMATCH ERROR:")
+        print(e)
+        return
+
+    except FallbackError as e:
+        print("⚠️ FALLBACKS IN USE:")
+        print(e)
+        print("Continuing in 5 seconds...")
+        time.sleep(5)
+
+    except RecommendedError as e:
+        print("⚠️ RECOMMENDED KEYS MISSING:")
         print(e)
         print("Continuing in 5 seconds...")
         time.sleep(5)
@@ -25,7 +38,7 @@ def main():
     except ValidationError as e:
         print("❌ CONFIG ERROR:")
         print(e)
-        return  # non-fatal but still cancel
+        return
 
     watcher = ServerWatcher()
     watcher.run()

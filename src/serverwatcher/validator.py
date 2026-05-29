@@ -10,8 +10,12 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 
 utils.clearTerminal()
 
-# You can customize messages here if you want
-v = Validator()
+v = Validator(
+    throw_on_required=True,
+    throw_on_type_mismatch=True,
+    throw_on_fallback=True,
+    throw_on_recommended=True,
+)
 
 
 def validate_global_config(c):

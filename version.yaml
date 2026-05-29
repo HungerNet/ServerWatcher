@@ -1,4 +1,6 @@
 run: true
-version: "5.29"
+version: "5.30"
 description: |
-  - Modified time callbacks to be more intuitive
+  - Updated validator
+    - Better error handling
+    - Improved logic
