@@ -10,12 +10,7 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 
 utils.clearTerminal()
 
-v = Validator(
-    throw_on_required=True,
-    throw_on_type_mismatch=True,
-    throw_on_fallback=True,
-    throw_on_recommended=True,
-)
+v = Validator()
 
 
 def validate_global_config(c):
