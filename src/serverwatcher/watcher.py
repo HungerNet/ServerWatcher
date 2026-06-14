@@ -174,9 +174,14 @@ class ServerWatcher:
 
         self.router.info(self.messages.startup)
 
-        if not utils.validateAll(self.panel, self.server):
+        # retry validation 5 times
+        for i in range(5):
+            if utils.validateAll(self.panel, self.server):
+                break
+            time.sleep(2)
+        else:
             self.router.error(self.messages.validation_fail)
-            self.shutdown()
+            return
 
         sample_duration_formatted = int(self.watcherconfig.sample_duration) if self.watcherconfig.sample_duration.is_integer() else self.watcherconfig.sample_duration
         self.router.info(self.messages.sampling_start, duration=sample_duration_formatted)
