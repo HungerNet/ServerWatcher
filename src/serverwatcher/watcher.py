@@ -137,12 +137,12 @@ class ServerWatcher:
         # minute message generator
         def minute_msg(n):
             raw = self.messages.minute_template
-            return self.res(raw, n=n, s=plural(n))
+            return self.res(raw, n=n, s=plural(n), prefix=self.messages.prefix)
 
         # second message generator
         def second_msg(n):
             raw = self.messages.second_template
-            return self.res(raw, n=n, s=plural(n))
+            return self.res(raw, n=n, s=plural(n), prefix=self.messages.prefix)
 
         # minute callbacks using template
         minute_callbacks = {
