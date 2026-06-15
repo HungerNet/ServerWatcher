@@ -147,8 +147,8 @@ class ServerWatcher:
         # minute callbacks using template
         minute_callbacks = {
             n: (lambda n=n: (
-                self.router.broadcast(minute_msg(n)),
-                self.router.origin(minute_msg(n))
+                self.router.broadcast(minute_msg(n + 1)),
+                self.router.origin(minute_msg(n + 1))
             ))
             for n in self.watcherconfig.snap_minutes
         }
