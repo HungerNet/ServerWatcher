@@ -1,4 +1,4 @@
 run: true
-version: "5.30.5"
+version: "5.30.6"
 description: |
-  - Fixed server_back_online_log key
+  - Swapped back online message and log

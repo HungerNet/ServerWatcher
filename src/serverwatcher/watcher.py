@@ -114,8 +114,8 @@ class ServerWatcher:
         )
 
         if alive:
-            self.router.info(self.messages.server_back_online)
-            self.router.destination(self.messages.server_back_online_log)
+            self.router.info(self.messages.server_back_online_log)
+            self.router.destination(self.messages.server_back_online)
         else:
             self.router.error(self.messages.server_failed_restart)
 
