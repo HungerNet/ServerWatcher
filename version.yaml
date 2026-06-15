@@ -1,4 +1,4 @@
 run: true
-version: "5.30.4"
+version: "5.30.5"
 description: |
-  - Fixed prefix ctx not being applied
+  - Fixed server_back_online_log key

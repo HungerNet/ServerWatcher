@@ -41,6 +41,7 @@ class MessagesConfig:
 
     restart_action_sent: str = 'restarts.restart_action_sent'
     server_back_online: str = 'restarts.back_online'
+    server_back_online_log: str = 'restarts.back_online_log'
     server_failed_restart: str = 'restarts.failed_restart'
 
 
