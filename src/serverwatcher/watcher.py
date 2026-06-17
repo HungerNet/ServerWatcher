@@ -91,6 +91,13 @@ class ServerWatcher:
             error_prefix=self.config.error_prefix,
         )
 
+        self.router.registerLevel(
+            name='debug',
+            prefix=self.config.debug_prefix,
+            file_method='debug',
+            routes=['origin']
+        )
+
         self.tz = ZoneInfo(self.config.timezone)
 
     def clearTerminal(self):
@@ -197,11 +204,11 @@ class ServerWatcher:
         no_restart_reasons = []
 
         if self.config.debug:
-            self.router.origin(f'RAM: {snap.ram}/{self.watcherconfig.threshold_ram}', level=self.config.debug_prefix)
-            self.router.origin(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}', level=self.config.debug_prefix)
-            self.router.origin(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}', level=self.config.debug_prefix)
-            self.router.origin(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}', level=self.config.debug_prefix)
-            self.router.origin(f'Players: {snap.players}', level=self.config.debug_prefix)
+            self.router.debug(f'RAM: {snap.ram}/{self.watcherconfig.threshold_ram}')
+            self.router.debug(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}')
+            self.router.debug(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}')
+            self.router.debug(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}')
+            self.router.debug(f'Players: {snap.players}')
 
         if snap.ram >= self.watcherconfig.threshold_ram:
             restart_reasons.append(self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
@@ -271,6 +278,8 @@ class ServerWatcher:
                 while True:
                     utils.clearTerminal()
                     self.evaluate()
+                    if self.config.debug:
+                        self.router.debug(f'Waiting {self.watcherconfig.watch_interval}s until next run...')
                     time.sleep(self.watcherconfig.watch_interval)
             except KeyboardInterrupt:
                 self.shutdown()
@@ -278,4 +287,6 @@ class ServerWatcher:
             while True:
                 utils.clearTerminal()
                 self.evaluate()
+                if self.config.debug:
+                    self.router.debug(f'Waiting {self.watcherconfig.watch_interval}s until next run...')
                 time.sleep(self.watcherconfig.watch_interval)
