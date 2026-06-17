@@ -1,6 +1,4 @@
 run: true
-version: '5.31'
+version: '5.31.1'
 description: |
-  - Added debugging
-  - Removed duplicate terminal clearing
-  - Used single quotes where possible
+  - Fixed terminal clearing

@@ -266,11 +266,13 @@ class ServerWatcher:
         if self.config.handle_keyboard_interrupt:
             try:
                 while True:
+                    utils.clearTerminal()
                     self.evaluate()
                     time.sleep(self.watcherconfig.watch_interval)
             except KeyboardInterrupt:
                 self.shutdown()
         else:
             while True:
+                utils.clearTerminal()
                 self.evaluate()
                 time.sleep(self.watcherconfig.watch_interval)
