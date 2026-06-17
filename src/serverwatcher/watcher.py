@@ -194,9 +194,6 @@ class ServerWatcher:
         self.router.info(self.messages.sampling_start, duration=sample_duration_formatted)
         self.server.refresh()
         snap = utils.Snapshot(self.server, duration=self.watcherconfig.sample_duration, interval=self.watcherconfig.sample_interval, drop_outliers=self.watcherconfig.sample_outlier_drop, gb=True)
-
-        # get latest player count, do not average
-        snap.players = self.server.getPlayers()
         
         pro = 0
         anti = 0
@@ -208,7 +205,7 @@ class ServerWatcher:
             self.router.debug(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}')
             self.router.debug(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}')
             self.router.debug(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}')
-            self.router.debug(f'Players: {snap.players}')
+            self.router.debug(f'Players: {snap.players}/{self.server.getMaxPlayers()}')
 
         if snap.ram >= self.watcherconfig.threshold_ram:
             restart_reasons.append(self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
