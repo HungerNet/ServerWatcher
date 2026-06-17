@@ -1,3 +1,4 @@
+debug: False
 timezone: 'America/Chicago'
 
 panel:
@@ -5,15 +6,11 @@ panel:
   url: 'https://example.com'
   api_key: 'CHANGE_ME'
 
-origin:
-  server_id: 'CHANGE_ME'
-
 server:
   name: 'My SMP'
   server_id: 'CHANGE_ME'
   domain: 'mc.example.com'
   port: 25565
-  tps_command: 'ticks'
 
 hungerbridge:
   token: 'CHANGE_ME'
@@ -25,9 +22,11 @@ logger:
   log_path: '/home/container/logs/'
   
   prefixes:
-    info: "<white>[%hh%:%mm%:%ss%] [INFO]: "
-    warn: "<yellow>[%hh%:%mm%:%ss%] [WARN]: "
-    error: "<red>[%hh%:%mm%:%ss%] [ERROR]: "
+    info: '<white>[%hh%:%mm%:%ss%] [INFO]: '
+    warn: '<yellow>[%hh%:%mm%:%ss%] [WARN]: '
+    error: '<red>[%hh%:%mm%:%ss%] [ERROR]: '
+    debug: '<aqua>[%hh%:%mm%:%ss%] [DEBUG]: '
 
 terminal:
   enable_clearing: True
+  handle_keyboard_interrupt: True

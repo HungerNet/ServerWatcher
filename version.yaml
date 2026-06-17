@@ -1,4 +1,5 @@
 run: true
-version: "5.19"
+version: '5.33.dev1'
 description: |
-  - Added KeyboardInterrupt handler
+  - Added max players debug
+  - Removed player smoothing logic (hungerlib does this internally now)

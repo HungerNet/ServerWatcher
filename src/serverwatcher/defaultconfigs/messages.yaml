@@ -43,6 +43,10 @@ bullet: '-'
 
 broadcast_restart_at: '{prefix} The server will restart at {time} CDT.'
 
+broadcast_templates:
+  minutes: '{prefix} Restart in {n} minute{s}!'
+  seconds: '{prefix} <red>Restarting in {n} second{s}!'
+
 broadcast_minutes: {}
 broadcast_seconds: {}
 
@@ -51,6 +55,7 @@ logging:
   status_check: 'Checking server status...'
   validation_fail: 'Validation FAILED.'
   validation_ok: 'All validation checks succeeded.'
+  sampling_start: 'Starting sampling process. This should take about {duration} seconds...'
   shutdown: 'Shutting down ServerWatcher.'
   immediate_restart: 'Restarting immediately.'
   no_restart: 'The server does not need to restart.'
@@ -68,7 +73,7 @@ reasons:
   uptime: 'Uptime {uptime} exceeds {threshold}h'
   tps: 'TPS {tps} is lower than {threshold}'
   low_uptime: 'Uptime {uptime} is shorter than 30m'
-  players: 'There {verb} {count} {plural} online'         # produces: "There are 2 players online" or "There is 1 player online"
+  players: 'There {verb} {count} {plural} online'         # produces: 'There are 2 players online' or 'There is 1 player online'
 
   pro_restart_number: 'Pro-restart: '
   anti_restart_number: 'Anti-restart:'
@@ -76,5 +81,5 @@ reasons:
 restarts:
   restart_action_sent: 'Restart action sent. Waiting...'
   back_online: 'Server is back online!'
-  back_online_broadcast: '{prefix} <green>Restart successful!'
+  back_online_log: 'ServerWatcher successfully restarted the server.'
   failed_restart: 'Server failed to restart!'
