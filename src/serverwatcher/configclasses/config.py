@@ -5,6 +5,7 @@ class GlobalConfig:
     __user_config_path__ = 'config/config.yaml'
     __default_config_path__ = 'defaultconfigs/config.yaml'
 
+    debug: bool = 'debug'
     timezone: str = 'timezone'
 
     panel_name: str = 'panel.name'
@@ -26,12 +27,14 @@ class GlobalConfig:
     info_prefix: str = 'logger.prefixes.info'
     warn_prefix: str = 'logger.prefixes.warn'
     error_prefix: str = 'logger.prefixes.error'
+    debug_prefix: str = 'logger.prefixes.debug'
 
     clear_terminal: bool = 'terminal.enable_clearing'
     handle_keyboard_interrupt: bool = 'terminal.handle_keyboard_interrupt'
 
 
 class fallbacks:
+    debug = False
     timezone = 'America/Chicago'
 
     panel_name = 'My Panel'
@@ -50,24 +53,25 @@ class fallbacks:
     logger_name = 'Server Watcher'
     log_path = '/home/container/logs/'
 
-    info_prefix = '<white>[INFO]: '
-    warn_prefix = '<yellow>[WARN]: '
-    error_prefix = '<red>[ERROR]: '
+    info_prefix = '<white>[%hh%:%mm%:%ss%] [INFO]: '
+    warn_prefix = '<yellow>[%hh%:%mm%:%ss%] [WARN]: '
+    error_prefix = '<red>[%hh%:%mm%:%ss%] [ERROR]: '
+    debug_prefix = '<aqua>[%hh%:%mm%:%ss%] [DEBUG]: '
 
     clear_terminal = True
     handle_keyboard_interrupt = True
 
 
 class rules:
-    panel_url = "required"
-    panel_api_key = "required"
-    server_id = "required"
-    server_domain = "required"
-    bridge_token = "required"
+    panel_url = 'required'
+    panel_api_key = 'required'
+    server_id = 'required'
+    server_domain = 'required'
+    bridge_token = 'required'
 
-    timezone = "recommended"
-    panel_name = "recommended"
-    server_port = "recommended"
-    bridge_port = "recommended"
+    timezone = 'recommended'
+    panel_name = 'recommended'
+    server_port = 'recommended'
+    bridge_port = 'recommended'
 
     # everything else defaults to optional

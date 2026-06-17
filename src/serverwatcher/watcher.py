@@ -124,10 +124,10 @@ class ServerWatcher:
             minimumMinutes=minutes,
             snapMinutes=tuple(sorted(self.watcherconfig.snap_minutes))
         )
-        scheduled = info["scheduled"]
+        scheduled = info['scheduled']
 
         local_time = scheduled.astimezone(self.tz)
-        time_str = local_time.strftime("%I:%M %p")
+        time_str = local_time.strftime('%I:%M %p')
 
         self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
 
@@ -169,7 +169,7 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.router.info("ServerWatcher is running!")
+        self.router.info('ServerWatcher is running!')
         utils.clearTerminal()
 
         self.router.info(self.messages.startup)
@@ -193,6 +193,13 @@ class ServerWatcher:
         restart_reasons = []
         no_restart_reasons = []
 
+        if self.config.debug:
+            self.router.origin(f'RAM: {snap.ram}/{self.watcherconfig.threshold_ram}', level=self.config.debug_prefix)
+            self.router.origin(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}', level=self.config.debug_prefix)
+            self.router.origin(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}', level=self.config.debug_prefix)
+            self.router.origin(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}', level=self.config.debug_prefix)
+            self.router.origin(f'Players: {snap.players}', level=self.config.debug_prefix)
+
         if snap.ram >= self.watcherconfig.threshold_ram:
             restart_reasons.append(self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))
             pro += int(round(snap.ram, 0) - (self.watcherconfig.threshold_ram - 1))
@@ -214,23 +221,23 @@ class ServerWatcher:
             anti += self.watcherconfig.weight_low_uptime
 
         if snap.players > 0:
-            verb = "are" if snap.players != 1 else "is"
-            plural = "players" if snap.players != 1 else "player"
+            verb = 'are' if snap.players != 1 else 'is'
+            plural = 'players' if snap.players != 1 else 'player'
             no_restart_reasons.append(self.res(self.messages.reason_players, verb=verb, count=snap.players, plural=plural))
             anti += snap.players * self.watcherconfig.weight_per_player
 
         if restart_reasons:
             self.router.warn(self.messages.pro_restart_splash)
             for r in restart_reasons:
-                self.router.warn(f"{self.messages.bullet} {r}")
+                self.router.warn(f'{self.messages.bullet} {r}')
 
         if no_restart_reasons:
             self.router.warn(self.messages.anti_restart_splash)
             for r in no_restart_reasons:
-                self.router.warn(f"{self.messages.bullet} {r}")
+                self.router.warn(f'{self.messages.bullet} {r}')
 
-        self.router.warn(f"{self.messages.pro_restart_number} {pro}")
-        self.router.warn(f"{self.messages.anti_restart_number} {anti}")
+        self.router.warn(f'{self.messages.pro_restart_number} {pro}')
+        self.router.warn(f'{self.messages.anti_restart_number} {anti}')
 
         gap = abs(pro - anti)
 
@@ -259,13 +266,11 @@ class ServerWatcher:
         if self.config.handle_keyboard_interrupt:
             try:
                 while True:
-                    self.clearTerminal()
                     self.evaluate()
                     time.sleep(self.watcherconfig.watch_interval)
             except KeyboardInterrupt:
                 self.shutdown()
         else:
             while True:
-                self.clearTerminal()
                 self.evaluate()
                 time.sleep(self.watcherconfig.watch_interval)

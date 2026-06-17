@@ -1,3 +1,4 @@
+debug: False
 timezone: 'America/Chicago'
 
 panel:
@@ -21,9 +22,10 @@ logger:
   log_path: '/home/container/logs/'
   
   prefixes:
-    info: "<white>[%hh%:%mm%:%ss%] [INFO]: "
-    warn: "<yellow>[%hh%:%mm%:%ss%] [WARN]: "
-    error: "<red>[%hh%:%mm%:%ss%] [ERROR]: "
+    info: '<white>[%hh%:%mm%:%ss%] [INFO]: '
+    warn: '<yellow>[%hh%:%mm%:%ss%] [WARN]: '
+    error: '<red>[%hh%:%mm%:%ss%] [ERROR]: '
+    debug: '<aqua>[%hh%:%mm%:%ss%] [DEBUG]: '
 
 terminal:
   enable_clearing: True

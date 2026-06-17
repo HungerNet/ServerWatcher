@@ -1,4 +1,6 @@
 run: true
-version: "5.30.8"
+version: '5.31'
 description: |
-  - Flipped server_back_online messages again
+  - Added debugging
+  - Removed duplicate terminal clearing
+  - Used single quotes where possible

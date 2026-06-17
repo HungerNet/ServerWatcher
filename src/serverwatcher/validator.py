@@ -15,19 +15,19 @@ v = Validator()
 
 def validate_global_config(c):
     for f in fields(GlobalConfig):
-        if not f.name.startswith("__"):
+        if not f.name.startswith('__'):
             v.check_field(c, f.name)
 
 
 def validate_watcher_config(c):
     for f in fields(WatcherConfig):
-        if not f.name.startswith("__"):
+        if not f.name.startswith('__'):
             v.check_field(c, f.name)
 
 
 def validate_messages_config(c):
     for f in fields(MessagesConfig):
-        if not f.name.startswith("__"):
+        if not f.name.startswith('__'):
             v.check_field(c, f.name)
 
 
