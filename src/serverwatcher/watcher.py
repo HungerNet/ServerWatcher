@@ -205,7 +205,7 @@ class ServerWatcher:
             self.router.debug(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}')
             self.router.debug(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}')
             self.router.debug(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}')
-            self.router.debug(f'Players: {snap.players}/{self.server.getMaxPlayers()}')
+            self.router.debug(f'Players: {snap.players}/{self.server.max_players}')
 
         if snap.ram >= self.watcherconfig.threshold_ram:
             restart_reasons.append(self.res(self.messages.reason_ram, ram=snap.ram, threshold=self.watcherconfig.threshold_ram))

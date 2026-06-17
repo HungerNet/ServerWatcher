@@ -1,5 +1,5 @@
 run: true
-version: '5.33.dev1'
+version: '5.33.dev2'
 description: |
-  - Added max players debug
-  - Removed player smoothing logic (hungerlib does this internally now)
+  - Fixed property usage
+  - Removed dev branch (will use main instead, channels will provide other information)
