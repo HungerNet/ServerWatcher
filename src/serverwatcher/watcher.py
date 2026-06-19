@@ -33,7 +33,7 @@ class ServerWatcher:
             server_id=self.config.server_id,
             server_domain=self.config.server_domain,
             server_port=self.config.server_port,
-            url=self.config.bridge_url,
+            bridge_url=self.config.bridge_url,
             bridge_token=self.config.bridge_token,
         )
 
