@@ -18,7 +18,7 @@ class GlobalConfig:
     server_port: int = 'server.port'
 
     bridge_token: str = 'hungerbridge.token'
-    bridge_port: int = 'hungerbridge.port'
+    bridge_url: str = 'hungerbridge.url'
 
     enable_logging: bool = 'logger.enabled'
     logger_name: str = 'logger.name'
@@ -47,7 +47,7 @@ class fallbacks:
     server_port = 25565
 
     bridge_token = 'CHANGE_ME'
-    bridge_port = 1913
+    bridge_url = 'https://api.example.com:1913'
 
     enable_logging = True
     logger_name = 'Server Watcher'
@@ -72,6 +72,6 @@ class rules:
     timezone = 'recommended'
     panel_name = 'recommended'
     server_port = 'recommended'
-    bridge_port = 'recommended'
+    bridge_url = 'recommended'
 
     # everything else defaults to optional

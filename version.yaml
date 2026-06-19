@@ -1,5 +1,7 @@
 run: true
-version: '5.33.dev2'
+version: '5.33.dev3'
 description: |
-  - Fixed property usage
-  - Removed dev branch (will use main instead, channels will provide other information)
+  - Added `hungerbridge.url` configuration option to specify the URL of the HungerBridge API.
+  - Updated default configuration to include the new `hungerbridge.url` option.
+  - Updated `Config` class to include the new `bridge_url` attribute.
+  - Updated `Watcher` class to use the new `bridge_url` configuration option when initializing the `HungerBridgeClient`.
