@@ -1,4 +1,4 @@
 run: true
-version: '5.33.dev4'
+version: '5.33.alpha1'
 description: |
-  - Fixed MinecraftServer constructor call.
+  - Now in alpha
