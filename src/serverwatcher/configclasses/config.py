@@ -20,6 +20,10 @@ class GlobalConfig:
     bridge_token: str = 'hungerbridge.token'
     bridge_url: str = 'hungerbridge.url'
 
+    discord_enabled = 'discord.enabled'
+    discord_token = 'discord.token'
+    discord_url = 'discord.url'
+
     enable_logging: bool = 'logger.enabled'
     logger_name: str = 'logger.name'
     log_path: str = 'logger.log_path'
@@ -48,6 +52,10 @@ class fallbacks:
 
     bridge_token = 'CHANGE_ME'
     bridge_url = 'https://api.example.com:1913'
+
+    discord_enabled = True
+    discord_token = 'CHANGE_ME'
+    discord_url = 'https://bot.example.com'
 
     enable_logging = True
     logger_name = 'Server Watcher'

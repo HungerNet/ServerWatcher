@@ -16,6 +16,11 @@ hungerbridge:
   token: 'CHANGE_ME'
   url: 'https://api.example.com:1913'
 
+discord:
+  enabled: True
+  token: 'CHANGE_ME'
+  url: 'https://bot.example.com'
+
 logger:
   enabled: True
   name: 'Server Watcher'

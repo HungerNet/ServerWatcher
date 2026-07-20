@@ -1,7 +1,7 @@
-import os
 import time
 from zoneinfo import ZoneInfo
 
+from .discord_bot_webook import DiscordBotWebhook
 from hungerlib import servers, MessageRouter, loadConfig, utils
 from mapres import MapResolver, maps
 
@@ -99,6 +99,7 @@ class ServerWatcher:
         )
 
         self.tz = ZoneInfo(self.config.timezone)
+        self.Webhook = DiscordBotWebhook(url = self.config.discord_url, token = self.config.discord_token)
 
     def clearTerminal(self):
         if self.config.clear_terminal:
@@ -263,11 +264,14 @@ class ServerWatcher:
         if gap <= self.watcherconfig.threshold_low_gap:
             self.router.warn(self.messages.gap_low, gap=gap)
             self.schedule_restart(self.watcherconfig.low_gap_minutes)
+            # send discord message
         else:
             self.router.warn(self.messages.gap_high, gap=gap)
             self.schedule_restart(self.watcherconfig.high_gap_minutes)
+            # send discord message
 
         self.restart_and_wait()
+        # send discord message
 
     def run(self):
         if self.config.handle_keyboard_interrupt:
