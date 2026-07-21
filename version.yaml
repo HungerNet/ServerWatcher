@@ -1,4 +1,4 @@
 run: true
-version: '5.33.alpha2'
+version: '5.33-alpha.2'
 description: |
-  - Start testing Discord bot
+  - Fixed version
