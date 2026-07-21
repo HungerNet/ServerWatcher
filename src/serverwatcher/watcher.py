@@ -1,8 +1,7 @@
 import time
 from zoneinfo import ZoneInfo
 
-from .discord_bot_webook import DiscordBotWebhook
-from hungerlib import servers, MessageRouter, loadConfig, utils
+from hungerlib import servers, MessageRouter, loadConfig, DiscordBotWebhook, utils
 from mapres import MapResolver, maps
 
 from serverwatcher.configclasses.config import GlobalConfig
@@ -99,7 +98,11 @@ class ServerWatcher:
         )
 
         self.tz = ZoneInfo(self.config.timezone)
-        self.Webhook = DiscordBotWebhook(url = self.config.discord_url, token = self.config.discord_token)
+        self.Webhook = DiscordBotWebhook(url=self.config.discord_url, token=self.config.discord_token)
+
+    def webhookSend(self, event: str, **ctx):
+        if self.config.discord_enabled:
+            self.Webhook.send(event=event, **ctx)
 
     def clearTerminal(self):
         if self.config.clear_terminal:
@@ -111,7 +114,10 @@ class ServerWatcher:
 
     def restart_and_wait(self):
         self.server.restart()
+
         self.router.info(self.messages.restart_action_sent)
+        self.webhookSend(event='restart_action_sent', server=self.config.server_name)
+
         time.sleep(self.watcherconfig.restart_wait_seconds)
 
         self.router.warn(self.messages.status_check)
@@ -124,8 +130,10 @@ class ServerWatcher:
         if alive:
             self.router.info(self.messages.server_back_online)
             self.router.destination(self.messages.server_back_online_log)
+            self.webhookSend(event='server_back_online', server=self.config.server_name)
         else:
             self.router.error(self.messages.server_failed_restart)
+            self.webhookSend(event='server_failed_restart', server=self.config.server_name)
 
     def schedule_restart(self, minutes):
         info = utils.snapSchedule(
@@ -138,6 +146,7 @@ class ServerWatcher:
         time_str = local_time.strftime('%I:%M %p')
 
         self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
+        self.webhookSend(event="restart_scheduled", server=self.config.server_name, time=time_str)
 
         def plural(n):
             return '' if n == 1 else 's'
@@ -189,6 +198,7 @@ class ServerWatcher:
             time.sleep(2)
         else:
             self.router.error(self.messages.validation_fail)
+            self.webhookSend(event="validation_fail", server=self.config.server_name)
             return
 
         sample_duration_formatted = int(self.watcherconfig.sample_duration) if self.watcherconfig.sample_duration.is_integer() else self.watcherconfig.sample_duration
@@ -264,11 +274,9 @@ class ServerWatcher:
         if gap <= self.watcherconfig.threshold_low_gap:
             self.router.warn(self.messages.gap_low, gap=gap)
             self.schedule_restart(self.watcherconfig.low_gap_minutes)
-            # send discord message
         else:
             self.router.warn(self.messages.gap_high, gap=gap)
             self.schedule_restart(self.watcherconfig.high_gap_minutes)
-            # send discord message
 
         self.restart_and_wait()
         # send discord message

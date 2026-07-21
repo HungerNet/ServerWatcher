@@ -1,4 +1,8 @@
 run: true
-version: '5.33-alpha.2'
+version: '5.33-alpha.3'
 description: |
-  - Fixed version
+  - Alpha 1-2:
+    - Fixed version
+    - Moved DiscordBotWebhook into hungerlib
+  - Alpha 3:
+    - Fixed all Webhook issues
