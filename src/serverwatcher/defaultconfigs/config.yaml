@@ -14,12 +14,12 @@ server:
 
 hungerbridge:
   token: 'CHANGE_ME'
-  url: 'https://api.example.com:1913'
+  url: 'https://api.example.com'
 
 discord:
   enabled: True
   token: 'CHANGE_ME'
-  url: 'https://bot.example.com'
+  url: 'https://bot.example.com/webhook'
 
 logger:
   enabled: True

@@ -51,11 +51,11 @@ class fallbacks:
     server_port = 25565
 
     bridge_token = 'CHANGE_ME'
-    bridge_url = 'https://api.example.com:1913'
+    bridge_url = 'https://api.example.com'
 
     discord_enabled = True
     discord_token = 'CHANGE_ME'
-    discord_url = 'https://bot.example.com'
+    discord_url = 'https://bot.example.com/webhook'
 
     enable_logging = True
     logger_name = 'Server Watcher'
