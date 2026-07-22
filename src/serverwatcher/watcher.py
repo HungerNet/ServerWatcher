@@ -16,22 +16,18 @@ class ServerWatcher:
         self.config = loadConfig(GlobalConfig)
 
         # --- CONFIG DEBUG ---
+        import os
+        from hungerlib.configloader import deep_get
+
         print("\n=== CONFIG DEBUG ===")
-        print("Working directory:", utils.os.getcwd())
-        print("User config path:", GlobalConfig.__user_config_path__)
-        print("Default config path:", GlobalConfig.__default_config_path__)
+        print("Working directory:", os.getcwd())
 
         raw = self.config.raw._raw
-        print("\nRaw YAML keys:", list(raw.keys()))
+        print("Raw YAML keys:", list(raw.keys()))
         print("Raw discord block:", raw.get("discord"))
         print("Raw hungerbridge block:", raw.get("hungerbridge"))
 
         print("\nResolved config fields:")
-        print("debug:", repr(self.config.debug))
-        print("timezone:", repr(self.config.timezone))
-        print("panel_url:", repr(self.config.panel_url))
-        print("bridge_token:", repr(self.config.bridge_token))
-        print("bridge_url:", repr(self.config.bridge_url))
         print("discord_enabled:", repr(self.config.discord_enabled))
         print("discord_token:", repr(self.config.discord_token))
         print("discord_url:", repr(self.config.discord_url))
