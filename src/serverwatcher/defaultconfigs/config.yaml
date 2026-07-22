@@ -17,9 +17,9 @@ hungerbridge:
   url: 'https://api.example.com'
 
 webhook:
-  enabled: True
-  token: 'CHANGE_ME'
-  url: 'https://bot.example.com/webhook'
+  webhook_enabled: True
+  webhook_token: 'CHANGE_ME'
+  webhook_url: 'https://bot.example.com/webhook'
 
 logger:
   enabled: True
