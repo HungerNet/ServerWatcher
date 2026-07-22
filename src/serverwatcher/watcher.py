@@ -13,51 +13,62 @@ class ServerWatcher:
     def __init__(self):
         self.config = loadConfig(GlobalConfig)
         
-        # --- ADVANCED DEBUG: mapres + YAML inspection ---
-        import os, yaml
+        # --- MAPRES INTERNAL PATH DEBUG ---
+        from mapres import MapResolver
 
-        print("\n=== ADVANCED CONFIG DEBUG ===")
+        print("\n=== MAPRES INTERNAL PATH DEBUG ===")
 
-        # 1. Show working directory
-        print("Working directory:", os.getcwd())
-
-        # 2. Show raw YAML as PyYAML sees it
-        try:
-            with open(GlobalConfig.__user_config_path__, "r") as f:
-                raw_yaml = yaml.safe_load(f)
-            print("\nRaw YAML loaded by PyYAML:")
-            print(raw_yaml)
-        except Exception as e:
-            print("YAML LOAD ERROR:", e)
-
-        # 3. Show mapres resolver tree
         resolver = MapResolver()
-        tree = resolver.res(self.config)
-        print("\nMapResolver tree for config:")
-        print(tree)
 
-        # 4. Show individual key resolution
-        print("\n--- Individual key resolution ---")
-        print("discord.enabled:", repr(self.config.discord_enabled))
-        print("discord.token:", repr(self.config.discord_token))
-        print("discord.url:", repr(self.config.discord_url))
+        # 1. Print all top-level keys mapres thinks exist
+        print("Mapres sees these top-level keys:")
+        try:
+            keys = resolver.keys(self.config)
+            print(keys)
+        except Exception as e:
+            print("Error reading keys:", e)
 
-        print("hungerbridge.token:", repr(self.config.bridge_token))
-        print("hungerbridge.url:", repr(self.config.bridge_url))
+        # 2. Print full path tree
+        print("\nFull path tree:")
+        try:
+            tree = resolver.tree(self.config)
+            for k, v in tree.items():
+                print(f"{k}: {v}")
+        except Exception as e:
+            print("Error reading tree:", e)
 
-        # 5. Detect mapres fallback failure
-        def check(key, value):
-            if value == key:
-                print(f"!!! mapres returned literal mapping key '{key}' → YAML block was NOT loaded")
-            else:
-                print(f"✓ {key} resolved:", value)
+        # 3. Try resolving each discord path step-by-step
+        print("\nDiscord path resolution steps:")
+        paths = [
+            "discord",
+            "discord.enabled",
+            "discord.token",
+            "discord.url"
+        ]
 
-        check("discord.token", self.config.discord_token)
-        check("discord.url", self.config.discord_url)
-        check("hungerbridge.token", self.config.bridge_token)
-        check("hungerbridge.url", self.config.bridge_url)
+        for p in paths:
+            try:
+                val = resolver.get(self.config, p)
+                print(f"{p} → {repr(val)}")
+            except Exception as e:
+                print(f"{p} → ERROR:", e)
 
-        print("\n=== END ADVANCED CONFIG DEBUG ===\n")
+        # 4. Try resolving hungerbridge paths for comparison
+        print("\nHungerbridge path resolution steps:")
+        paths_hb = [
+            "hungerbridge",
+            "hungerbridge.token",
+            "hungerbridge.url"
+        ]
+
+        for p in paths_hb:
+            try:
+                val = resolver.get(self.config, p)
+                print(f"{p} → {repr(val)}")
+            except Exception as e:
+                print(f"{p} → ERROR:", e)
+
+        print("\n=== END MAPRES INTERNAL PATH DEBUG ===\n")
         # --- END DEBUG ---
 
 
