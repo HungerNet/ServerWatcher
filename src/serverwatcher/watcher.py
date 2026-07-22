@@ -14,8 +14,6 @@ class ServerWatcher:
         self.config = loadConfig(GlobalConfig)
         
         # --- MAPRES INTERNAL PATH DEBUG ---
-        from mapres import MapResolver
-
         print("\n=== MAPRES INTERNAL PATH DEBUG ===")
 
         resolver = MapResolver()
@@ -78,6 +76,45 @@ class ServerWatcher:
         # resolver for internal mapping
         self.resolver = MapResolver()
         self.res = self.resolver.res
+
+        # --- CORRECT MAPRES DEBUG ---
+        print("\n=== CORRECT MAPRES DEBUG ===")
+
+        # 1. Show what maps are loaded
+        print("Loaded origin maps:")
+        for m in self.router.origin_maps:
+            print(" -", type(m))
+
+        print("\nLoaded destination maps:")
+        for m in self.router.destination_maps:
+            print(" -", type(m))
+
+        print("\nLoaded broadcast maps:")
+        for m in self.router.broadcast_maps:
+            print(" -", type(m))
+
+        print("\nLoaded file maps:")
+        for m in self.router.file_maps:
+            print(" -", type(m))
+
+        print("\nLoaded prefix maps:")
+        for m in self.router.prefix_maps:
+            print(" -", type(m))
+
+        # 2. Show what mapres thinks discord.* resolves to
+        print("\nDiscord resolution via self.res:")
+        print("discord.enabled →", repr(self.res(self.config.discord_enabled)))
+        print("discord.token   →", repr(self.res(self.config.discord_token)))
+        print("discord.url     →", repr(self.res(self.config.discord_url)))
+
+        # 3. Show what mapres thinks hungerbridge.* resolves to
+        print("\nHungerbridge resolution via self.res:")
+        print("hungerbridge.token →", repr(self.res(self.config.bridge_token)))
+        print("hungerbridge.url   →", repr(self.res(self.config.bridge_url)))
+
+        print("\n=== END CORRECT MAPRES DEBUG ===\n")
+        # --- END DEBUG ---
+
 
         # panel + server
         self.panel = servers.Panel(
