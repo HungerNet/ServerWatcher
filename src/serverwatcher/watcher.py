@@ -12,34 +12,54 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 class ServerWatcher:
     def __init__(self):
         self.config = loadConfig(GlobalConfig)
+        
+        # --- ADVANCED DEBUG: mapres + YAML inspection ---
+        import os, yaml
 
-        # --- DEBUG: mapres config resolution ---
-        import os
-        print("\n=== CONFIG DEBUG ===")
+        print("\n=== ADVANCED CONFIG DEBUG ===")
 
-        user_path = GlobalConfig.__user_config_path__
-        default_path = GlobalConfig.__default_config_path__
-
+        # 1. Show working directory
         print("Working directory:", os.getcwd())
-        print("User config expected at:", user_path, "exists:", os.path.exists(user_path))
-        print("Default config expected at:", default_path, "exists:", os.path.exists(default_path))
 
-        print("Raw discord_url from mapres:", repr(self.config.discord_url))
-        print("Raw discord_token from mapres:", repr(self.config.discord_token))
-        print("Raw bridge_token from mapres:", repr(self.config.bridge_token))
-        print("Raw bridge_url from mapres:", repr(self.config.bridge_url))
+        # 2. Show raw YAML as PyYAML sees it
+        try:
+            with open(GlobalConfig.__user_config_path__, "r") as f:
+                raw_yaml = yaml.safe_load(f)
+            print("\nRaw YAML loaded by PyYAML:")
+            print(raw_yaml)
+        except Exception as e:
+            print("YAML LOAD ERROR:", e)
 
-        # detect mapping-key fallback failure
-        if self.config.discord_url == "discord.url":
-            print("!!! mapres returned the MAPPING KEY instead of YAML or fallback")
-            print("!!! This means the YAML file was NOT loaded")
-        elif self.config.discord_url.startswith("http"):
-            print("✓ discord_url loaded correctly")
-        else:
-            print("??? discord_url is something unexpected:", self.config.discord_url)
+        # 3. Show mapres resolver tree
+        resolver = MapResolver()
+        tree = resolver.res(self.config)
+        print("\nMapResolver tree for config:")
+        print(tree)
 
-        print("=== END CONFIG DEBUG ===\n")
+        # 4. Show individual key resolution
+        print("\n--- Individual key resolution ---")
+        print("discord.enabled:", repr(self.config.discord_enabled))
+        print("discord.token:", repr(self.config.discord_token))
+        print("discord.url:", repr(self.config.discord_url))
+
+        print("hungerbridge.token:", repr(self.config.bridge_token))
+        print("hungerbridge.url:", repr(self.config.bridge_url))
+
+        # 5. Detect mapres fallback failure
+        def check(key, value):
+            if value == key:
+                print(f"!!! mapres returned literal mapping key '{key}' → YAML block was NOT loaded")
+            else:
+                print(f"✓ {key} resolved:", value)
+
+        check("discord.token", self.config.discord_token)
+        check("discord.url", self.config.discord_url)
+        check("hungerbridge.token", self.config.bridge_token)
+        check("hungerbridge.url", self.config.bridge_url)
+
+        print("\n=== END ADVANCED CONFIG DEBUG ===\n")
         # --- END DEBUG ---
+
 
         self.messages = loadConfig(MessagesConfig)
         self.watcherconfig = loadConfig(WatcherConfig)
