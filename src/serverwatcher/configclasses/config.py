@@ -20,9 +20,9 @@ class GlobalConfig:
     bridge_token: str = 'hungerbridge.token'
     bridge_url: str = 'hungerbridge.url'
 
-    discord_enabled = 'discord.enabled'
-    discord_token = 'discord.token'
-    discord_url = 'discord.url'
+    discord_enabled = 'webhook.enabled'
+    discord_token = 'webhook.token'
+    discord_url = 'webhook.url'
 
     enable_logging: bool = 'logger.enabled'
     logger_name: str = 'logger.name'
@@ -81,5 +81,8 @@ class rules:
     panel_name = 'recommended'
     server_port = 'recommended'
     bridge_url = 'recommended'
+
+    discord_url = 'recommended'
+    discord_token = 'recommended'
 
     # everything else defaults to optional
