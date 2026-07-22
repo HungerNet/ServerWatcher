@@ -2,6 +2,7 @@ import time
 from zoneinfo import ZoneInfo
 
 from hungerlib import servers, MessageRouter, loadConfig, DiscordBotWebhook, utils
+from hungerlib.configloader import deep_get
 from mapres import MapResolver, maps
 
 from serverwatcher.configclasses.config import GlobalConfig
@@ -11,64 +12,37 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 
 class ServerWatcher:
     def __init__(self):
+        # load main config
         self.config = loadConfig(GlobalConfig)
-        
-        # --- MAPRES INTERNAL PATH DEBUG ---
-        print("\n=== MAPRES INTERNAL PATH DEBUG ===")
 
-        resolver = MapResolver()
+        # --- CONFIG DEBUG ---
+        print("\n=== CONFIG DEBUG ===")
+        print("Working directory:", utils.os.getcwd())
+        print("User config path:", GlobalConfig.__user_config_path__)
+        print("Default config path:", GlobalConfig.__default_config_path__)
 
-        # 1. Print all top-level keys mapres thinks exist
-        print("Mapres sees these top-level keys:")
-        try:
-            keys = resolver.keys(self.config)
-            print(keys)
-        except Exception as e:
-            print("Error reading keys:", e)
+        raw = self.config.raw._raw
+        print("\nRaw YAML keys:", list(raw.keys()))
+        print("Raw discord block:", raw.get("discord"))
+        print("Raw hungerbridge block:", raw.get("hungerbridge"))
 
-        # 2. Print full path tree
-        print("\nFull path tree:")
-        try:
-            tree = resolver.tree(self.config)
-            for k, v in tree.items():
-                print(f"{k}: {v}")
-        except Exception as e:
-            print("Error reading tree:", e)
+        print("\nResolved config fields:")
+        print("debug:", repr(self.config.debug))
+        print("timezone:", repr(self.config.timezone))
+        print("panel_url:", repr(self.config.panel_url))
+        print("bridge_token:", repr(self.config.bridge_token))
+        print("bridge_url:", repr(self.config.bridge_url))
+        print("discord_enabled:", repr(self.config.discord_enabled))
+        print("discord_token:", repr(self.config.discord_token))
+        print("discord_url:", repr(self.config.discord_url))
 
-        # 3. Try resolving each discord path step-by-step
-        print("\nDiscord path resolution steps:")
-        paths = [
-            "discord",
-            "discord.enabled",
-            "discord.token",
-            "discord.url"
-        ]
-
-        for p in paths:
-            try:
-                val = resolver.get(self.config, p)
-                print(f"{p} → {repr(val)}")
-            except Exception as e:
-                print(f"{p} → ERROR:", e)
-
-        # 4. Try resolving hungerbridge paths for comparison
-        print("\nHungerbridge path resolution steps:")
-        paths_hb = [
-            "hungerbridge",
-            "hungerbridge.token",
-            "hungerbridge.url"
-        ]
-
-        for p in paths_hb:
-            try:
-                val = resolver.get(self.config, p)
-                print(f"{p} → {repr(val)}")
-            except Exception as e:
-                print(f"{p} → ERROR:", e)
-
-        print("\n=== END MAPRES INTERNAL PATH DEBUG ===\n")
-        # --- END DEBUG ---
-
+        print("\nDeep-get checks:")
+        print("deep_get(raw, 'discord'):", deep_get(raw, "discord"))
+        print("deep_get(raw, 'discord.enabled'):", deep_get(raw, "discord.enabled"))
+        print("deep_get(raw, 'discord.token'):", deep_get(raw, "discord.token"))
+        print("deep_get(raw, 'discord.url'):", deep_get(raw, "discord.url"))
+        print("=== END CONFIG DEBUG ===\n")
+        # --- END CONFIG DEBUG ---
 
         self.messages = loadConfig(MessagesConfig)
         self.watcherconfig = loadConfig(WatcherConfig)
@@ -76,45 +50,6 @@ class ServerWatcher:
         # resolver for internal mapping
         self.resolver = MapResolver()
         self.res = self.resolver.res
-
-        # --- CORRECT MAPRES DEBUG ---
-        print("\n=== CORRECT MAPRES DEBUG ===")
-
-        # 1. Show what maps are loaded
-        print("Loaded origin maps:")
-        for m in self.router.origin_maps:
-            print(" -", type(m))
-
-        print("\nLoaded destination maps:")
-        for m in self.router.destination_maps:
-            print(" -", type(m))
-
-        print("\nLoaded broadcast maps:")
-        for m in self.router.broadcast_maps:
-            print(" -", type(m))
-
-        print("\nLoaded file maps:")
-        for m in self.router.file_maps:
-            print(" -", type(m))
-
-        print("\nLoaded prefix maps:")
-        for m in self.router.prefix_maps:
-            print(" -", type(m))
-
-        # 2. Show what mapres thinks discord.* resolves to
-        print("\nDiscord resolution via self.res:")
-        print("discord.enabled →", repr(self.res(self.config.discord_enabled)))
-        print("discord.token   →", repr(self.res(self.config.discord_token)))
-        print("discord.url     →", repr(self.res(self.config.discord_url)))
-
-        # 3. Show what mapres thinks hungerbridge.* resolves to
-        print("\nHungerbridge resolution via self.res:")
-        print("hungerbridge.token →", repr(self.res(self.config.bridge_token)))
-        print("hungerbridge.url   →", repr(self.res(self.config.bridge_url)))
-
-        print("\n=== END CORRECT MAPRES DEBUG ===\n")
-        # --- END DEBUG ---
-
 
         # panel + server
         self.panel = servers.Panel(
@@ -195,7 +130,10 @@ class ServerWatcher:
         )
 
         self.tz = ZoneInfo(self.config.timezone)
-        self.Webhook = DiscordBotWebhook(url=self.config.discord_url, token=self.config.discord_token)
+        self.Webhook = DiscordBotWebhook(
+            url=self.config.discord_url,
+            token=self.config.discord_token
+        )
 
     def webhookSend(self, event: str, **ctx):
         if self.config.discord_enabled:
