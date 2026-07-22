@@ -12,6 +12,33 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 class ServerWatcher:
     def __init__(self):
         self.config = loadConfig(GlobalConfig)
+        
+        # --- DEBUG: mapres config resolution ---
+        import os
+        print("\n=== CONFIG DEBUG ===")
+
+        user_path = GlobalConfig.__user_config_path__
+        default_path = GlobalConfig.__default_config_path__
+
+        print("Working directory:", os.getcwd())
+        print("User config expected at:", user_path, "exists:", os.path.exists(user_path))
+        print("Default config expected at:", default_path, "exists:", os.path.exists(default_path))
+
+        print("Raw discord_url from mapres:", repr(self.config.discord_url))
+        print("Raw discord_token from mapres:", repr(self.config.discord_token))
+
+        # detect mapping-key fallback failure
+        if self.config.discord_url == "discord.url":
+            print("!!! mapres returned the MAPPING KEY instead of YAML or fallback")
+            print("!!! This means the YAML file was NOT loaded")
+        elif self.config.discord_url.startswith("http"):
+            print("✓ discord_url loaded correctly")
+        else:
+            print("??? discord_url is something unexpected:", self.config.discord_url)
+
+        print("=== END CONFIG DEBUG ===\n")
+        # --- END DEBUG ---
+
         self.messages = loadConfig(MessagesConfig)
         self.watcherconfig = loadConfig(WatcherConfig)
 
