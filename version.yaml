@@ -1,5 +1,5 @@
 run: true
-version: '5.33-alpha.16'
+version: '5.33-beta.1'
 description: |
   - Alpha 1-2:
     - Fixed version
@@ -14,3 +14,6 @@ description: |
     - Fix config loading issues
   - Alpha 16:
     - Remove debugging
+  - Beta 1:
+    - Now in Beta channel
+    - Changed retry time.sleep() to 5

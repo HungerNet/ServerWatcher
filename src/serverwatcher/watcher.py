@@ -99,6 +99,7 @@ class ServerWatcher:
         )
 
         self.tz = ZoneInfo(self.config.timezone)
+
         self.Webhook = DiscordBotWebhook(
             url=self.config.discord_url,
             token=self.config.discord_token
@@ -199,7 +200,7 @@ class ServerWatcher:
         for i in range(5):
             if utils.validateAll(self.panel, self.server):
                 break
-            time.sleep(2)
+            time.sleep(5)
         else:
             self.router.error(self.messages.validation_fail)
             self.webhookSend(event="validation_fail", server=self.config.server_name)
