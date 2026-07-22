@@ -12,34 +12,7 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 
 class ServerWatcher:
     def __init__(self):
-        # load main config
         self.config = loadConfig(GlobalConfig)
-
-        # --- CONFIG DEBUG ---
-        import os
-        from hungerlib.configloader import deep_get
-
-        print("\n=== CONFIG DEBUG ===")
-        print("Working directory:", os.getcwd())
-
-        raw = self.config.raw._raw
-        print("Raw YAML keys:", list(raw.keys()))
-        print("Raw discord block:", raw.get("discord"))
-        print("Raw hungerbridge block:", raw.get("hungerbridge"))
-
-        print("\nResolved config fields:")
-        print("discord_enabled:", repr(self.config.discord_enabled))
-        print("discord_token:", repr(self.config.discord_token))
-        print("discord_url:", repr(self.config.discord_url))
-
-        print("\nDeep-get checks:")
-        print("deep_get(raw, 'discord'):", deep_get(raw, "discord"))
-        print("deep_get(raw, 'discord.enabled'):", deep_get(raw, "discord.enabled"))
-        print("deep_get(raw, 'discord.token'):", deep_get(raw, "discord.token"))
-        print("deep_get(raw, 'discord.url'):", deep_get(raw, "discord.url"))
-        print("=== END CONFIG DEBUG ===\n")
-        # --- END CONFIG DEBUG ---
-
         self.messages = loadConfig(MessagesConfig)
         self.watcherconfig = loadConfig(WatcherConfig)
 
