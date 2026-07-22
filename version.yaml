@@ -1,5 +1,5 @@
 run: true
-version: '5.33-alpha.14'
+version: '5.33-alpha.15'
 description: |
   - Alpha 1-2:
     - Fixed version
@@ -10,3 +10,5 @@ description: |
     - Changed defaults
   - Alpha 5-14:
     - Debugging
+  - Alpha 15:
+    - Fix config loading issues

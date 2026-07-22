@@ -20,9 +20,9 @@ class GlobalConfig:
     bridge_token: str = 'hungerbridge.token'
     bridge_url: str = 'hungerbridge.url'
 
-    discord_enabled = 'discordwebhook.enabled'
-    discord_token = 'discordwebhook.token'
-    discord_url = 'discordwebhook.url'
+    discord_enabled: bool = 'discord.enabled'
+    discord_token: str = 'discord.token'
+    discord_url: str = 'discord.url'
 
     enable_logging: bool = 'logger.enabled'
     logger_name: str = 'logger.name'

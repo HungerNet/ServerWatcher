@@ -16,7 +16,7 @@ hungerbridge:
   token: 'CHANGE_ME'
   url: 'https://api.example.com'
 
-discordwebhook:
+discord:
   enabled: True
   token: 'CHANGE_ME'
   url: 'https://bot.example.com/webhook'
