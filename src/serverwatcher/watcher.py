@@ -12,7 +12,7 @@ from serverwatcher.configclasses.watcher import WatcherConfig
 class ServerWatcher:
     def __init__(self):
         self.config = loadConfig(GlobalConfig)
-        
+
         # --- DEBUG: mapres config resolution ---
         import os
         print("\n=== CONFIG DEBUG ===")
@@ -26,6 +26,8 @@ class ServerWatcher:
 
         print("Raw discord_url from mapres:", repr(self.config.discord_url))
         print("Raw discord_token from mapres:", repr(self.config.discord_token))
+        print("Raw bridge_token from mapres:", repr(self.config.bridge_token))
+        print("Raw bridge_url from mapres:", repr(self.config.bridge_url))
 
         # detect mapping-key fallback failure
         if self.config.discord_url == "discord.url":
