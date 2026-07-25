@@ -262,7 +262,7 @@ class ServerWatcher:
         self.router.warn(f'{self.messages.pro_restart_number} {pro}')
         self.router.warn(f'{self.messages.anti_restart_number} {anti}')
 
-        gap = abs(pro - anti)
+        gap = pro - anti
 
         if pro == 0:
             self.router.info(self.messages.no_restart)
@@ -284,7 +284,6 @@ class ServerWatcher:
             self.schedule_restart(self.watcherconfig.high_gap_minutes)
 
         self.restart_and_wait()
-        # send discord message
 
     def run(self):
         if self.config.handle_keyboard_interrupt:
