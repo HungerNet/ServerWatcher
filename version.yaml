@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.2'
+version: '5.33-beta.3'
 description: |
   - Alpha 1-2:
     - Fixed version
@@ -19,3 +19,6 @@ description: |
     - Changed retry time.sleep() to 5
   - Beta 2:
     - Fixed gap detection being wrongly absolute
+  - Beta 3:
+    - Changed datamap syntax from braces to double_braces (mapres update)
+    - Simplified datamap definition

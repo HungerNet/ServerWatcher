@@ -9,22 +9,22 @@
 #     <red> <green> <yellow> <reset>
 #
 # 2. GlobalConfig  (config)
-#   Provides server-wide configuration values. Syntax: {field}
+#   Provides server-wide configuration values. Syntax: {{field}}
 #   Examples:
-#     {server_name}
-#     {panel_url}
+#     {{server_name}}
+#     {{panel_url}}
 #
 # 3. MessagesConfig  (keys)
-#   Provides message templates. Syntax: {field}
+#   Provides message templates. Syntax: {{field}}
 #   Examples:
-#     {prefix}
-#     {broadcast_restart_at}
+#     {{prefix}}
+#     {{broadcast_restart_at}}
 #
 # 4. WatcherConfig  (config)
-#   Provides thresholds, weights, and timing values. Syntax: {field}
+#   Provides thresholds, weights, and timing values. Syntax: {{field}}
 #   Examples:
-#     {threshold_ram}
-#     {low_gap_minutes}
+#     {{threshold_ram}}
+#     {{low_gap_minutes}}
 #
 # 5. TimeMap  (dynamic)
 #   Provides live timestamps. Syntax: %field%
@@ -41,11 +41,11 @@
 prefix: '<aqua>[Server Watcher]'
 bullet: '-'
 
-broadcast_restart_at: '{prefix} The server will restart at {time} CDT.'
+broadcast_restart_at: '{{prefix}} The server will restart at {{time}} CDT.'
 
 broadcast_templates:
-  minutes: '{prefix} Restart in {n} minute{s}!'
-  seconds: '{prefix} <red>Restarting in {n} second{s}!'
+  minutes: '{{prefix}} Restart in {{n}} minute{{s}}!'
+  seconds: '{{prefix}} <red>Restarting in {{n}} second{{s}}!'
 
 broadcast_minutes: {}
 broadcast_seconds: {}
@@ -55,25 +55,25 @@ logging:
   status_check: 'Checking server status...'
   validation_fail: 'Validation FAILED.'
   validation_ok: 'All validation checks succeeded.'
-  sampling_start: 'Starting sampling process. This should take about {duration} seconds...'
+  sampling_start: 'Starting sampling process. This should take about {{duration}} seconds...'
   shutdown: 'Shutting down ServerWatcher.'
   immediate_restart: 'Restarting immediately.'
   no_restart: 'The server does not need to restart.'
   scheduled: 'Restart needed, but anti-restart factors outweigh it.'
-  gap_low: 'Gap {gap}. Scheduling restart in 2 hours.'
-  gap_high: 'Gap {gap}. Scheduling restart in 1 hour.'
+  gap_low: 'Gap {{gap}}. Scheduling restart in 2 hours.'
+  gap_high: 'Gap {{gap}}. Scheduling restart in 1 hour.'
 
 reasons:
   pro_splash: 'PRO-RESTART REASONS:'
   anti_splash: 'ANTI-RESTART REASONS:'
 
   restart_soon: 'The server is set to restart soon'
-  ram: 'RAM usage ({ram}) is higher than {threshold} GB'
-  cpu: 'CPU usage ({cpu}) is higher than {threshold}%'
-  uptime: 'Uptime {uptime} exceeds {threshold}h'
-  tps: 'TPS {tps} is lower than {threshold}'
-  low_uptime: 'Uptime {uptime} is shorter than 30m'
-  players: 'There {verb} {count} {plural} online'         # produces: 'There are 2 players online' or 'There is 1 player online'
+  ram: 'RAM usage ({{ram}}) is higher than {{threshold}} GB'
+  cpu: 'CPU usage ({{cpu}}) is higher than {{threshold}}%'
+  uptime: 'Uptime {{uptime}} exceeds {{threshold}}h'
+  tps: 'TPS {{tps}} is lower than {{threshold}}'
+  low_uptime: 'Uptime {{uptime}} is shorter than 30m'
+  players: 'There {{verb}} {{count}} {{plural}} online'         # produces: 'There are 2 players online' or 'There is 1 player online'
 
   pro_restart_number: 'Pro-restart: '
   anti_restart_number: 'Anti-restart:'
