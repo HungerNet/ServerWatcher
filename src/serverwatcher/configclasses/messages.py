@@ -1,6 +1,6 @@
 from mapres import datamap, syntax
 
-@datamap(syntax=syntax.double_braces, mode='config')
+@datamap.double_braces(mode='config')
 class MessagesConfig:
     __user_config_path__ = 'config/messages.yaml'
     __default_config_path__ = 'defaultconfigs/messages.yaml'
