@@ -1,6 +1,6 @@
-from mapres import datamap, syntax
+from mapres import datamap
 
-@datamap.double_braces(mode='config')
+@datamap.double_braces.config
 class WatcherConfig:
     __user_config_path__ = 'config/watcher.yaml'
     __default_config_path__ = 'defaultconfigs/watcher.yaml'
