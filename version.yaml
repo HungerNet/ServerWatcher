@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.8'
+version: '5.33-beta.9'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -31,3 +31,5 @@ description: |
   - Begin upgrade to mapres 3-dev
   Beta 8:
   - Fixed "recursion" paramater name
+  Beta 9:
+  - Attempt repush for pip
