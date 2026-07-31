@@ -1,6 +1,6 @@
 from mapres import datamap
 
-@datamap.double_braces.config
+@datamap.braces.config(recursive=True)
 class GlobalConfig:
     __user_config_path__ = 'config/config.yaml'
     __default_config_path__ = 'defaultconfigs/config.yaml'

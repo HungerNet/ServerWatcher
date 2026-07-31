@@ -1,28 +1,31 @@
 run: true
-version: '5.33-beta.6'
+version: '5.33-beta.7'
 description: |
-  - Alpha 1-2:
-    - Fixed version
-    - Moved DiscordBotWebhook into hungerlib
-  - Alpha 3:
-    - Fixed all Webhook issues
-  - Alpha 4:
-    - Changed defaults
-  - Alpha 5-14:
+  Alpha 1-2:
+  - Fixed version
+  - Moved DiscordBotWebhook into hungerlib
+  Alpha 3:
+  - Fixed all Webhook issues
+  Alpha 4:
+  - Changed defaults
+  Alpha 5-14:
+  - Debugging
+  Alpha 15:
+  - Fix config loading issues
+  Alpha 16:
+  - Remove debugging
+  Beta 1:
+  - Now in Beta channel
+  - Changed retry time.sleep() to 5
+  Beta 2:
+  - Fixed gap detection being wrongly absolute
+  Beta 3:
+  - Changed datamap syntax from braces to double_braces (mapres update)
+  - Simplified datamap definition
+  Beta 4-5:
     - Debugging
-  - Alpha 15:
-    - Fix config loading issues
-  - Alpha 16:
-    - Remove debugging
-  - Beta 1:
-    - Now in Beta channel
-    - Changed retry time.sleep() to 5
-  - Beta 2:
-    - Fixed gap detection being wrongly absolute
-  - Beta 3:
-    - Changed datamap syntax from braces to double_braces (mapres update)
-    - Simplified datamap definition
-  - Beta 4-5:
-    - Debugging
-  - Beta 6:
-    - Simplified datamap definition (mapres update)
+  Beta 6:
+  - Simplified datamap definition (mapres update)
+  Beta 7:
+  - Updated changelog formatting
+  - Begin upgrade to mapres 3-dev
