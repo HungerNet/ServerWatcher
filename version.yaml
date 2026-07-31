@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.10'
+version: '5.33-beta.11'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -35,3 +35,5 @@ description: |
   - Attempt repush for pip
   Beta 10:
   - Fixed "recursive" paramater name
+  Beta 11:
+  - Added a unified egg
