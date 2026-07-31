@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.7'
+version: '5.33-beta.8'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -29,3 +29,5 @@ description: |
   Beta 7:
   - Updated changelog formatting
   - Begin upgrade to mapres 3-dev
+  Beta 8:
+  - Fixed "recursion" paramater name

@@ -1,6 +1,6 @@
 from mapres import datamap
 
-@datamap.braces.config(recursive=True)
+@datamap.braces.config(recursion=True)
 class WatcherConfig:
     __user_config_path__ = 'config/watcher.yaml'
     __default_config_path__ = 'defaultconfigs/watcher.yaml'
