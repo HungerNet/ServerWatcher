@@ -1,16 +1,12 @@
 # ServerWatcher
+A highly configurable Minecraft server monitoring and restart engine for HungerBridge / Pterodactyl-based Minecraft servers.
 
-A configurable server monitoring and restart engine for HungerLib / Pterodactyl-based Minecraft servers.
+## System requirements
 
-## Usage
-```bash
-pip install serverwatcher
-```
-```python
-from serverwatcher.watcher import ServerWatcher
-from serverwatcher.config import WatcherConfig
-from serverwatcher.messages import WatcherMessages
-
-watcher = ServerWatcher(server, origin, panel, logger, WatcherConfig(), WatcherMessages())
-watcher.evaluate()
-```
+## Prerequisites
+**HungerBridge**
+- Install [HungerBridge from Modrinth](https://modrinth.com/project/hungerbridge) on the Minecraft server you wish to monitor
+- HungerBridge supports `Fabric`, `Quilt`, `Paper`, `Purpur`, and `Folia`
+**A dedicated Python environment**
+- ServerWatcher requires a Python 3.14+ environment to run
+- Minimum system requirements

@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.11'
+version: '5.33-beta.12'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -37,3 +37,8 @@ description: |
   - Fixed "recursive" paramater name
   Beta 11:
   - Added a unified egg
+  Beta 12:
+  - Fixed validator not catching all errors
+  - Renamed serverwatcher-unified.json to serverwatcher.json
+  - Removed deprecated seperate eggs
+  - Updated README
