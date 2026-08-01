@@ -18,6 +18,20 @@ def validate_global_config(c):
         if not f.name.startswith('__'):
             v.check_field(c, f.name)
 
+    # --- URL validation ---
+    if c.discord_enabled:
+        url = c.discord_url.strip()
+
+        if not url.startswith('https://'):
+            v.errors.append(f'discord_url: must start with https:// (got "{url}")')
+
+        # optional: detect example.com placeholder
+        if 'example.com' in url:
+            v.errors.append(f'discord_url: placeholder URL detected ("{url}")')
+        
+        if c.discord_token == 'CHANGE_ME':
+            v.errors.append('discord_token: must be configured (got "CHANGE_ME")')
+
 
 def validate_watcher_config(c):
     for f in fields(WatcherConfig):
