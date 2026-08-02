@@ -46,45 +46,45 @@ def main():
         validate_all()
 
     except FatalError as e:
-        rprint('<red> FATAL CONFIG ERROR:')
+        rprint('<bold><red>FATAL CONFIG ERROR:')
         rprint(pretty_report(e.report))
         rprint('\nIt looks like ServerWatcher is not configured yet.')
-        rprint('Please edit your config files in <aqua>config/ and try again.')
+        rprint('<aqua>Please edit your config files in config/ and try again.')
         return
 
     except TypeMismatchError as e:
-        rprint('<red> TYPE MISMATCH ERROR:')
+        rprint('<bold><red>TYPE MISMATCH ERROR:')
         rprint(pretty_report(e.report))
         rprint('\nYour configuration contains values of the wrong type.')
-        rprint('Please fix your config files and try again.')
+        rprint('<aqua>Please fix your config files and try again.')
         return
 
     except FallbackError as e:
-        rprint('<yellow> FALLBACKS IN USE:')
+        rprint('<bold><yellow>FALLBACKS IN USE:')
         rprint(pretty_report(e.report))
         rprint('\nIt looks like you have not configured ServerWatcher yet.')
-        rprint('Please edit your config files in <aqua>config/ and try again.')
+        rprint('<aqua>Please edit your config files in config/ and try again.')
         return
 
     except RecommendedError as e:
-        rprint('<yellow> RECOMMENDED KEYS MISSING:')
+        rprint('<bold><yellow>RECOMMENDED KEYS MISSING:')
         rprint(pretty_report(e.report))
         rprint('\nYour configuration is missing recommended keys.')
-        rprint('Continuing in 5 seconds...')
+        rprint('<aqua>Continuing in 5 seconds...')
         time.sleep(5)
 
     except ValidationError as e:
-        rprint('<red> CONFIG ERROR:')
+        rprint('<bold><red>CONFIG ERROR:')
         rprint(pretty_report(e.report))
         rprint('\nYour configuration is invalid.')
-        rprint('Please edit your config files and try again.')
+        rprint('<aqua>Please edit your config files and try again.')
         return
 
     except Exception as e:
-        rprint('<red> UNEXPECTED ERROR:')
+        rprint('<bold><red>UNEXPECTED ERROR:')
         rprint(str(e))
         rprint('\nSomething went wrong before ServerWatcher could start.')
-        rprint('Please check your configuration and environment.')
+        rprint('<aqua>Please check your configuration and environment.')
         return
 
     # if validation passes, start ServerWatcher
