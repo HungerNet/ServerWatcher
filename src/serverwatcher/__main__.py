@@ -49,7 +49,7 @@ def main():
         rprint('<red> FATAL CONFIG ERROR:')
         rprint(pretty_report(e.report))
         rprint('\nIt looks like ServerWatcher is not configured yet.')
-        rprint('Please edit your config files in <aqua>config/</aqua> and try again.')
+        rprint('Please edit your config files in <aqua>config/ and try again.')
         return
 
     except TypeMismatchError as e:
@@ -63,7 +63,7 @@ def main():
         rprint('<yellow> FALLBACKS IN USE:')
         rprint(pretty_report(e.report))
         rprint('\nIt looks like you have not configured ServerWatcher yet.')
-        rprint('Please edit your config files in <aqua>config/</aqua> and try again.')
+        rprint('Please edit your config files in <aqua>config/ and try again.')
         return
 
     except RecommendedError as e:

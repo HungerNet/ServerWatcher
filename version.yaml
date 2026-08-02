@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.14'
+version: '5.33-beta.15'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -48,3 +48,5 @@ description: |
   Beta 14:
   - Updated import order
   - Prettier print via mapres
+  Beta 15:
+  - Fixed text colorization
