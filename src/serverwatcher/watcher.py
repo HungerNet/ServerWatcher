@@ -287,8 +287,6 @@ class ServerWatcher:
         self.restart_and_wait()
 
     def run(self):
-
-
         crash_times = []  # timestamps of recent crashes
 
         while True:
@@ -343,7 +341,7 @@ class ServerWatcher:
                     self.router.warn("Error rate high — suppressing webhook spam.")
 
                 # exponential backoff
-                backoff = min(2 ** len(crash_times), self.config.watch_interval)  # max: user-specified watch_interval
+                backoff = min(2 ** len(crash_times), self.watcherconfig.watch_interval)
                 self.router.warn(f"Backing off for {backoff}s due to repeated errors.")
                 time.sleep(backoff)
 

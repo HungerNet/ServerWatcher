@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.17'
+version: '5.33-beta.18'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -52,3 +52,5 @@ description: |
   - Fixed text colorization
   Beta 17:
   - Added exception catching with exponential backoff
+  Beta 18:
+  - Fixed name error
