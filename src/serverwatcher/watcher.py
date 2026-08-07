@@ -1,4 +1,5 @@
 import time
+import traceback
 from zoneinfo import ZoneInfo
 
 from hungerlib import servers, MessageRouter, loadConfig, DiscordBotWebhook, utils
@@ -286,20 +287,64 @@ class ServerWatcher:
         self.restart_and_wait()
 
     def run(self):
-        if self.config.handle_keyboard_interrupt:
+
+
+        crash_times = []  # timestamps of recent crashes
+
+        while True:
             try:
-                while True:
-                    utils.clearTerminal()
-                    self.evaluate()
-                    if self.config.debug:
-                        self.router.debug(f'Waiting {self.watcherconfig.watch_interval}s until next run...')
-                    time.sleep(self.watcherconfig.watch_interval)
-            except KeyboardInterrupt:
-                self.shutdown()
-        else:
-            while True:
                 utils.clearTerminal()
                 self.evaluate()
+
                 if self.config.debug:
                     self.router.debug(f'Waiting {self.watcherconfig.watch_interval}s until next run...')
+
                 time.sleep(self.watcherconfig.watch_interval)
+
+            except KeyboardInterrupt:
+                if self.config.handle_keyboard_interrupt:
+                    self.shutdown()
+                else:
+                    raise
+
+            except Exception as e:
+                now = time.time()
+                crash_times.append(now)
+
+                # keep only crashes in last 60 seconds
+                crash_times = [t for t in crash_times if now - t <= 60]
+
+                # format traceback
+                tb = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+
+                # log locally
+                try:
+                    with open("watcher_errors.log", "a") as f:
+                        f.write("\n\n=== Unexpected Error ===\n")
+                        f.write(tb)
+                except Exception:
+                    pass
+
+                # router log
+                self.router.error("Unexpected error in watcher loop:")
+                self.router.error(tb)
+
+                # webhook spam protection
+                if len(crash_times) <= 3:
+                    try:
+                        self.webhookSend(
+                            event="unexpected_error",
+                            server=self.config.server_name,
+                            error=tb[:1800]
+                        )
+                    except Exception:
+                        self.router.warn("Failed to send Discord webhook for unexpected error.")
+                else:
+                    self.router.warn("Error rate high — suppressing webhook spam.")
+
+                # exponential backoff
+                backoff = min(2 ** len(crash_times), self.config.watch_interval)  # max: user-specified watch_interval
+                self.router.warn(f"Backing off for {backoff}s due to repeated errors.")
+                time.sleep(backoff)
+
+                continue

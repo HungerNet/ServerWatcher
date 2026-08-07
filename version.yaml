@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.16'
+version: '5.33-beta.17'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -50,3 +50,5 @@ description: |
   - Prettier print via mapres
   Beta 15-16:
   - Fixed text colorization
+  Beta 17:
+  - Added exception catching with exponential backoff
