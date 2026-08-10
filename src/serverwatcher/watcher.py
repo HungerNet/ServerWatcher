@@ -2,7 +2,7 @@ import time
 import traceback
 from zoneinfo import ZoneInfo
 
-from hungerlib import servers, MessageRouter, loadConfig, DiscordBotWebhook, utils
+from hungerlib import servers, MessageRouter, loadConfig, WebhookClient, utils
 from hungerlib.configloader import deep_get
 from mapres import MapResolver, maps
 
@@ -101,7 +101,7 @@ class ServerWatcher:
 
         self.tz = ZoneInfo(self.config.timezone)
 
-        self.Webhook = DiscordBotWebhook(
+        self.Webhook = WebhookClient(
             url=self.config.discord_url,
             token=self.config.discord_token
         )
