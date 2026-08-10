@@ -152,7 +152,7 @@ class ServerWatcher:
         time_str = local_time.strftime('%I:%M %p')
 
         self.router.broadcast(self.messages.broadcast_restart_at, time=time_str)
-        self.webhookSend(event="restart_scheduled", server=self.config.server_name, time=time_str)
+        self.webhookSend(event='restart_scheduled', server=self.config.server_name, time=time_str)
 
         def plural(n):
             return '' if n == 1 else 's'
@@ -204,7 +204,7 @@ class ServerWatcher:
             time.sleep(5)
         else:
             self.router.error(self.messages.validation_fail)
-            self.webhookSend(event="validation_fail", server=self.config.server_name)
+            self.webhookSend(event='validation_fail', server=self.config.server_name)
             return
 
         sample_duration_formatted = int(self.watcherconfig.sample_duration) if self.watcherconfig.sample_duration.is_integer() else self.watcherconfig.sample_duration
@@ -216,6 +216,13 @@ class ServerWatcher:
         anti = 0
         restart_reasons = []
         no_restart_reasons = []
+
+        # NoneType error handling (for slower panels and apis)
+        resourcelist = [snap.ram, snap.cpu, snap.uptime, snap.tps, snap.players]
+        if any(item is None for item in resourcelist):
+            self.router.error(self.messages.sampling_fail)
+            self.webhookSend(event='sampling_fail', server=self.config.server_name)
+            return
 
         if self.config.debug:
             self.router.debug(f'RAM: {snap.ram}/{self.watcherconfig.threshold_ram}')
@@ -267,7 +274,6 @@ class ServerWatcher:
 
         if pro == 0:
             self.router.info(self.messages.no_restart)
-            # will add something here later
             return
 
         if pro > anti and snap.players == 0:
@@ -313,36 +319,36 @@ class ServerWatcher:
                 crash_times = [t for t in crash_times if now - t <= 60]
 
                 # format traceback
-                tb = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+                tb = ''.join(traceback.format_exception(type(e), e, e.__traceback__))
 
                 # log locally
                 try:
-                    with open("watcher_errors.log", "a") as f:
-                        f.write("\n\n=== Unexpected Error ===\n")
+                    with open('watcher_errors.log', 'a') as f:
+                        f.write('\n\n=== Unexpected Error ===\n')
                         f.write(tb)
                 except Exception:
                     pass
 
                 # router log
-                self.router.error("Unexpected error in watcher loop:")
+                self.router.error('Unexpected error in watcher loop:')
                 self.router.error(tb)
 
                 # webhook spam protection
                 if len(crash_times) <= 3:
                     try:
                         self.webhookSend(
-                            event="unexpected_error",
+                            event='unexpected_error',
                             server=self.config.server_name,
                             error=tb[:1800]
                         )
                     except Exception:
-                        self.router.warn("Failed to send Discord webhook for unexpected error.")
+                        self.router.warn('Failed to send Discord webhook for unexpected error.')
                 else:
-                    self.router.warn("Error rate high — suppressing webhook spam.")
+                    self.router.warn('Error rate high — suppressing webhook spam.')
 
                 # exponential backoff
                 backoff = min(2 ** len(crash_times), self.watcherconfig.watch_interval)
-                self.router.warn(f"Backing off for {backoff}s due to repeated errors.")
+                self.router.warn(f'Backing off for {backoff}s due to repeated errors.')
                 time.sleep(backoff)
 
                 continue
