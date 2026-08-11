@@ -76,3 +76,6 @@ description: |
   - Fixed clearTerminal()
   Beta 27:
   - Fixed terminal clearing and buffering when switching output modes
+  Beta 28:
+  - Fixed terminal clearing and buffering when switching output modes (again)
+  - Fixed res() not being called, now using rprint()

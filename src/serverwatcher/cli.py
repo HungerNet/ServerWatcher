@@ -1,7 +1,9 @@
 import asyncio
 from hungerlib import LiveCLI, utils
+from mapres import rprint, maps, setGlobalMaps
 from .watcher import ServerWatcher
 
+setGlobalMaps(maps.ascii_colors)
 
 class WatcherCLI:
     def __init__(self, watcher: ServerWatcher):
@@ -55,12 +57,11 @@ class WatcherCLI:
             print('\b')
 
             # print header, newline, buffer, prompt
-            print("<yellow>-------------------------")
-            print("<yellow>--- <aqua>ServerWatcher CLI <yellow>---")
-            print("<yellow>-------------------------")
+            rprint("<yellow>-------------------------")
+            rprint("<yellow>--- <aqua>ServerWatcher CLI <yellow>---")
+            rprint("<yellow>-------------------------")
             print('\n')
             self.Buffer.print()
-            print('\n')
             print("> ", end="")
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
@@ -69,7 +70,7 @@ class WatcherCLI:
 
             # trigger Pterodactyl clear
             utils.clearTerminal()
-            print('\n')
+            print('\b')
 
             # print watcher buffer
             self.watcher.router.Buffer.print()
