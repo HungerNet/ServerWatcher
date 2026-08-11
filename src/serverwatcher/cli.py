@@ -1,12 +1,29 @@
 import asyncio
 import argparse
 import cmd
+import sys
 
 from hungerlib import utils
 from mapres import rprint, maps, setGlobalMaps
 from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
+
+
+class BufferingStdout:
+    def __init__(self, buffer, real_stdout):
+        self.buffer = buffer
+        self.real_stdout = real_stdout
+
+    def write(self, text):
+        # store only non-empty lines
+        if text.strip():
+            self.buffer.captured.append(text.rstrip("\n"))
+        self.real_stdout.write(text)
+
+    def flush(self):
+        self.real_stdout.flush()
+
 
 
 stats_parser = argparse.ArgumentParser()
@@ -35,6 +52,10 @@ class WatcherCLI(cmd.Cmd):
 
         # output mode: both | cli | silent
         self.outputMode = "both"
+
+        # override with custom stdout
+        self.real_stdout = sys.stdout
+        sys.stdout = BufferingStdout(self.buffer, self.real_stdout)
 
         self.use_rawinput = False
 
