@@ -4,7 +4,7 @@ import cmd
 import sys
 
 from hungerlib import utils
-from mapres import rprint, maps, setGlobalMaps
+from mapres import res, maps, setGlobalMaps
 from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
@@ -55,7 +55,7 @@ class WatcherCLI(cmd.Cmd):
 
         # override with custom stdout
         self.real_stdout = sys.stdout
-        sys.stdout = BufferingStdout(self.buffer, self.real_stdout)
+        # sys.stdout = BufferingStdout(self.buffer, self.real_stdout)
 
         self.use_rawinput = False
 
@@ -71,9 +71,24 @@ class WatcherCLI(cmd.Cmd):
             if not line:
                 continue
 
-            stop = await asyncio.to_thread(self.onecmd, line)
+            # override stdout ONLY during CLI command execution
+            old_stdout = sys.stdout
+            sys.stdout = BufferingStdout(self.buffer, old_stdout)
+
+            try:
+                stop = await asyncio.to_thread(self.onecmd, line)
+            finally:
+                # restore real stdout so watcher logs bypass capture
+                sys.stdout = old_stdout
+
             if stop:
                 break
+
+
+    def safePrint(self, msg="", end="\n"):
+        self.real_stdout.write(msg + end)
+        self.real_stdout.flush()
+
 
     # ---------------------------------------------------------
     # VIEW COMMANDS
@@ -84,7 +99,6 @@ class WatcherCLI(cmd.Cmd):
         view watcher
         """
         if arg == "cli":
-            self.bprint("test")
             self._view_cli()
         elif arg == "watcher":
             self._view_watcher()
@@ -96,16 +110,16 @@ class WatcherCLI(cmd.Cmd):
         self.outputMode = "cli"
 
         utils.clearTerminal()
-        print("", end="")
+        self.safePrint("", end="")
 
-        rprint("<yellow>-----------------------------------")
-        rprint("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------")
-        rprint("<yellow>-----------------------------------")
-        print("\n")
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint("\n")
 
         # print buffer WITHOUT capturing
         for msg in self.buffer.captured:
-            print(msg, file=self.real_stdout)
+            self.safePrint(msg)
 
 
     def _view_watcher(self):
@@ -113,7 +127,7 @@ class WatcherCLI(cmd.Cmd):
         self.outputMode = "both"
 
         utils.clearTerminal()
-        print("", end="")
+        self.safePrint("", end="")
         self.watcher.router.buffer.printCaptured()
 
     # ---------------------------------------------------------

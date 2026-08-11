@@ -122,16 +122,6 @@ class ServerWatcher:
             if not self.router.buffer.enabled: # if buffer disabled
                 utils.clearTerminal()
 
-
-    # # DEBUGGING
-    # def clearTerminal(self, conditional=True):
-    #     self.router.buffer.clear()
-    #     if conditional:
-    #         if self.config.clear_terminal and not self.router.buffer.enabled: # if clearing terminal is enabled and buffer is disabled
-    #             utils.clearTerminal()
-    #     else:
-    #         utils.clearTerminal()
-
     def shutdown(self):
         self.router.info(self.messages.shutdown)
         raise SystemExit
