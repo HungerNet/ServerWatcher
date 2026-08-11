@@ -42,6 +42,7 @@ class WatcherCLI(cmd.Cmd):
         while True:
             if self.outputMode == "cli":
                 print("> ", end="")
+                print('', end='')
 
             line = await asyncio.to_thread(input)
             line = line.strip()
