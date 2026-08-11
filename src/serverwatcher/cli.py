@@ -63,6 +63,7 @@ class WatcherCLI(cmd.Cmd):
         view watcher
         """
         if arg == "cli":
+            bprint("test")
             self._view_cli()
         elif arg == "watcher":
             self._view_watcher()
