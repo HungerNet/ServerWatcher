@@ -19,7 +19,7 @@ class WatcherCLI:
     def bprint(self, text):
         if self.buffer.enabled:
             self.buffer.captured.append(text)
-        print(text)
+        self.cli.write(text)   # use LiveCLI buffer
 
     async def run(self):
         await self.cli.run()
@@ -61,8 +61,10 @@ class WatcherCLI:
             rprint("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------")
             rprint("<yellow>-----------------------------------")
             print('\n')
-            self.buffer.printCaptured()
-            print(" ", end="")
+            for msg in self.buffer.captured:
+                self.cli.write(msg)
+            print('', end='')
+
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
@@ -71,8 +73,6 @@ class WatcherCLI:
             # trigger Pterodactyl clear
             utils.clearTerminal()
             print('', end='')
-
-            # print watcher buffer
             self.watcher.router.buffer.printCaptured()
 
     # stats get <stat>
