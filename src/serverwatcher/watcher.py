@@ -203,7 +203,7 @@ class ServerWatcher:
         self.router.Buffer.disable()
         self.router.info('ServerWatcher is running!')
         self.router.Buffer.enable()
-        clearTerminal(conditional=False)
+        self.clearTerminal(conditional=False)
 
         self.router.info(self.messages.startup)
 
@@ -307,7 +307,7 @@ class ServerWatcher:
 
         while True:
             try:
-                clearTerminal()
+                self.clearTerminal()
                 self.evaluate()
 
                 if self.config.debug:

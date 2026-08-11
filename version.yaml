@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.25'
+version: '5.33-beta.26'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -72,3 +72,5 @@ description: |
   - A bunch of buffering fixes and improvements
   Beta 25:
   - Fixed terminal clearing when switching output modes
+  Beta 26:
+  - Fixed useTerminal()
