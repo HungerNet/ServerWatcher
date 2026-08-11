@@ -1,6 +1,6 @@
 import asyncio
 import argparse
-import cmd2
+import cmd
 
 from hungerlib import utils
 from mapres import rprint, maps, setGlobalMaps
@@ -8,10 +8,6 @@ from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
 
-
-# ---------------------------------------------------------
-# ARGPARSE DEFINITIONS
-# ---------------------------------------------------------
 
 stats_parser = argparse.ArgumentParser()
 stats_parser.add_argument(
@@ -28,15 +24,11 @@ schedule_parser.add_argument(
 )
 
 
-# ---------------------------------------------------------
-# MAIN SHELL
-# ---------------------------------------------------------
-
-class WatcherCLI(cmd2.Cmd):
+class WatcherCLI(cmd.Cmd):
     prompt = "> "
 
     def __init__(self, watcher: ServerWatcher):
-        super().__init__(allow_cli_args=False)
+        super().__init__()
 
         self.watcher = watcher
         self.buffer = utils.Buffer(enabled=True)
@@ -45,14 +37,11 @@ class WatcherCLI(cmd2.Cmd):
         self.outputMode = "both"
 
         self.use_rawinput = False
-        self.echo = False
-        self.disable_history = True
 
     async def run(self):
         while True:
             if self.outputMode == "cli":
                 print("> ", end="")
-                print('', end='')
 
             line = await asyncio.to_thread(input)
             line = line.strip()
@@ -60,7 +49,6 @@ class WatcherCLI(cmd2.Cmd):
             if not line:
                 continue
 
-            # cmd2 handles dispatching
             stop = await asyncio.to_thread(self.onecmd, line)
             if stop:
                 break
@@ -68,7 +56,6 @@ class WatcherCLI(cmd2.Cmd):
     # ---------------------------------------------------------
     # VIEW COMMANDS
     # ---------------------------------------------------------
-
     def do_view(self, arg):
         """
         view cli
@@ -79,7 +66,7 @@ class WatcherCLI(cmd2.Cmd):
         elif arg == "watcher":
             self._view_watcher()
         else:
-            self.poutput("Usage: view <cli|watcher>")
+            print("Usage: view <cli|watcher>")
 
     def _view_cli(self):
         self.watcher.router.disableOriginOutput()
@@ -107,14 +94,15 @@ class WatcherCLI(cmd2.Cmd):
     # ---------------------------------------------------------
     # STATS COMMANDS
     # ---------------------------------------------------------
-
-    @cmd2.with_argparser(stats_parser)
-    def do_stats(self, args):
+    def do_stats(self, arg):
         """
         stats get <cpu|ram|uptime|tps|players>
         """
-        # cmd2 already validated the stat
-        self._stats_get(args.stat)
+        try:
+            args = stats_parser.parse_args(arg.split())
+            self._stats_get(args.stat)
+        except SystemExit:
+            print("Usage: stats get <cpu|ram|uptime|tps|players>")
 
     def _stats_get(self, stat):
         self.watcher.server.refresh()
@@ -133,7 +121,6 @@ class WatcherCLI(cmd2.Cmd):
     # ---------------------------------------------------------
     # WATCHER COMMANDS
     # ---------------------------------------------------------
-
     def do_watcher(self, arg):
         """
         watcher restart
@@ -143,7 +130,7 @@ class WatcherCLI(cmd2.Cmd):
         parts = arg.split()
 
         if len(parts) == 0:
-            self.poutput("Usage: watcher <restart|schedule|shutdown>")
+            print("Usage: watcher <restart|schedule|shutdown>")
             return
 
         sub = parts[0]
@@ -152,25 +139,23 @@ class WatcherCLI(cmd2.Cmd):
             self.watcher.restart_and_wait()
 
         elif sub == "schedule":
-            # delegate to argparse version
             try:
                 args = schedule_parser.parse_args(parts[1:])
                 self.watcher.schedule_restart(args.minutes)
             except SystemExit:
-                self.poutput("Usage: watcher schedule <minutes>")
+                print("Usage: watcher schedule <minutes>")
 
         elif sub == "shutdown":
             self.watcher.shutdown()
             return True
 
         else:
-            self.poutput("Usage: watcher <restart|schedule|shutdown>")
+            print("Usage: watcher <restart|schedule|shutdown>")
 
     # ---------------------------------------------------------
     # BUFFER PRINT
     # ---------------------------------------------------------
-
     def bprint(self, text):
         if self.buffer.enabled:
             self.buffer.captured.append(text)
-        self.poutput(text)
+        print(text)
