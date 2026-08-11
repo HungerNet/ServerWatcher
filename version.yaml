@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.32'
+version: '5.33-beta.33'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -89,3 +89,5 @@ description: |
   Beta 32:
   - Now uses LiveCLI's buffering system
   - Fixed order, should work now
+  Beta 33:
+  - Debugging clearTerminal()
