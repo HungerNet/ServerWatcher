@@ -1,5 +1,5 @@
 import asyncio
-from hungerlib import LiveCLI
+from hungerlib import LiveCLI, utils
 from .watcher import ServerWatcher
 
 
@@ -42,13 +42,12 @@ class WatcherCLI:
         @self.cli.command("view.cli", description="Switch output mode to CLI only")
         def view_cli():
             self.cli.outputMode = "cli"
-            self.watcher.router.enableBuffer()
+            utils.clearTerminal()
             print("Output mode set to cli")
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
             self.cli.outputMode = "both"
-            self.watcher.router.disableBuffer()
             self.watcher.router.flushBuffer()
             print("Output mode set to watcher")
 

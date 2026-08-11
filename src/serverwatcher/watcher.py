@@ -90,6 +90,9 @@ class ServerWatcher:
             info_prefix=self.config.info_prefix,
             warn_prefix=self.config.warn_prefix,
             error_prefix=self.config.error_prefix,
+
+            buffer_enabled=True,
+            origin_output=True
         )
 
         self.router.registerLevel(
@@ -111,7 +114,8 @@ class ServerWatcher:
             self.Webhook.send(event=event, **ctx)
 
     def clearTerminal(self):
-        if self.config.clear_terminal:
+        self.router.clearBuffer()
+        if self.config.clear_terminal and not self.buffer_enabled:
             utils.clearTerminal()
 
     def shutdown(self):

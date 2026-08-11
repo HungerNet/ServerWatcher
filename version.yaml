@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.22'
+version: '5.33-beta.23'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -63,3 +63,6 @@ description: |
   - Added LiveCLI support
   Beta 22:
   - Fixed watcher not running by using threading
+  Beta 23:
+  - Fixed custom clearTerminal() function
+  - Buffering fixes
