@@ -1,100 +1,89 @@
 import asyncio
+import argparse
+import cmd2
+
 from hungerlib import utils
 from mapres import rprint, maps, setGlobalMaps
 from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
 
-class WatcherCLI:
+
+# ---------------------------------------------------------
+# ARGPARSE DEFINITIONS
+# ---------------------------------------------------------
+
+stats_parser = argparse.ArgumentParser()
+stats_parser.add_argument(
+    "stat",
+    choices=["cpu", "ram", "uptime", "tps", "players"],
+    help="Statistic to retrieve"
+)
+
+schedule_parser = argparse.ArgumentParser()
+schedule_parser.add_argument(
+    "minutes",
+    type=int,
+    help="Minutes until restart"
+)
+
+
+# ---------------------------------------------------------
+# MAIN SHELL
+# ---------------------------------------------------------
+
+class WatcherCLI(cmd2.Cmd):
+    prompt = "> "
+
     def __init__(self, watcher: ServerWatcher):
+        super().__init__(allow_cli_args=False)
+
         self.watcher = watcher
         self.buffer = utils.Buffer(enabled=True)
 
         # output mode: both | cli | silent
         self.outputMode = "both"
 
-    # ---------------------------------------------------------
-    # CLI buffer write
-    # ---------------------------------------------------------
-    def bprint(self, text):
-        if self.buffer.enabled:
-            self.buffer.captured.append(text)
-        print(text)
+        # disable cmd2 features you don't want
+        self.use_rawinput = False
+        self.echo = False
+        self.history = None
 
     # ---------------------------------------------------------
-    # MAIN CLI LOOP (no LiveCLI)
+    # ASYNC INPUT LOOP (your original logic)
     # ---------------------------------------------------------
     async def run(self):
         while True:
-
-            # show prompt only in CLI mode
             if self.outputMode == "cli":
                 print("> ", end="")
-                print('', end='')
 
-            # Pterodactyl-safe input
-            # print("", end="")
             line = await asyncio.to_thread(input)
             line = line.strip()
 
             if not line:
                 continue
 
-            parts = line.split()
-            cmd = parts[0]
-            args = parts[1:]
-
-            # -------------------------------------------------
-            # COMMAND ROUTING (simple if/elif)
-            # -------------------------------------------------
-
-            # view cli
-            if cmd == "view" and len(args) == 1 and args[0] == "cli":
-                self._view_cli()
-                continue
-
-            # view watcher
-            if cmd == "view" and len(args) == 1 and args[0] == "watcher":
-                self._view_watcher()
-                continue
-
-            # stats get <stat>
-            if cmd == "stats" and len(args) == 2 and args[0] == "get":
-                self._stats_get(args[1])
-                continue
-
-            # watcher restart
-            if cmd == "watcher" and len(args) == 1 and args[0] == "restart":
-                self.watcher.restart_and_wait()
-                continue
-
-            # watcher schedule <minutes>
-            if cmd == "watcher" and len(args) == 2 and args[0] == "schedule":
-                try:
-                    minutes = int(args[1])
-                    self.watcher.schedule_restart(minutes)
-                except:
-                    print("Invalid minutes")
-                continue
-
-            # watcher shutdown
-            if cmd == "watcher" and len(args) == 1 and args[0] == "shutdown":
-                self.watcher.shutdown()
-                continue
-
-            # unknown command
-            print(f"Unknown command: '{line}'")
-            print("Commands:")
-            print("  view cli")
-            print("  view watcher")
-            print("  stats get <cpu|ram|uptime|tps|players>")
-            print("  watcher restart")
-            print("  watcher schedule <minutes>")
-            print("  watcher shutdown")
+            # cmd2 handles dispatching
+            stop = await asyncio.to_thread(self.onecmd, line)
+            if stop:
+                break
 
     # ---------------------------------------------------------
     # VIEW COMMANDS
     # ---------------------------------------------------------
+
+    def do_view(self, arg):
+        """
+        view cli
+        view watcher
+        """
+        if arg == "cli":
+            self._view_cli()
+        elif arg == "watcher":
+            self._view_watcher()
+        else:
+            self.poutput("Usage: view <cli|watcher>")
+
     def _view_cli(self):
         self.watcher.router.disableOriginOutput()
         self.outputMode = "cli"
@@ -121,6 +110,15 @@ class WatcherCLI:
     # ---------------------------------------------------------
     # STATS COMMANDS
     # ---------------------------------------------------------
+
+    @cmd2.with_argparser(stats_parser)
+    def do_stats(self, args):
+        """
+        stats get <cpu|ram|uptime|tps|players>
+        """
+        # cmd2 already validated the stat
+        self._stats_get(args.stat)
+
     def _stats_get(self, stat):
         self.watcher.server.refresh()
 
@@ -134,5 +132,48 @@ class WatcherCLI:
             self.bprint(self.watcher.server.tps)
         elif stat == "players":
             self.bprint(self.watcher.server.players)
+
+    # ---------------------------------------------------------
+    # WATCHER COMMANDS
+    # ---------------------------------------------------------
+
+    def do_watcher(self, arg):
+        """
+        watcher restart
+        watcher schedule <minutes>
+        watcher shutdown
+        """
+        parts = arg.split()
+
+        if len(parts) == 0:
+            self.poutput("Usage: watcher <restart|schedule|shutdown>")
+            return
+
+        sub = parts[0]
+
+        if sub == "restart":
+            self.watcher.restart_and_wait()
+
+        elif sub == "schedule":
+            # delegate to argparse version
+            try:
+                args = schedule_parser.parse_args(parts[1:])
+                self.watcher.schedule_restart(args.minutes)
+            except SystemExit:
+                self.poutput("Usage: watcher schedule <minutes>")
+
+        elif sub == "shutdown":
+            self.watcher.shutdown()
+            return True
+
         else:
-            self.bprint(f"Unknown stat: {stat}")
+            self.poutput("Usage: watcher <restart|schedule|shutdown>")
+
+    # ---------------------------------------------------------
+    # BUFFER PRINT
+    # ---------------------------------------------------------
+
+    def bprint(self, text):
+        if self.buffer.enabled:
+            self.buffer.captured.append(text)
+        self.poutput(text)

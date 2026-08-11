@@ -30,6 +30,7 @@ dependencies = [
     "hungerlib>=3.1",
     "PyYaml",
     "mapres",
+    "cmd2",
 ]
 
 classifiers = [

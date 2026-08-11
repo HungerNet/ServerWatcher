@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.38'
+version: '5.33-beta.39'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -97,3 +97,6 @@ description: |
   - Stop using LiveCLI
   Beta 36-38:
   - Debugging
+  Beta 39:
+  - Rewritten to use cmd2
+  - Added cmd2 to dependencies
