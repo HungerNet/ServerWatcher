@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.23'
+version: '5.33-beta.24'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -66,3 +66,7 @@ description: |
   Beta 23:
   - Fixed custom clearTerminal() function
   - Buffering fixes
+  Beta 24:
+  - Used printBuffer() instead of flushBuffer() to avoid clearing the buffer when switching output modes
+  - Removed "Output mode set to <mode>" messages to avoid cluttering the output when switching modes
+  - A bunch of buffering fixes and improvements

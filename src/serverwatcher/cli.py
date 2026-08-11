@@ -8,9 +8,16 @@ class WatcherCLI:
         self.watcher = watcher
         self.cli = LiveCLI(prefix=None)
 
+        self.Buffer = utils.Buffer(enabled=True)
+
         self._register_types()
         self._register_aliases()
         self._register_commands()
+
+    def bprint(self, text):
+        if self.Buffer.enabled:
+            self.Buffer.captured.append(text)
+        print(text)
 
     async def run(self):
         await self.cli.run()
@@ -43,13 +50,12 @@ class WatcherCLI:
         def view_cli():
             self.cli.outputMode = "cli"
             utils.clearTerminal()
-            print("Output mode set to cli")
+            self.Buffer.print()
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
             self.cli.outputMode = "both"
-            self.watcher.router.flushBuffer()
-            print("Output mode set to watcher")
+            self.watcher.router.Buffer.print()
 
     # stats get <stat>
     def _register_stats_commands(self):
@@ -64,17 +70,17 @@ class WatcherCLI:
             self.watcher.server.refresh()
 
             if stat == "cpu":
-                print(self.watcher.server.cpu)
+                self.bprint(self.watcher.server.cpu)
             elif stat == "ram":
-                print(self.watcher.server.ram)
+                self.bprint(self.watcher.server.ram)
             elif stat == "uptime":
-                print(self.watcher.server.uptime)
+                self.bprint(self.watcher.server.uptime)
             elif stat == "tps":
-                print(self.watcher.server.tps)
+                self.bprint(self.watcher.server.tps)
             elif stat == "players":
-                print(self.watcher.server.players)
+                self.bprint(self.watcher.server.players)
             else:
-                print(f"Unknown stat: {stat}")
+                self.bprint(f"Unknown stat: {stat}")
 
     # watcher commands
     def _register_watcher_commands(self):
