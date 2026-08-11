@@ -44,18 +44,15 @@ class WatcherCLI(cmd2.Cmd):
         # output mode: both | cli | silent
         self.outputMode = "both"
 
-        # disable cmd2 features you don't want
         self.use_rawinput = False
         self.echo = False
         self.disable_history = True
 
-    # ---------------------------------------------------------
-    # ASYNC INPUT LOOP (your original logic)
-    # ---------------------------------------------------------
     async def run(self):
         while True:
             if self.outputMode == "cli":
                 print("> ", end="")
+                print('', end='')
 
             line = await asyncio.to_thread(input)
             line = line.strip()

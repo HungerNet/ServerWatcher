@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.40'
+version: '5.33-beta.41'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -100,5 +100,5 @@ description: |
   Beta 39:
   - Rewritten to use cmd2
   - Added cmd2 to dependencies
-  Beta 40:
+  Beta 40+:
   - Debugging
