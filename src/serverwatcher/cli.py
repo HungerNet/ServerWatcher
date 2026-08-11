@@ -50,6 +50,7 @@ class WatcherCLI:
 
         @self.cli.command("view.cli", description="Switch output mode to CLI only")
         def view_cli():
+            self.watcher.router.disableOriginOutput()
             self.cli.outputMode = "cli"
 
             # trigger Pterodactyl clear
@@ -68,6 +69,7 @@ class WatcherCLI:
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
+            self.watcher.router.enableOriginOutput()
             self.cli.outputMode = "both"
 
             # trigger Pterodactyl clear

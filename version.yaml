@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.33'
+version: '5.33-beta.34'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -91,3 +91,5 @@ description: |
   - Fixed order, should work now
   Beta 33:
   - Debugging clearTerminal()
+  Beta 34:
+  - Toggle watcher's origin_output appropriately
