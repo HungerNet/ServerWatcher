@@ -54,15 +54,15 @@ class WatcherCLI:
 
             # trigger Pterodactyl clear
             utils.clearTerminal()
-            print('\b')
+            print('', end='')
 
             # print header, newline, buffer, prompt
-            rprint("<yellow>-------------------------")
-            rprint("<yellow>--- <aqua>ServerWatcher CLI <yellow>---")
-            rprint("<yellow>-------------------------")
+            rprint("<yellow>-----------------------------------")
+            rprint("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------")
+            rprint("<yellow>-----------------------------------")
             print('\n')
             self.buffer.printCaptured()
-            print("> ", end="")
+            print(" ", end="")
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
@@ -70,7 +70,7 @@ class WatcherCLI:
 
             # trigger Pterodactyl clear
             utils.clearTerminal()
-            print('\b')
+            print('', end='')
 
             # print watcher buffer
             self.watcher.router.buffer.printCaptured()
