@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.28'
+version: '5.33-beta.29'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -79,3 +79,6 @@ description: |
   Beta 28:
   - Fixed terminal clearing and buffering when switching output modes (again)
   - Fixed res() not being called, now using rprint()
+  Beta 29:
+  - Renamed Buffer to buffer
+  - Used buffer.printCaptured() instead of buffer.print() (hungerlib 4.24-alpha.12 update)

@@ -10,15 +10,15 @@ class WatcherCLI:
         self.watcher = watcher
         self.cli = LiveCLI(prefix=None)
 
-        self.Buffer = utils.Buffer(enabled=True)
+        self.buffer = utils.Buffer(enabled=True)
 
         self._register_types()
         self._register_aliases()
         self._register_commands()
 
     def bprint(self, text):
-        if self.Buffer.enabled:
-            self.Buffer.captured.append(text)
+        if self.buffer.enabled:
+            self.buffer.captured.append(text)
         print(text)
 
     async def run(self):
@@ -61,7 +61,7 @@ class WatcherCLI:
             rprint("<yellow>--- <aqua>ServerWatcher CLI <yellow>---")
             rprint("<yellow>-------------------------")
             print('\n')
-            self.Buffer.print()
+            self.buffer.printCaptured()
             print("> ", end="")
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
@@ -73,7 +73,7 @@ class WatcherCLI:
             print('\b')
 
             # print watcher buffer
-            self.watcher.router.Buffer.print()
+            self.watcher.router.buffer.printCaptured()
 
     # stats get <stat>
     def _register_stats_commands(self):

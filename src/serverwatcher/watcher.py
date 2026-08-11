@@ -114,12 +114,12 @@ class ServerWatcher:
             self.Webhook.send(event=event, **ctx)
 
     def clearTerminal(self, conditional=True):
-        self.router.Buffer.clear()
+        self.router.buffer.clear()
         if conditional:
-            if self.config.clear_terminal and not self.router.Buffer.enabled:
+            if self.config.clear_terminal and not self.router.buffer.enabled:
                 utils.clearTerminal()
         else:
-            if not self.router.Buffer.enabled:
+            if not self.router.buffer.enabled:
                 utils.clearTerminal()
 
     def shutdown(self):
@@ -200,9 +200,9 @@ class ServerWatcher:
         )
 
     def evaluate(self):
-        self.router.Buffer.disable()
+        self.router.buffer.disable()
         self.router.info('ServerWatcher is running!')
-        self.router.Buffer.enable()
+        self.router.buffer.enable()
         self.clearTerminal(conditional=False)
 
         self.router.info(self.messages.startup)
