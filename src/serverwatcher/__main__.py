@@ -1,5 +1,7 @@
 from mapres import rprint, setGlobalMaps, ascii_colors
 import time
+import asyncio
+from .cli import WatcherCLI
 
 from hungerlib.validator import (
     ValidationError,
@@ -89,7 +91,8 @@ def main():
 
     # if validation passes, start ServerWatcher
     watcher = ServerWatcher()
-    watcher.run()
+    cli = WatcherCLI(watcher)
+    asyncio.run(cli.run())
 
 if __name__ == '__main__':
     main()
