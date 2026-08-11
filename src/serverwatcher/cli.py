@@ -1,92 +1,164 @@
 import asyncio
-from hungerlib import LiveCLI, utils
+from hungerlib import utils
 from mapres import rprint, maps, setGlobalMaps
 from .watcher import ServerWatcher
+import inspect
 
 setGlobalMaps(maps.ascii_colors)
 
 class WatcherCLI:
     def __init__(self, watcher: ServerWatcher):
         self.watcher = watcher
-        self.cli = LiveCLI(prefix=None)
-
         self.buffer = utils.Buffer(enabled=True)
+
+        # command registry
+        self.commands = {}
+        self.aliases = {}
+
+        # output mode: both | cli | silent
+        self.outputMode = "both"
 
         self._register_types()
         self._register_aliases()
         self._register_commands()
 
+    # ---------------------------------------------------------
+    # Registration helpers
+    # ---------------------------------------------------------
+    def command(self, name, args=None, description=None):
+        def decorator(func):
+            self.commands[name] = {
+                "handler": func,
+                "args": args or [],
+                "description": description or ""
+            }
+            return func
+        return decorator
+
+    def alias(self, name, target):
+        self.aliases[name] = target
+
+    # ---------------------------------------------------------
+    # CLI buffer write
+    # ---------------------------------------------------------
     def bprint(self, text):
         if self.buffer.enabled:
             self.buffer.captured.append(text)
-        self.cli.write(text)   # use LiveCLI buffer
+        print(text)  # raw print for CLI mode
 
+    # ---------------------------------------------------------
+    # MAIN CLI LOOP (replaces LiveCLI.run)
+    # ---------------------------------------------------------
     async def run(self):
-        await self.cli.run()
+        while True:
 
+            # show prompt only in CLI mode
+            if self.outputMode == "cli":
+                print("> ", end="")
+
+            # Pterodactyl-safe input
+            print("", end="")
+            line = await asyncio.to_thread(input, "")
+            line = line.strip()
+
+            if not line:
+                continue
+
+            # alias resolution
+            if line in self.aliases:
+                line = self.aliases[line]
+
+            parts = line.split()
+            cmd_name = parts[0]
+            args = parts[1:]
+
+            # unknown command
+            if cmd_name not in self.commands:
+                print(f"Unknown command: '{cmd_name}'")
+                print("Root commands:", ", ".join(self.commands.keys()))
+                continue
+
+            cmd = self.commands[cmd_name]
+            handler = cmd["handler"]
+
+            try:
+                # run command
+                if inspect.iscoroutinefunction(handler):
+                    result = await handler(*args)
+                else:
+                    result = handler(*args)
+
+                # print result
+                if result is not None and self.outputMode in ("both", "cli"):
+                    print(result)
+
+                # print CLI buffer
+                if self.outputMode == "cli":
+                    for msg in self.buffer.captured:
+                        print(msg)
+
+            except Exception as e:
+                print(f"Error: {e}")
+
+    # ---------------------------------------------------------
     # Types
+    # ---------------------------------------------------------
     def _register_types(self):
-        # enum for stats
-        self.cli.register_type("Stat", lambda s: s if s in (
-            "cpu", "ram", "uptime", "tps", "players"
-        ) else (_ for _ in ()).throw(ValueError(
-            f"Invalid stat '{s}'. Expected: cpu, ram, uptime, tps, players"
-        )))
+        pass  # your types are handled manually in commands
 
-    # aliases (optional)
+    # ---------------------------------------------------------
+    # Aliases
+    # ---------------------------------------------------------
     def _register_aliases(self):
-        self.cli.alias("stats", "stats")
-        self.cli.alias("view", "view")
-        self.cli.alias("watcher", "watcher")
+        self.alias("stats", "stats.get")
+        self.alias("view", "view.cli")
+        self.alias("watcher", "watcher.restart")
 
-    # commands
+    # ---------------------------------------------------------
+    # Commands
+    # ---------------------------------------------------------
     def _register_commands(self):
         self._register_view_commands()
         self._register_stats_commands()
         self._register_watcher_commands()
 
-    # view cli / view watcher
+    # ---------------------------------------------------------
+    # VIEW COMMANDS
+    # ---------------------------------------------------------
     def _register_view_commands(self):
 
-        @self.cli.command("view.cli", description="Switch output mode to CLI only")
+        @self.command("view.cli", description="Switch output mode to CLI only")
         def view_cli():
             self.watcher.router.disableOriginOutput()
-            self.cli.outputMode = "cli"
+            self.outputMode = "cli"
 
-            # trigger Pterodactyl clear
             utils.clearTerminal()
-            print('', end='')
+            print("", end="")
 
-            # print header, newline, buffer, prompt
             rprint("<yellow>-----------------------------------")
             rprint("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------")
             rprint("<yellow>-----------------------------------")
-            print('\n')
+            print("\n")
+
             for msg in self.buffer.captured:
-                self.cli.write(msg)
-            print('', end='')
+                print(msg)
 
-
-        @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
+        @self.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
             self.watcher.router.enableOriginOutput()
-            self.cli.outputMode = "both"
+            self.outputMode = "both"
 
-            # trigger Pterodactyl clear
             utils.clearTerminal()
-            print('', end='')
+            print("", end="")
             self.watcher.router.buffer.printCaptured()
 
-    # stats get <stat>
+    # ---------------------------------------------------------
+    # STATS COMMANDS
+    # ---------------------------------------------------------
     def _register_stats_commands(self):
 
-        @self.cli.command(
-            "stats.get",
-            args=["stat:Stat"],
-            description="Get a server statistic"
-        )
+        @self.command("stats.get", description="Get a server statistic")
         def stats_get(stat):
-            # refresh server snapshot
             self.watcher.server.refresh()
 
             if stat == "cpu":
@@ -102,27 +174,19 @@ class WatcherCLI:
             else:
                 self.bprint(f"Unknown stat: {stat}")
 
-    # watcher commands
+    # ---------------------------------------------------------
+    # WATCHER COMMANDS
+    # ---------------------------------------------------------
     def _register_watcher_commands(self):
 
-        @self.cli.command(
-            "watcher.restart",
-            description="Restart the server and wait for it to come online"
-        )
+        @self.command("watcher.restart", description="Restart the server")
         def watcher_restart():
             self.watcher.restart_and_wait()
 
-        @self.cli.command(
-            "watcher.schedule",
-            args=["minutes:int"],
-            description="Schedule a restart in N minutes"
-        )
+        @self.command("watcher.schedule", description="Schedule a restart")
         def watcher_schedule(minutes):
-            self.watcher.schedule_restart(minutes)
+            self.watcher.schedule_restart(int(minutes))
 
-        @self.cli.command(
-            "watcher.shutdown",
-            description="Shutdown the watcher"
-        )
+        @self.command("watcher.shutdown", description="Shutdown watcher")
         def watcher_shutdown():
             self.watcher.shutdown()

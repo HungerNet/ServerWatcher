@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.34'
+version: '5.33-beta.35'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -93,3 +93,5 @@ description: |
   - Debugging clearTerminal()
   Beta 34:
   - Toggle watcher's origin_output appropriately
+  Beta 35:
+  - Stop using LiveCLI
