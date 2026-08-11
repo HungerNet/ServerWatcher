@@ -70,3 +70,5 @@ description: |
   - Used printBuffer() instead of flushBuffer() to avoid clearing the buffer when switching output modes
   - Removed "Output mode set to <mode>" messages to avoid cluttering the output when switching modes
   - A bunch of buffering fixes and improvements
+  Beta 25:
+  - Fixed terminal clearing when switching output modes

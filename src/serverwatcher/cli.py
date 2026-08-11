@@ -50,11 +50,14 @@ class WatcherCLI:
         def view_cli():
             self.cli.outputMode = "cli"
             utils.clearTerminal()
+            print("\n")
             self.Buffer.print()
 
         @self.cli.command("view.watcher", description="Switch output mode to watcher logs")
         def view_watcher():
             self.cli.outputMode = "both"
+            utils.clearTerminal()
+            print("\n")
             self.watcher.router.Buffer.print()
 
     # stats get <stat>
