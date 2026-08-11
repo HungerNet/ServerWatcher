@@ -113,14 +113,24 @@ class ServerWatcher:
         if self.config.discord_enabled:
             self.Webhook.send(event=event, **ctx)
 
+    # def clearTerminal(self, conditional=True):
+    #     self.router.buffer.clear()
+    #     if conditional:
+    #         if self.config.clear_terminal and not self.router.buffer.enabled: # if clearing terminal is enabled and buffer is disabled
+    #             utils.clearTerminal()
+    #     else:
+    #         if not self.router.buffer.enabled: # if buffer disabled
+    #             utils.clearTerminal()
+
+
+    # DEBUGGING
     def clearTerminal(self, conditional=True):
         self.router.buffer.clear()
         if conditional:
-            if self.config.clear_terminal and not self.router.buffer.enabled:
+            if self.config.clear_terminal and not self.router.buffer.enabled: # if clearing terminal is enabled and buffer is disabled
                 utils.clearTerminal()
         else:
-            if not self.router.buffer.enabled:
-                utils.clearTerminal()
+            utils.clearTerminal()
 
     def shutdown(self):
         self.router.info(self.messages.shutdown)
@@ -202,8 +212,8 @@ class ServerWatcher:
     def evaluate(self):
         self.router.buffer.disable()
         self.router.info('ServerWatcher is running!')
-        self.router.buffer.enable()
         self.clearTerminal(conditional=False)
+        self.router.buffer.enable()
 
         self.router.info(self.messages.startup)
 
