@@ -30,9 +30,10 @@ class WatcherCLI:
             # show prompt only in CLI mode
             if self.outputMode == "cli":
                 print("> ", end="")
+                print('', end='')
 
             # Pterodactyl-safe input
-            print("", end="")
+            # print("", end="")
             line = await asyncio.to_thread(input)
             line = line.strip()
 
