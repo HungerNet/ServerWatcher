@@ -33,7 +33,7 @@ class WatcherCLI:
 
             # Pterodactyl-safe input
             print("", end="")
-            line = await asyncio.to_thread(input, "")
+            line = await asyncio.to_thread(input)
             line = line.strip()
 
             if not line:
