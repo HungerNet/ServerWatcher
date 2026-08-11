@@ -47,7 +47,7 @@ class WatcherCLI(cmd2.Cmd):
         # disable cmd2 features you don't want
         self.use_rawinput = False
         self.echo = False
-        self.history = None
+        self.disable_history = True
 
     # ---------------------------------------------------------
     # ASYNC INPUT LOOP (your original logic)
