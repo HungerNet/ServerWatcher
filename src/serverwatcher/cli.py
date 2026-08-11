@@ -103,8 +103,10 @@ class WatcherCLI(cmd.Cmd):
         rprint("<yellow>-----------------------------------")
         print("\n")
 
-        self.buffer.printCaptured()
-        print(len(self.buffer.captured)) # debugging
+        # print buffer WITHOUT capturing
+        for msg in self.buffer.captured:
+            print(msg, file=self.real_stdout)
+
 
     def _view_watcher(self):
         self.watcher.router.enableOriginOutput()
