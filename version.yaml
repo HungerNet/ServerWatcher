@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.35'
+version: '5.33-beta.36'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -95,3 +95,5 @@ description: |
   - Toggle watcher's origin_output appropriately
   Beta 35:
   - Stop using LiveCLI
+  Beta 36:
+  - Debugging
