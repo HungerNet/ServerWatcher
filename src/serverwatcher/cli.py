@@ -128,7 +128,10 @@ class WatcherCLI(cmd.Cmd):
 
         utils.clearTerminal()
         self.safePrint("", end="")
-        self.watcher.router.buffer.printCaptured()
+
+        # print buffer WITHOUT capturing
+        for msg in self.watcher.router.buffer.captured:
+            self.safePrint(msg)
 
     # ---------------------------------------------------------
     # STATS COMMANDS
