@@ -68,7 +68,7 @@ class WatcherCLI(cmd.Cmd):
                 self.safePrint("> ", end="")
                 self.safePrint("", end="")
 
-            line = await asyncio.to_thread(input)
+            line = await asyncio.to_thread(input('(input prompt): '))
             line = line.strip()
 
             if not line:
