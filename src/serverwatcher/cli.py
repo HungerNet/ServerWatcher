@@ -3,12 +3,44 @@ import argparse
 import cmd
 import sys
 
+import termios
+import tty
+
 from hungerlib import utils
 from mapres import res, maps, setGlobalMaps
+
 from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
 
+def read_line_raw():
+    """Read a line from stdin with NO terminal echo."""
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+
+    try:
+        tty.setraw(fd)
+        line = ""
+        while True:
+            ch = sys.stdin.read(1)
+
+            # user pressed Enter
+            if ch == "\r" or ch == "\n":
+                break
+
+            # manually echo through your buffering stdout
+            sys.stdout.write(ch)
+            sys.stdout.flush()
+
+            line += ch
+
+        # manually print newline
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+
+        return line
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
 class BufferingStdout:
     def __init__(self, buffer, real_stdout):
@@ -68,7 +100,7 @@ class WatcherCLI(cmd.Cmd):
                 self.safePrint("> ", end="")
                 self.safePrint("", end="")
 
-            line = await asyncio.to_thread(input('(input prompt): '))
+            line = await asyncio.to_thread(input)
             line = line.strip()
 
             if not line:
