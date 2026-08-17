@@ -55,7 +55,7 @@ class WatcherCLI(cmd.Cmd):
 
         # override with custom stdout
         self.real_stdout = sys.stdout
-        # sys.stdout = BufferingStdout(self.buffer, self.real_stdout)
+        sys.stdout = BufferingStdout(self.buffer, self.real_stdout) # this may be a breaking change
 
         self.use_rawinput = False
 
