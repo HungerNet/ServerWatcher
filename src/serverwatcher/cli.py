@@ -89,22 +89,16 @@ class WatcherCLI(cmd.Cmd):
             self.real_stdout.flush()
 
             line = "".join(chars)
-
-            # capture full line
-            if self.buffer.enabled:
-                self.buffer.captured.append(line)
-
             return line
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
-
     async def run(self):
         while True:
             if self.outputMode == "cli":
-                # print prompt through buffering stdout
-                self.stdout.write("> ")
-                self.stdout.flush()
+                # prompt to real stdout (not captured)
+                self.real_stdout.write("> ")
+                self.real_stdout.flush()
 
             # read input without terminal echo
             line = await asyncio.to_thread(self.read_line_raw)
@@ -113,17 +107,23 @@ class WatcherCLI(cmd.Cmd):
             if not line:
                 continue
 
+            # capture command with prompt, except view commands
+            if self.buffer.enabled and not line.startswith("view"):
+                self.buffer.captured.append(f"> {line}")
+
             # run command (self.stdout is already overridden)
             stop = await asyncio.to_thread(self.onecmd, line)
+
+            # capture trailing prompt
+            if self.buffer.enabled and not line.startswith("view"):
+                self.buffer.captured.append(">")
 
             if stop:
                 break
 
-
     def safePrint(self, msg="", end="\n"):
         self.real_stdout.write(msg + end)
         self.real_stdout.flush()
-
 
     # ---------------------------------------------------------
     # VIEW COMMANDS
@@ -140,7 +140,6 @@ class WatcherCLI(cmd.Cmd):
         else:
             self.safePrint("Usage: view <cli|watcher>")
 
-
     def _view_cli(self):
         self.watcher.router.disableOriginOutput()
         self.outputMode = "cli"
@@ -151,6 +150,7 @@ class WatcherCLI(cmd.Cmd):
         utils.clearTerminal()
         self.safePrint("", end="")
 
+        # header is always printed fresh, not stored in buffer
         self.safePrint(res("<yellow>-----------------------------------"))
         self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
         self.safePrint(res("<yellow>-----------------------------------"))
@@ -159,7 +159,6 @@ class WatcherCLI(cmd.Cmd):
         # replay captured CLI output
         for msg in self.buffer.captured:
             self.safePrint(msg)
-
 
     def _view_watcher(self):
         self.watcher.router.enableOriginOutput()
@@ -175,7 +174,6 @@ class WatcherCLI(cmd.Cmd):
         for msg in self.watcher.router.buffer.captured:
             self.safePrint(msg)
 
-
     # ---------------------------------------------------------
     # STATS COMMANDS
     # ---------------------------------------------------------
@@ -189,13 +187,11 @@ class WatcherCLI(cmd.Cmd):
         except SystemExit:
             self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players>")
 
-
     def _stats_get(self, stat):
         self.watcher.server.refresh()
 
         value = getattr(self.watcher.server, stat)
         self.bprint(value)
-
 
     # ---------------------------------------------------------
     # WATCHER COMMANDS
@@ -230,7 +226,6 @@ class WatcherCLI(cmd.Cmd):
 
         else:
             self.safePrint("Usage: watcher <restart|schedule|shutdown>")
-
 
     # ---------------------------------------------------------
     # BUFFER PRINT
