@@ -97,10 +97,12 @@ class WatcherCLI(cmd.Cmd):
     async def run(self):
         while True:
             if self.outputMode == "cli":
-                self.safePrint("> ", end="")
-                self.safePrint("", end="")
+                # print prompt through buffering stdout
+                self.stdout.write("> ")
+                self.stdout.flush()
 
-            line = await asyncio.to_thread(input)
+            # read input without terminal echo
+            line = await asyncio.to_thread(read_line_raw)
             line = line.strip()
 
             if not line:
