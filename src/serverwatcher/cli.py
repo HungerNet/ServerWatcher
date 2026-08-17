@@ -71,22 +71,28 @@ class WatcherCLI(cmd.Cmd):
 
         try:
             tty.setraw(fd)
-            line = ""
+            chars = []
             while True:
                 ch = sys.stdin.read(1)
 
                 if ch in ("\r", "\n"):
                     break
 
-                # echo through BufferingStdout (capturable)
-                self.stdout.write(ch)
-                self.stdout.flush()
+                # echo to terminal only (not captured)
+                self.real_stdout.write(ch)
+                self.real_stdout.flush()
 
-                line += ch
+                chars.append(ch)
 
-            # newline
-            self.stdout.write("\n")
-            self.stdout.flush()
+            # newline on terminal
+            self.real_stdout.write("\n")
+            self.real_stdout.flush()
+
+            line = "".join(chars)
+
+            # capture full line
+            if self.buffer.enabled:
+                self.buffer.captured.append(line)
 
             return line
         finally:
