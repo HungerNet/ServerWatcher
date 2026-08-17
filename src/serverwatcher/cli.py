@@ -78,17 +78,14 @@ class WatcherCLI(cmd.Cmd):
                 if ch in ("\r", "\n"):
                     break
 
-                # echo to terminal only (not captured)
-                self.real_stdout.write(ch)
-                self.real_stdout.flush()
-
+                # do NOT echo here; we already printed "> "
                 chars.append(ch)
 
-            # newline on terminal
-            self.real_stdout.write("\n")
+            # finish the line on terminal: "> asdf"
+            line = "".join(chars)
+            self.real_stdout.write(line + "\n")
             self.real_stdout.flush()
 
-            line = "".join(chars)
             return line
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
@@ -114,9 +111,10 @@ class WatcherCLI(cmd.Cmd):
             # run command (self.stdout is already overridden)
             stop = await asyncio.to_thread(self.onecmd, line)
 
-            # capture trailing prompt
+            # ensure a single trailing ">" at the end of buffer
             if self.buffer.enabled and not line.startswith("view"):
-                self.buffer.captured.append(">")
+                if not self.buffer.captured or self.buffer.captured[-1] != ">":
+                    self.buffer.captured.append(">")
 
             if stop:
                 break
