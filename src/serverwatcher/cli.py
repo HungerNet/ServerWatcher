@@ -45,7 +45,7 @@ schedule_parser.add_argument(
 
 
 class WatcherCLI(cmd.Cmd):
-    prompt = "> "
+    prompt = ""
 
     def __init__(self, watcher: ServerWatcher):
         self.watcher = watcher
@@ -78,45 +78,26 @@ class WatcherCLI(cmd.Cmd):
                     break
                 chars.append(ch)
 
-            line = "".join(chars)
-            return line
+            return "".join(chars)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
     async def run(self):
         while True:
-            if self.outputMode == "cli":
-                # print prompt to real stdout (not captured)
-                self.real_stdout.write("> ")
-                self.real_stdout.flush()
 
-            # read input without terminal echo
+            # read input without echo (Pterodactyl will echo anyway)
             line = await asyncio.to_thread(self.read_line_raw)
             line = line.strip()
 
             if not line:
                 continue
 
-            # print the command on the same line: "> asdf"
-            self.real_stdout.write(f"{line}\n")
-            self.real_stdout.flush()
-
-            # capture command with prompt, except view commands
+            # capture command (Pterodactyl already printed it)
             if self.buffer.enabled and not line.startswith("view"):
-                self.buffer.captured.append(f"> {line}")
+                self.buffer.captured.append(line)
 
             # run command (self.stdout is already overridden)
             stop = await asyncio.to_thread(self.onecmd, line)
-
-            # ensure a single trailing ">" at the end of buffer
-            if self.buffer.enabled and not line.startswith("view"):
-                if not self.buffer.captured or self.buffer.captured[-1] != ">":
-                    self.buffer.captured.append(">")
-
-            # print trailing prompt live
-            if self.outputMode == "cli":
-                self.real_stdout.write("> ")
-                self.real_stdout.flush()
 
             if stop:
                 break
