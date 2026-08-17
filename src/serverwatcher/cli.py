@@ -74,18 +74,11 @@ class WatcherCLI(cmd.Cmd):
             chars = []
             while True:
                 ch = sys.stdin.read(1)
-
                 if ch in ("\r", "\n"):
                     break
-
-                # do NOT echo here; we already printed "> "
                 chars.append(ch)
 
-            # finish the line on terminal: "> asdf"
             line = "".join(chars)
-            self.real_stdout.write(line + "\n")
-            self.real_stdout.flush()
-
             return line
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
@@ -93,7 +86,7 @@ class WatcherCLI(cmd.Cmd):
     async def run(self):
         while True:
             if self.outputMode == "cli":
-                # prompt to real stdout (not captured)
+                # print prompt to real stdout (not captured)
                 self.real_stdout.write("> ")
                 self.real_stdout.flush()
 
@@ -103,6 +96,10 @@ class WatcherCLI(cmd.Cmd):
 
             if not line:
                 continue
+
+            # print the command on the same line: "> asdf"
+            self.real_stdout.write(f"{line}\n")
+            self.real_stdout.flush()
 
             # capture command with prompt, except view commands
             if self.buffer.enabled and not line.startswith("view"):
@@ -115,6 +112,11 @@ class WatcherCLI(cmd.Cmd):
             if self.buffer.enabled and not line.startswith("view"):
                 if not self.buffer.captured or self.buffer.captured[-1] != ">":
                     self.buffer.captured.append(">")
+
+            # print trailing prompt live
+            if self.outputMode == "cli":
+                self.real_stdout.write("> ")
+                self.real_stdout.flush()
 
             if stop:
                 break
