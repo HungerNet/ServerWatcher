@@ -16,14 +16,13 @@ class BufferingStdout:
         self.real_stdout = real_stdout
 
     def write(self, text):
-        # store only non-empty lines
-        if text.strip():
+        # capture only non-empty lines
+        if self.buffer.enabled and text.strip():
             self.buffer.captured.append(text.rstrip("\n"))
         self.real_stdout.write(text)
 
     def flush(self):
         self.real_stdout.flush()
-
 
 
 stats_parser = argparse.ArgumentParser()
@@ -45,25 +44,29 @@ class WatcherCLI(cmd.Cmd):
     prompt = "> "
 
     def __init__(self, watcher: ServerWatcher):
-        super().__init__()
-
         self.watcher = watcher
+
+        # buffer for CLI output
         self.buffer = utils.Buffer(enabled=True)
+
+        # real stdout (terminal)
+        self.real_stdout = sys.stdout
+
+        # permanently override cmd.Cmd stdout
+        super().__init__(stdout=BufferingStdout(self.buffer, self.real_stdout))
 
         # output mode: both | cli | silent
         self.outputMode = "both"
 
-        # override with custom stdout
-        self.real_stdout = sys.stdout
-        sys.stdout = BufferingStdout(self.buffer, self.real_stdout) # this may be a breaking change
-
+        # disable rawinput in order to control input manually
         self.use_rawinput = False
+
 
     async def run(self):
         while True:
             if self.outputMode == "cli":
-                print("> ", end="")
-                print('', end='')
+                self.safePrint("> ", end="")
+                self.safePrint("", end="")
 
             line = await asyncio.to_thread(input)
             line = line.strip()
@@ -71,15 +74,8 @@ class WatcherCLI(cmd.Cmd):
             if not line:
                 continue
 
-            # override stdout ONLY during CLI command execution
-            old_stdout = sys.stdout
-            sys.stdout = BufferingStdout(self.buffer, old_stdout)
-
-            try:
-                stop = await asyncio.to_thread(self.onecmd, line)
-            finally:
-                # restore real stdout so watcher logs bypass capture
-                sys.stdout = old_stdout
+            # run command (self.stdout is already overridden)
+            stop = await asyncio.to_thread(self.onecmd, line)
 
             if stop:
                 break
@@ -103,11 +99,15 @@ class WatcherCLI(cmd.Cmd):
         elif arg == "watcher":
             self._view_watcher()
         else:
-            print("Usage: view <cli|watcher>")
+            self.safePrint("Usage: view <cli|watcher>")
+
 
     def _view_cli(self):
         self.watcher.router.disableOriginOutput()
         self.outputMode = "cli"
+
+        # enable CLI capture
+        self.buffer.enabled = True
 
         utils.clearTerminal()
         self.safePrint("", end="")
@@ -117,7 +117,7 @@ class WatcherCLI(cmd.Cmd):
         self.safePrint(res("<yellow>-----------------------------------"))
         self.safePrint("\n")
 
-        # print buffer WITHOUT capturing
+        # replay captured CLI output
         for msg in self.buffer.captured:
             self.safePrint(msg)
 
@@ -126,12 +126,16 @@ class WatcherCLI(cmd.Cmd):
         self.watcher.router.enableOriginOutput()
         self.outputMode = "both"
 
+        # disable CLI capture
+        self.buffer.enabled = False
+
         utils.clearTerminal()
         self.safePrint("", end="")
 
-        # print buffer WITHOUT capturing
+        # replay watcher output
         for msg in self.watcher.router.buffer.captured:
             self.safePrint(msg)
+
 
     # ---------------------------------------------------------
     # STATS COMMANDS
@@ -144,21 +148,15 @@ class WatcherCLI(cmd.Cmd):
             args = stats_parser.parse_args(arg.split())
             self._stats_get(args.stat)
         except SystemExit:
-            print("Usage: stats get <cpu|ram|uptime|tps|players>")
+            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players>")
+
 
     def _stats_get(self, stat):
         self.watcher.server.refresh()
 
-        if stat == "cpu":
-            self.bprint(self.watcher.server.cpu)
-        elif stat == "ram":
-            self.bprint(self.watcher.server.ram)
-        elif stat == "uptime":
-            self.bprint(self.watcher.server.uptime)
-        elif stat == "tps":
-            self.bprint(self.watcher.server.tps)
-        elif stat == "players":
-            self.bprint(self.watcher.server.players)
+        value = getattr(self.watcher.server, stat)
+        self.bprint(value)
+
 
     # ---------------------------------------------------------
     # WATCHER COMMANDS
@@ -172,7 +170,7 @@ class WatcherCLI(cmd.Cmd):
         parts = arg.split()
 
         if len(parts) == 0:
-            print("Usage: watcher <restart|schedule|shutdown>")
+            self.safePrint("Usage: watcher <restart|schedule|shutdown>")
             return
 
         sub = parts[0]
@@ -185,14 +183,15 @@ class WatcherCLI(cmd.Cmd):
                 args = schedule_parser.parse_args(parts[1:])
                 self.watcher.schedule_restart(args.minutes)
             except SystemExit:
-                print("Usage: watcher schedule <minutes>")
+                self.safePrint("Usage: watcher schedule <minutes>")
 
         elif sub == "shutdown":
             self.watcher.shutdown()
             return True
 
         else:
-            print("Usage: watcher <restart|schedule|shutdown>")
+            self.safePrint("Usage: watcher <restart|schedule|shutdown>")
+
 
     # ---------------------------------------------------------
     # BUFFER PRINT
@@ -200,4 +199,4 @@ class WatcherCLI(cmd.Cmd):
     def bprint(self, text):
         if self.buffer.enabled:
             self.buffer.captured.append(text)
-        print(text)
+        self.safePrint(text)
