@@ -260,10 +260,10 @@ class WatcherCLI(cmd.Cmd):
 
         # clear CLI buffer only
         if clear_buffer:
-            self.buffer.captured.clear()
+            self.buffer.clear()
 
         # clear terminal (but NOT watcher buffer)
-        self.watcher.clearTerminal(conditional=False)
+        utils.clearTerminal()
 
         # print header (not captured)
         self.printHeader()
