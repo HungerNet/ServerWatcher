@@ -213,7 +213,7 @@ class WatcherCLI(cmd.Cmd):
     def _stats_get(self, stat: str, gb: bool = True, rounding: int = 2):
         # always refresh before reading
         self.watcher.server.refresh()
-j
+
         # explicit mapping to server methods
         if stat == "ram":
             value = self.watcher.server.getRAM(rounding=rounding, gb=gb)

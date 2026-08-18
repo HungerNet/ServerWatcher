@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.62'
+version: '5.33-beta.63'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -106,3 +106,5 @@ description: |
   - Fixed views
   Beta 62:
   - Fixed stats get command
+  Beta 63:
+  - Fixed typo
