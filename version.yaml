@@ -1,5 +1,5 @@
 run: true
-version: '5.33-beta.67'
+version: '5.33-beta.68'
 description: |
   Alpha 1-2:
   - Fixed version
@@ -116,3 +116,5 @@ description: |
   - Fixed clear command
   Beta 67:
   - Stringified things properly
+  Beta 68:
+  - Add more stats

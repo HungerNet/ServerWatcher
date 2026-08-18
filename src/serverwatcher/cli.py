@@ -187,12 +187,13 @@ class WatcherCLI(cmd.Cmd):
             args = stats_parser.parse_args([tokens[0]])
             stat = args.stat
         except SystemExit:
-            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:<bool>] [rounding:<int>] [formatted:<bool>]")
             return
 
         # defaults
         gb = True
         rounding = 2
+        formatted = True
 
         # parse optional key:value tokens
         for token in tokens[1:]:
@@ -210,29 +211,39 @@ class WatcherCLI(cmd.Cmd):
                 except ValueError:
                     self.safePrint("rounding must be an integer")
                     return
+            elif key == 'formatted':
+                formatted = value == 'true'
 
-        self._stats_get(stat, gb=gb, rounding=rounding)
+        self._stats_get(stat, gb=gb, rounding=rounding, formatted=formatted)
 
-    def _stats_get(self, stat: str, gb: bool = True, rounding: int = 2):
-        # always refresh before reading
+    def _stats_get(self, stat: str, gb: bool=True, rounding: int=2, formatted: bool=True):
         self.watcher.server.refresh()
 
-        # explicit mapping to server methods
         if stat == "ram":
             value = self.watcher.server.getRAM(rounding=rounding, gb=gb)
+            stat_name = 'RAM'
+            unit = ' GB' if gb else ' MB'
         elif stat == "cpu":
             value = self.watcher.server.getCPU(rounding=rounding)
+            stat_name = 'CPU'
+            unit = '%'
         elif stat == "uptime":
-            value = self.watcher.server.getUptime()
+            value = self.watcher.server.getUptime(formatted=formatted)
+            stat_name = 'Uptime'
+            unit = '' if formatted else 'ms'
         elif stat == "tps":
             value = self.watcher.server.getTPS()
+            stat_name = 'TPS'
+            unit = ''
         elif stat == "players":
             value = self.watcher.server.getPlayers()
+            stat_name = 'Players'
+            unit = ''
         else:
             self.safePrint("Unknown stat")
             return
 
-        self.bprint(value)
+        self.bprint(f'{stat_name}: {value}{unit}')
 
     # ---------------------------------------------------------
     # CLEAR COMMAND
