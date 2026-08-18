@@ -22,31 +22,30 @@ class BufferingStdout:
     def write(self, text):
         # capture only non-empty lines
         if self.buffer.enabled and text.strip():
-            self.buffer.captured.append(text.rstrip("\n"))
+            self.buffer.captured.append(text.rstrip('\n'))
         self.real_stdout.write(text)
 
     def flush(self):
         self.real_stdout.flush()
 
 
-# we keep this only for the positional stat name
 stats_parser = argparse.ArgumentParser(add_help=False)
 stats_parser.add_argument(
-    "stat",
-    choices=["cpu", "ram", "uptime", "tps", "players"],
-    help="Statistic to retrieve"
+    'stat',
+    choices=['cpu', 'ram', 'uptime', 'tps', 'players'],
+    help='Statistic to retrieve'
 )
 
 schedule_parser = argparse.ArgumentParser()
 schedule_parser.add_argument(
-    "minutes",
+    'minutes',
     type=int,
-    help="Minutes until restart"
+    help='Minutes until restart'
 )
 
 
 class WatcherCLI(cmd.Cmd):
-    prompt = ""
+    prompt = ''
 
     def __init__(self, watcher: ServerWatcher):
         self.watcher = watcher
@@ -64,7 +63,7 @@ class WatcherCLI(cmd.Cmd):
         super().__init__(stdout=self.cli_stdout)
 
         # output mode: both | cli | silent
-        self.outputMode = "both"
+        self.outputMode = 'both'
 
         # disable rawinput in order to control input manually
         self.use_rawinput = False
@@ -78,67 +77,63 @@ class WatcherCLI(cmd.Cmd):
             chars = []
             while True:
                 ch = sys.stdin.read(1)
-                if ch in ("\r", "\n"):
+                if ch in ('\r', '\n'):
                     break
                 chars.append(ch)
 
-            return "".join(chars)
+            return ''.join(chars)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
     async def run(self):
         while True:
-            # read input without echo (Pterodactyl will echo anyway)
-            line = await asyncio.to_thread(self.read_line_raw)
-            line = line.strip()
+            try:
+                line = await asyncio.to_thread(self.read_line_raw)
+                line = line.strip()
+                if not line:
+                    continue
+                if self.buffer.enabled and not line.startswith("view"):
+                    self.buffer.captured.append(line)
+                stop = await asyncio.to_thread(self.onecmd, line)
+                if stop:
+                    break
+            except KeyboardInterrupt:
+                if self.watcher.config.handle_keyboard_interrupt:
+                    self.watcher.shutdown()
+                    return
+                else:
+                    raise
 
-            if not line:
-                continue
-
-            # capture command (Pterodactyl already printed it)
-            if self.buffer.enabled and not line.startswith("view"):
-                self.buffer.captured.append(line)
-
-            # run command (self.stdout is already overridden)
-            stop = await asyncio.to_thread(self.onecmd, line)
-
-            if stop:
-                break
-
-    def safePrint(self, msg="", end="\n"):
+    def safePrint(self, msg='', end='\n'):
         self.real_stdout.write(str(msg) + end)
         self.real_stdout.flush()
     
     def printHeader(self):
-        self.safePrint(res("<yellow>-----------------------------------"))
-        self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
-        self.safePrint(res("<yellow>-----------------------------------"))
-        self.safePrint("\n")
+        self.safePrint(res('<yellow>-----------------------------------'))
+        self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
+        self.safePrint(res('<yellow>-----------------------------------'))
+        self.safePrint('\n')
 
-    # ---------------------------------------------------------
-    # VIEW COMMANDS
-    # ---------------------------------------------------------
+    # view commands
     def do_view(self, arg):
-        """
+        '''
         view cli
         view watcher
-        """
-        if arg == "cli":
+        '''
+        if arg == 'cli':
             self._view_cli()
-        elif arg == "watcher":
+        elif arg == 'watcher':
             self._view_watcher()
         else:
-            self.safePrint("Usage: view <cli|watcher>")
+            self.safePrint('Usage: view <cli|watcher>')
 
     def _view_cli(self):
         self.watcher.router.disableOriginOutput()
-        self.outputMode = "cli"
-
-        # CLI capture always enabled
+        self.outputMode = 'cli'
         self.buffer.enabled = True
 
         utils.clearTerminal()
-        self.safePrint("", end="")
+        self.safePrint('', end='')
 
         # header is always printed fresh, not stored in buffer
         self.printHeader()
@@ -149,37 +144,33 @@ class WatcherCLI(cmd.Cmd):
 
     def _view_watcher(self):
         self.watcher.router.enableOriginOutput()
-        self.outputMode = "both"
-
-        # do NOT touch self.buffer.enabled here
+        self.outputMode = 'both'
 
         utils.clearTerminal()
-        self.safePrint("", end="")
+        self.safePrint('', end='')
 
         # replay watcher output
         for msg in self.watcher.router.buffer.captured:
             self.safePrint(msg)
 
-    # ---------------------------------------------------------
-    # STATS COMMANDS
-    # ---------------------------------------------------------
+    # stats commands
     def do_stats(self, arg):
-        """
+        '''
         stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]
         Example:
           stats get ram
           stats get ram gb:false
           stats get ram gb:false rounding:1
-        """
+        '''
         parts = arg.split()
-        if len(parts) == 0 or parts[0] != "get":
-            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+        if len(parts) == 0 or parts[0] != 'get':
+            self.safePrint('Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]')
             return
 
-        # strip the leading "get"
+        # strip the leading 'get'
         tokens = parts[1:]
         if not tokens:
-            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+            self.safePrint('Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]')
             return
 
         # first token is the stat name, validated by stats_parser
@@ -187,7 +178,7 @@ class WatcherCLI(cmd.Cmd):
             args = stats_parser.parse_args([tokens[0]])
             stat = args.stat
         except SystemExit:
-            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:<bool>] [rounding:<int>] [formatted:<bool>]")
+            self.safePrint('Usage: stats get <cpu|ram|uptime|tps|players> [gb:<bool>] [rounding:<int>] [formatted:<bool>]')
             return
 
         # defaults
@@ -197,19 +188,19 @@ class WatcherCLI(cmd.Cmd):
 
         # parse optional key:value tokens
         for token in tokens[1:]:
-            if ":" not in token:
+            if ':' not in token:
                 continue
-            key, value = token.split(":", 1)
+            key, value = token.split(':', 1)
             key = key.strip().lower()
             value = value.strip().lower()
 
-            if key == "gb":
-                gb = value == "true"
-            elif key == "rounding":
+            if key == 'gb':
+                gb = value == 'true'
+            elif key == 'rounding':
                 try:
                     rounding = int(value)
                 except ValueError:
-                    self.safePrint("rounding must be an integer")
+                    self.safePrint('rounding must be an integer')
                     return
             elif key == 'formatted':
                 formatted = value == 'true'
@@ -219,55 +210,51 @@ class WatcherCLI(cmd.Cmd):
     def _stats_get(self, stat: str, gb: bool=True, rounding: int=2, formatted: bool=True):
         self.watcher.server.refresh()
 
-        if stat == "ram":
+        if stat == 'ram':
             value = self.watcher.server.getRAM(rounding=rounding, gb=gb)
             stat_name = 'RAM'
             unit = ' GB' if gb else ' MB'
-        elif stat == "cpu":
+        elif stat == 'cpu':
             value = self.watcher.server.getCPU(rounding=rounding)
             stat_name = 'CPU'
             unit = '%'
-        elif stat == "uptime":
+        elif stat == 'uptime':
             value = self.watcher.server.getUptime(formatted=formatted)
             stat_name = 'Uptime'
             unit = '' if formatted else 'ms'
-        elif stat == "tps":
+        elif stat == 'tps':
             value = self.watcher.server.getTPS()
             stat_name = 'TPS'
             unit = ''
-        elif stat == "players":
+        elif stat == 'players':
             value = self.watcher.server.getPlayers()
             stat_name = 'Players'
             unit = ''
         else:
-            self.safePrint("Unknown stat")
+            self.safePrint('Unknown stat')
             return
 
         self.bprint(f'{stat_name}: {value}{unit}')
 
-    # ---------------------------------------------------------
-    # CLEAR COMMAND
-    # ---------------------------------------------------------
+    # clear command
     def do_clear(self, arg):
-        """
+        '''
         clear buffer:true
         clear buffer:false
-        """
+        '''
         parts = arg.split()
-
-        # default: buffer:false
         clear_buffer = False
 
         # parse key:value pairs
         for token in parts:
-            if ":" not in token:
+            if ':' not in token:
                 continue
-            key, value = token.split(":", 1)
+            key, value = token.split(':', 1)
             key = key.strip().lower()
             value = value.strip().lower()
 
-            if key == "buffer":
-                clear_buffer = (value == "true")
+            if key == 'buffer':
+                clear_buffer = (value == 'true')
 
         # clear CLI buffer only
         if clear_buffer:
@@ -275,48 +262,42 @@ class WatcherCLI(cmd.Cmd):
 
         # clear terminal (but NOT watcher buffer)
         utils.clearTerminal()
-
-        # print header (not captured)
         self.printHeader()
 
 
-    # ---------------------------------------------------------
-    # WATCHER COMMANDS
-    # ---------------------------------------------------------
+    # watcher commands
     def do_watcher(self, arg):
-        """
+        '''
         watcher restart
         watcher schedule <minutes>
         watcher shutdown
-        """
+        '''
         parts = arg.split()
 
         if len(parts) == 0:
-            self.safePrint("Usage: watcher <restart|schedule|shutdown>")
+            self.safePrint('Usage: watcher <restart|schedule|shutdown>')
             return
 
         sub = parts[0]
 
-        if sub == "restart":
+        if sub == 'restart':
             self.watcher.restart_and_wait()
 
-        elif sub == "schedule":
+        elif sub == 'schedule':
             try:
                 args = schedule_parser.parse_args(parts[1:])
                 self.watcher.schedule_restart(args.minutes)
             except SystemExit:
-                self.safePrint("Usage: watcher schedule <minutes>")
+                self.safePrint('Usage: watcher schedule <minutes>')
 
-        elif sub == "shutdown":
+        elif sub == 'shutdown':
             self.watcher.shutdown()
             return True
 
         else:
-            self.safePrint("Usage: watcher <restart|schedule|shutdown>")
+            self.safePrint('Usage: watcher <restart|schedule|shutdown>')
 
-    # ---------------------------------------------------------
-    # BUFFER PRINT
-    # ---------------------------------------------------------
+    # buffer print
     def bprint(self, text):
         if self.buffer.enabled:
             self.buffer.captured.append(str(text))
