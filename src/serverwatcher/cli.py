@@ -56,8 +56,11 @@ class WatcherCLI(cmd.Cmd):
         # real stdout (terminal)
         self.real_stdout = sys.stdout
 
+        # CLI stdout goes through BufferingStdout → captured in self.buffer
+        self.cli_stdout = BufferingStdout(self.buffer, self.real_stdout)
+
         # permanently override cmd.Cmd stdout
-        super().__init__(stdout=BufferingStdout(self.buffer, self.real_stdout))
+        super().__init__(stdout=self.cli_stdout)
 
         # output mode: both | cli | silent
         self.outputMode = "both"
@@ -84,7 +87,6 @@ class WatcherCLI(cmd.Cmd):
 
     async def run(self):
         while True:
-
             # read input without echo (Pterodactyl will echo anyway)
             line = await asyncio.to_thread(self.read_line_raw)
             line = line.strip()
@@ -125,7 +127,7 @@ class WatcherCLI(cmd.Cmd):
         self.watcher.router.disableOriginOutput()
         self.outputMode = "cli"
 
-        # enable CLI capture
+        # CLI capture always enabled
         self.buffer.enabled = True
 
         utils.clearTerminal()
@@ -145,8 +147,7 @@ class WatcherCLI(cmd.Cmd):
         self.watcher.router.enableOriginOutput()
         self.outputMode = "both"
 
-        # disable CLI capture
-        self.buffer.enabled = False
+        # do NOT touch self.buffer.enabled here
 
         utils.clearTerminal()
         self.safePrint("", end="")
@@ -162,11 +163,24 @@ class WatcherCLI(cmd.Cmd):
         """
         stats get <cpu|ram|uptime|tps|players>
         """
+        # temporarily route argparse output through BufferingStdout
+        orig_stdout = sys.stdout
+        orig_stderr = sys.stderr
+        parser_stdout = BufferingStdout(self.buffer, self.real_stdout)
+
+        sys.stdout = parser_stdout
+        sys.stderr = parser_stdout
+
         try:
             args = stats_parser.parse_args(arg.split())
             self._stats_get(args.stat)
         except SystemExit:
+            # argparse already printed usage/error to parser_stdout (captured)
+            # add our concise usage line as well
             self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players>")
+        finally:
+            sys.stdout = orig_stdout
+            sys.stderr = orig_stderr
 
     def _stats_get(self, stat):
         self.watcher.server.refresh()
