@@ -11,7 +11,11 @@ from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
 
-# DSL core
+# command registry
+COMMANDS: dict[str, callable] = {}
+
+
+# parsed arguments
 @dataclass
 class ParsedArgs:
     subcommand: str | None
@@ -32,10 +36,10 @@ def parse_line(raw: str) -> ParsedArgs:
     params: dict[str, str] = {}
 
     for token in parts[1:]:
-        if token.startswith('--'):
+        if token.startswith("--"):
             flags[token[2:]] = True
-        elif ':' in token:
-            key, value = token.split(':', 1)
+        elif ":" in token:
+            key, value = token.split(":", 1)
             params[key.lower()] = value
         else:
             positional.append(token)
@@ -43,10 +47,11 @@ def parse_line(raw: str) -> ParsedArgs:
     return ParsedArgs(sub, positional, flags, params)
 
 
+# command context
 class CommandContext:
     def __init__(self, parsed: ParsedArgs):
         self.parsed = parsed
-        self.child_func = None
+        self.children: dict[str, callable] = {}
 
     def positional(self, index: int, default=None):
         try:
@@ -55,6 +60,7 @@ class CommandContext:
             return default
 
 
+# DSL object
 class CommandDSL:
     def __init__(self):
         self.registry: dict[str, callable] = {}
@@ -73,7 +79,7 @@ class CommandDSL:
 
     def param(self, name: str, type: callable = str, default: object = None):
         def deco(func: callable):
-            func.__arg_kind__ = 'param'
+            func.__arg_kind__ = "param"
             func.__arg_name__ = name
             func.__arg_type__ = type
             func.__arg_default__ = default
@@ -82,7 +88,7 @@ class CommandDSL:
 
     def flag(self, name: str):
         def deco(func: callable):
-            func.__arg_kind__ = 'flag'
+            func.__arg_kind__ = "flag"
             func.__arg_name__ = name
             return func
         return deco
@@ -91,23 +97,25 @@ class CommandDSL:
 command = CommandDSL()
 
 
+# bind nested functions (children, params, flags)
 def bind_nested_functions(ctx: CommandContext, namespace: dict):
     for name, obj in namespace.items():
         if not callable(obj):
             continue
 
-        # child
-        if hasattr(obj, '__child_name__'):
-            ctx.child_func = obj
+        # children
+        if hasattr(obj, "__child_name__"):
+            child_name = obj.__child_name__
+            ctx.children[child_name] = obj
 
-        # param / flag
-        if hasattr(obj, '__arg_kind__'):
+        # params / flags
+        if hasattr(obj, "__arg_kind__"):
             kind = obj.__arg_kind__
             argname = obj.__arg_name__
-            default = getattr(obj, '__arg_default__', None)
-            type_ = getattr(obj, '__arg_type__', str)
+            default = getattr(obj, "__arg_default__", None)
+            type_ = getattr(obj, "__arg_type__", str)
 
-            if kind == 'flag':
+            if kind == "flag":
                 present = argname in ctx.parsed.flags
 
                 def wrapper(present=present):
@@ -115,7 +123,7 @@ def bind_nested_functions(ctx: CommandContext, namespace: dict):
 
                 namespace[name] = wrapper
 
-            elif kind == 'param':
+            elif kind == "param":
                 if argname in ctx.parsed.params:
                     raw = ctx.parsed.params[argname]
 
@@ -133,15 +141,16 @@ def bind_nested_functions(ctx: CommandContext, namespace: dict):
                     namespace[name] = wrapper
 
 
-# Dispatcher / base
+# base CLI
 class CLIBase:
-    def safePrint(self, msg: object = '', end: str = '\n') -> None:
+    def safePrint(self, msg: object = "", end: str = "\n") -> None:
         print(str(msg), end=end)
 
     def bprint(self, msg: object) -> None:
         self.safePrint(msg)
 
 
+# dispatcher
 def dispatch(cli: CLIBase, line: str):
     parsed = parse_line(line)
     if not parsed.subcommand:
@@ -149,18 +158,26 @@ def dispatch(cli: CLIBase, line: str):
 
     handler = command.registry.get(parsed.subcommand)
     if handler is None:
-        cli.safePrint(f'Unknown command \'{parsed.subcommand}\'')
+        cli.safePrint(f"Unknown command '{parsed.subcommand}'")
         return
 
     ctx = CommandContext(parsed)
     handler(cli, ctx)
 
-    if ctx.child_func:
+    # choose child based on first positional token
+    sub = ctx.positional(0)
+    if sub and sub in ctx.children:
+        # second positional is the stat or argument
+        stat = ctx.positional(1)
+        return ctx.children[sub](stat)
+    elif len(ctx.children) == 1:
+        # single child, first positional is stat
+        only_child = next(iter(ctx.children.values()))
         stat = ctx.positional(0)
-        return ctx.child_func(stat)
+        return only_child(stat)
 
 
-# CLI implementation
+# buffering stdout
 class BufferingStdout:
     def __init__(self, buffer, real_stdout):
         self.buffer = buffer
@@ -168,15 +185,16 @@ class BufferingStdout:
 
     def write(self, text: str) -> None:
         if self.buffer.enabled and text.strip():
-            self.buffer.captured.append(text.rstrip('\n'))
+            self.buffer.captured.append(text.rstrip("\n"))
         self.real_stdout.write(text)
 
     def flush(self) -> None:
         self.real_stdout.flush()
 
 
+# main CLI
 class WatcherCLI(cmd.Cmd, CLIBase):
-    prompt = ''
+    prompt = ""
 
     def __init__(self, watcher: ServerWatcher):
         self.watcher = watcher
@@ -184,7 +202,7 @@ class WatcherCLI(cmd.Cmd, CLIBase):
         self.real_stdout = sys.stdout
         self.cli_stdout = BufferingStdout(self.buffer, self.real_stdout)
         super().__init__(stdout=self.cli_stdout)
-        self.outputMode = 'both'
+        self.outputMode = "both"
         self.use_rawinput = False
 
     def read_line_raw(self) -> str:
@@ -195,10 +213,10 @@ class WatcherCLI(cmd.Cmd, CLIBase):
             chars: list[str] = []
             while True:
                 ch = sys.stdin.read(1)
-                if ch in ('\r', '\n'):
+                if ch in ("\r", "\n"):
                     break
                 chars.append(ch)
-            return ''.join(chars)
+            return "".join(chars)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
@@ -209,7 +227,7 @@ class WatcherCLI(cmd.Cmd, CLIBase):
                 line = line.strip()
                 if not line:
                     continue
-                if self.buffer.enabled and not line.startswith('view'):
+                if self.buffer.enabled and not line.startswith("view"):
                     self.buffer.captured.append(line)
                 stop = await asyncio.to_thread(self.onecmd, line)
                 if stop:
@@ -225,36 +243,36 @@ class WatcherCLI(cmd.Cmd, CLIBase):
         return dispatch(self, line)
 
     def printHeader(self) -> None:
-        self.safePrint(res('<yellow>-----------------------------------'))
-        self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
-        self.safePrint(res('<yellow>-----------------------------------'))
-        self.safePrint('\n')
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint("\n")
 
 
-# commands
-@command('stats')
+# stats command
+@command("stats")
 def stats(self: WatcherCLI, ctx: CommandContext):
 
-    @command.child('get')
+    @command.child("get")
     def get(stat: str):
 
-        @command.param('rounding', type=int, default=2)
+        @command.param("rounding", type=int, default=2)
         def rounding(value):
             return value
 
-        @command.param('mode', type=str, default='current')
+        @command.param("mode", type=str, default="current")
         def mode(value):
             return value
 
-        @command.flag('raw')
+        @command.flag("raw")
         def raw():
             return False
 
-        @command.flag('formatted')
+        @command.flag("formatted")
         def formatted():
             return True
 
-        @command.flag('no-formatted')
+        @command.flag("no-formatted")
         def no_formatted():
             return False
 
@@ -263,59 +281,63 @@ def stats(self: WatcherCLI, ctx: CommandContext):
         self.watcher.server.refresh()
 
         gb = not raw()
-        fmt = formatted() if formatted() else not no_formatted()
+        if formatted():
+            fmt = True
+        elif no_formatted():
+            fmt = False
+        else:
+            fmt = True
 
-        unit = ''
+        unit = ""
         match stat:
-            case 'ram':
+            case "ram":
                 value = self.watcher.server.getRAM(rounding=rounding(), gb=gb)
-                name = 'RAM'
-                unit = ' GB' if gb else ' MB'
-            case 'cpu':
+                name = "RAM"
+                unit = " GB" if gb else " MB"
+            case "cpu":
                 value = self.watcher.server.getCPU(rounding=rounding())
-                name = 'CPU'
-                unit = '%'
-            case 'uptime':
+                name = "CPU"
+                unit = "%"
+            case "uptime":
                 value = self.watcher.server.getUptime(formatted=fmt)
-                name = 'Uptime'
-                unit = '' if fmt else 'ms'
-            case 'tps':
+                name = "Uptime"
+                unit = "" if fmt else "ms"
+            case "tps":
                 value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
-                name = 'TPS'
-            case 'players':
+                name = "TPS"
+            case "players":
                 value = self.watcher.server.getPlayers()
-                name = 'Players'
-            case 'version':
+                name = "Players"
+            case "version":
                 value = self.watcher.server.version
-                name = 'Minecraft version'
-            case 'platform':
+                name = "Minecraft version"
+            case "platform":
                 value = self.watcher.server.platform
-                name = 'Server platform'
+                name = "Server platform"
             case _:
-                return self.safePrint('Unknown stat')
+                return self.safePrint("Unknown stat")
 
-        self.bprint(f'{name}: {value}{unit}')
+        self.bprint(f"{name}: {value}{unit}")
 
 
-@command('view')
+# view command
+@command("view")
 def view(self: WatcherCLI, ctx: CommandContext):
 
-    @command.child('cli')
+    @command.child("cli")
     def cli_view(_stat: str):
-
         self.watcher.router.disableOriginOutput()
-        self.outputMode = 'cli'
+        self.outputMode = "cli"
         self.buffer.enabled = True
         utils.clearTerminal()
         self.printHeader()
         for msg in self.buffer.captured:
             self.safePrint(msg)
 
-    @command.child('watcher')
+    @command.child("watcher")
     def watcher_view(_stat: str):
-
         self.watcher.router.enableOriginOutput()
-        self.outputMode = 'both'
+        self.outputMode = "both"
         utils.clearTerminal()
         self.printHeader()
         for msg in self.watcher.router.buffer.captured:
@@ -324,12 +346,13 @@ def view(self: WatcherCLI, ctx: CommandContext):
     bind_nested_functions(ctx, locals())
 
 
-@command('clear')
+# clear command
+@command("clear")
 def clear(self: WatcherCLI, ctx: CommandContext):
 
-    @command.param('buffer', type=str, default='true')
+    @command.param("buffer", type=str, default="true")
     def buffer_param(value: str):
-        return value.lower() == 'true'
+        return value.lower() == "true"
 
     bind_nested_functions(ctx, locals())
 
@@ -341,26 +364,26 @@ def clear(self: WatcherCLI, ctx: CommandContext):
     self.printHeader()
 
 
-@command('watcher')
+# watcher command
+@command("watcher")
 def watcher(self: WatcherCLI, ctx: CommandContext):
 
-    @command.child('restart')
+    @command.child("restart")
     def restart(_stat: str):
         self.watcher.restart_and_wait()
 
-    @command.child('schedule')
+    @command.child("schedule")
     def schedule(_stat: str):
-
-        minutes = ctx.positional(1)
+        minutes = ctx.positional(2)
         if minutes is None:
-            return self.safePrint('Usage: watcher schedule <minutes>')
+            return self.safePrint("Usage: watcher schedule <minutes>")
         try:
             minutes = int(minutes)
         except ValueError:
-            return self.safePrint('Minutes must be an integer')
+            return self.safePrint("Minutes must be an integer")
         self.watcher.schedule_restart(minutes)
 
-    @command.child('shutdown')
+    @command.child("shutdown")
     def shutdown(_stat: str):
         self.watcher.shutdown()
         return True
