@@ -221,10 +221,8 @@ class WatcherCLI(cmd.Cmd):
         if stat == "ram":
             value = self.watcher.server.getRAM(rounding=rounding, gb=gb)
         elif stat == "cpu":
-            # assuming getCPU supports gb in your Minecraft subclass
-            value = self.watcher.server.getCPU(rounding=rounding, gb=gb)
+            value = self.watcher.server.getCPU(rounding=rounding)
         elif stat == "uptime":
-            # uptime in seconds; rounding not really meaningful here
             value = self.watcher.server.getUptime()
         elif stat == "tps":
             value = self.watcher.server.getTPS()
