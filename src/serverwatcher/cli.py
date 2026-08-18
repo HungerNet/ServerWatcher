@@ -29,7 +29,8 @@ class BufferingStdout:
         self.real_stdout.flush()
 
 
-stats_parser = argparse.ArgumentParser()
+# we keep this only for the positional stat name
+stats_parser = argparse.ArgumentParser(add_help=False)
 stats_parser.add_argument(
     "stat",
     choices=["cpu", "ram", "uptime", "tps", "players"],
@@ -161,31 +162,75 @@ class WatcherCLI(cmd.Cmd):
     # ---------------------------------------------------------
     def do_stats(self, arg):
         """
-        stats get <cpu|ram|uptime|tps|players>
+        stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]
+        Example:
+          stats get ram
+          stats get ram gb:false
+          stats get ram gb:false rounding:1
         """
-        # temporarily route argparse output through BufferingStdout
-        orig_stdout = sys.stdout
-        orig_stderr = sys.stderr
-        parser_stdout = BufferingStdout(self.buffer, self.real_stdout)
+        parts = arg.split()
+        if len(parts) == 0 or parts[0] != "get":
+            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+            return
 
-        sys.stdout = parser_stdout
-        sys.stderr = parser_stdout
+        # strip the leading "get"
+        tokens = parts[1:]
+        if not tokens:
+            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+            return
 
+        # first token is the stat name, validated by stats_parser
         try:
-            args = stats_parser.parse_args(arg.split())
-            self._stats_get(args.stat)
+            args = stats_parser.parse_args([tokens[0]])
+            stat = args.stat
         except SystemExit:
-            # argparse already printed usage/error to parser_stdout (captured)
-            # add our concise usage line as well
-            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players>")
-        finally:
-            sys.stdout = orig_stdout
-            sys.stderr = orig_stderr
+            self.safePrint("Usage: stats get <cpu|ram|uptime|tps|players> [gb:true|false] [rounding:<int>]")
+            return
 
-    def _stats_get(self, stat):
+        # defaults
+        gb = True
+        rounding = 2
+
+        # parse optional key:value tokens
+        for token in tokens[1:]:
+            if ":" not in token:
+                continue
+            key, value = token.split(":", 1)
+            key = key.strip().lower()
+            value = value.strip().lower()
+
+            if key == "gb":
+                gb = value == "true"
+            elif key == "rounding":
+                try:
+                    rounding = int(value)
+                except ValueError:
+                    self.safePrint("rounding must be an integer")
+                    return
+
+        self._stats_get(stat, gb=gb, rounding=rounding)
+
+    def _stats_get(self, stat: str, gb: bool = True, rounding: int = 2):
+        # always refresh before reading
         self.watcher.server.refresh()
+j
+        # explicit mapping to server methods
+        if stat == "ram":
+            value = self.watcher.server.getRAM(rounding=rounding, gb=gb)
+        elif stat == "cpu":
+            # assuming getCPU supports gb in your Minecraft subclass
+            value = self.watcher.server.getCPU(rounding=rounding, gb=gb)
+        elif stat == "uptime":
+            # uptime in seconds; rounding not really meaningful here
+            value = self.watcher.server.getUptime()
+        elif stat == "tps":
+            value = self.watcher.server.getTPS()
+        elif stat == "players":
+            value = self.watcher.server.getPlayers()
+        else:
+            self.safePrint("Unknown stat")
+            return
 
-        value = getattr(self.watcher.server, stat)
         self.bprint(value)
 
     # ---------------------------------------------------------
