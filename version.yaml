@@ -1,7 +1,9 @@
 run: true
-version: '6-dev.1'
+version: '6-dev.2'
 description: |
   Dev 1:
   - Added ctrl+c handling
   - Used single quotes when possible
   - Cleaned up code
+  Dev 2:
+  - CLI rewrite
