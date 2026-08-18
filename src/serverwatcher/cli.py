@@ -11,10 +11,7 @@ from .watcher import ServerWatcher
 
 setGlobalMaps(maps.ascii_colors)
 
-#  ARGUMENT PARSING ENGINE
-COMMANDS: dict[str, callable] = {}
-
-
+# DSL core
 @dataclass
 class ParsedArgs:
     subcommand: str | None
@@ -46,99 +43,97 @@ def parse_line(raw: str) -> ParsedArgs:
     return ParsedArgs(sub, positional, flags, params)
 
 
-@dataclass
-class ArgSpec:
-    name: str
-    kind: str  # 'flag' or 'param'
-    type: callable = str
-    default: object = None
-    func: callable | None = None
-    present: bool = False
-    raw_value: str | None = None
-
-    def __call__(self):
-        if not self.present:
-            return self.default
-        if self.kind == 'flag':
-            return True
-        if self.raw_value is None:
-            return self.default
-        return self.type(self.raw_value)
-
-
 class CommandContext:
     def __init__(self, parsed: ParsedArgs):
         self.parsed = parsed
-        self.arg_specs: dict[str, ArgSpec] = {}
-        self.child_name: str | None = None
-        self.child_func: callable | None = None
+        self.child_func = None
 
-    def register_param(self, name: str, type_: callable, default: object, func: callable) -> ArgSpec:
-        spec = ArgSpec(name=name, kind='param', type=type_, default=default, func=func)
-        self.arg_specs[name] = spec
-        return spec
-
-    def register_flag(self, name: str, func: callable) -> ArgSpec:
-        spec = ArgSpec(name=name, kind='flag', default=False, func=func)
-        self.arg_specs[name] = spec
-        return spec
-
-    def register_child(self, name: str, func: callable) -> callable:
-        self.child_name = name
-        self.child_func = func
-        return func
-
-    def bind(self) -> None:
-        for name, spec in self.arg_specs.items():
-            if spec.kind == 'flag' and name in self.parsed.flags:
-                spec.present = True
-
-        for name, spec in self.arg_specs.items():
-            if spec.kind == 'param' and name in self.parsed.params:
-                spec.present = True
-                spec.raw_value = self.parsed.params[name]
-
-    def positional(self, index: int, default: object = None) -> object:
+    def positional(self, index: int, default=None):
         try:
             return self.parsed.positional[index]
         except IndexError:
             return default
 
 
-# decorators
-def command(name: str):
-    def decorator(func: callable):
-        COMMANDS[name] = func
-        return func
-    return decorator
+class CommandDSL:
+    def __init__(self):
+        self.registry: dict[str, callable] = {}
+
+    def __call__(self, name: str):
+        def deco(func: callable):
+            self.registry[name] = func
+            return func
+        return deco
+
+    def child(self, name: str):
+        def deco(func: callable):
+            func.__child_name__ = name
+            return func
+        return deco
+
+    def param(self, name: str, type: callable = str, default: object = None):
+        def deco(func: callable):
+            func.__arg_kind__ = 'param'
+            func.__arg_name__ = name
+            func.__arg_type__ = type
+            func.__arg_default__ = default
+            return func
+        return deco
+
+    def flag(self, name: str):
+        def deco(func: callable):
+            func.__arg_kind__ = 'flag'
+            func.__arg_name__ = name
+            return func
+        return deco
 
 
-def child(name: str):
-    def decorator(func: callable):
-        func.__child_name__ = name
-        return func
-    return decorator
+command = CommandDSL()
 
 
-def param(name: str, type: callable = str, default: object = None):
-    def decorator(func: callable):
-        func.__arg_kind__ = 'param'
-        func.__arg_name__ = name
-        func.__arg_type__ = type
-        func.__arg_default__ = default
-        return func
-    return decorator
+def bind_nested_functions(ctx: CommandContext, namespace: dict):
+    for name, obj in namespace.items():
+        if not callable(obj):
+            continue
+
+        # child
+        if hasattr(obj, '__child_name__'):
+            ctx.child_func = obj
+
+        # param / flag
+        if hasattr(obj, '__arg_kind__'):
+            kind = obj.__arg_kind__
+            argname = obj.__arg_name__
+            default = getattr(obj, '__arg_default__', None)
+            type_ = getattr(obj, '__arg_type__', str)
+
+            if kind == 'flag':
+                present = argname in ctx.parsed.flags
+
+                def wrapper(present=present):
+                    return present
+
+                namespace[name] = wrapper
+
+            elif kind == 'param':
+                if argname in ctx.parsed.params:
+                    raw = ctx.parsed.params[argname]
+
+                    def wrapper(raw=raw, type_=type_, default=default):
+                        try:
+                            return type_(raw)
+                        except Exception:
+                            return default
+
+                    namespace[name] = wrapper
+                else:
+                    def wrapper(default=default):
+                        return default
+
+                    namespace[name] = wrapper
 
 
-def flag(name: str):
-    def decorator(func: callable):
-        func.__arg_kind__ = 'flag'
-        func.__arg_name__ = name
-        return func
-    return decorator
-
-
-# DISPATCHER
+# Dispatcher / base
 class CLIBase:
     def safePrint(self, msg: object = '', end: str = '\n') -> None:
         print(str(msg), end=end)
@@ -152,26 +147,20 @@ def dispatch(cli: CLIBase, line: str):
     if not parsed.subcommand:
         return
 
-    handler = COMMANDS.get(parsed.subcommand)
+    handler = command.registry.get(parsed.subcommand)
     if handler is None:
         cli.safePrint(f'Unknown command \'{parsed.subcommand}\'')
         return
 
     ctx = CommandContext(parsed)
-
-    # Register decorators
     handler(cli, ctx)
 
-    # Bind parsed values
-    ctx.bind()
-
-    # Execute child command
     if ctx.child_func:
         stat = ctx.positional(0)
         return ctx.child_func(stat)
 
 
-# CLI Implementation
+# CLI implementation
 class BufferingStdout:
     def __init__(self, buffer, real_stdout):
         self.buffer = buffer
@@ -246,58 +235,44 @@ class WatcherCLI(cmd.Cmd, CLIBase):
 @command('stats')
 def stats(self: WatcherCLI, ctx: CommandContext):
 
-    @child('get')
+    @command.child('get')
     def get(stat: str):
 
-        @param('rounding', type=int, default=2)
-        def rounding(value: int) -> int:
+        @command.param('rounding', type=int, default=2)
+        def rounding(value):
             return value
 
-        @param('mode', default='current')
-        def mode(value: str) -> str:
+        @command.param('mode', type=str, default='current')
+        def mode(value):
             return value
 
-        @flag('raw')
-        def raw() -> bool:
+        @command.flag('raw')
+        def raw():
             return False
 
-        @flag('formatted')
-        def formatted() -> bool:
+        @command.flag('formatted')
+        def formatted():
             return True
 
-        @flag('no-formatted')
-        def no_formatted() -> bool:
+        @command.flag('no-formatted')
+        def no_formatted():
             return False
 
-        # extract specs
-        r = ctx.arg_specs['rounding']
-        m = ctx.arg_specs['mode']
-        raw_f = ctx.arg_specs['raw']
-        fmt_f = ctx.arg_specs['formatted']
-        nofmt_f = ctx.arg_specs['no-formatted']
-
-        rounding_val = r()
-        mode_val = m()
-
-        gb: bool = False if raw_f.present else True
-
-        if fmt_f.present:
-            fmt: bool = True
-        elif nofmt_f.present:
-            fmt = False
-        else:
-            fmt = True
+        bind_nested_functions(ctx, locals())
 
         self.watcher.server.refresh()
 
-        unit: str = ''
+        gb = not raw()
+        fmt = formatted() if formatted() else not no_formatted()
+
+        unit = ''
         match stat:
             case 'ram':
-                value = self.watcher.server.getRAM(rounding=rounding_val, gb=gb)
+                value = self.watcher.server.getRAM(rounding=rounding(), gb=gb)
                 name = 'RAM'
                 unit = ' GB' if gb else ' MB'
             case 'cpu':
-                value = self.watcher.server.getCPU(rounding=rounding_val)
+                value = self.watcher.server.getCPU(rounding=rounding())
                 name = 'CPU'
                 unit = '%'
             case 'uptime':
@@ -305,7 +280,7 @@ def stats(self: WatcherCLI, ctx: CommandContext):
                 name = 'Uptime'
                 unit = '' if fmt else 'ms'
             case 'tps':
-                value = self.watcher.server.getTPS(rounding=rounding_val, mode=mode_val)
+                value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
                 name = 'TPS'
             case 'players':
                 value = self.watcher.server.getPlayers()
@@ -325,8 +300,9 @@ def stats(self: WatcherCLI, ctx: CommandContext):
 @command('view')
 def view(self: WatcherCLI, ctx: CommandContext):
 
-    @child('cli')
-    def cli_view(_):
+    @command.child('cli')
+    def cli_view(_stat: str):
+
         self.watcher.router.disableOriginOutput()
         self.outputMode = 'cli'
         self.buffer.enabled = True
@@ -335,8 +311,9 @@ def view(self: WatcherCLI, ctx: CommandContext):
         for msg in self.buffer.captured:
             self.safePrint(msg)
 
-    @child('watcher')
-    def watcher_view(_):
+    @command.child('watcher')
+    def watcher_view(_stat: str):
+
         self.watcher.router.enableOriginOutput()
         self.outputMode = 'both'
         utils.clearTerminal()
@@ -344,16 +321,19 @@ def view(self: WatcherCLI, ctx: CommandContext):
         for msg in self.watcher.router.buffer.captured:
             self.safePrint(msg)
 
+    bind_nested_functions(ctx, locals())
+
 
 @command('clear')
 def clear(self: WatcherCLI, ctx: CommandContext):
 
-    @param('buffer', type=str, default='true')
-    def buffer_param(value: str) -> bool:
+    @command.param('buffer', type=str, default='true')
+    def buffer_param(value: str):
         return value.lower() == 'true'
 
-    buf = ctx.arg_specs['buffer']()
+    bind_nested_functions(ctx, locals())
 
+    buf = buffer_param()
     if buf:
         self.buffer.clear()
 
@@ -364,12 +344,13 @@ def clear(self: WatcherCLI, ctx: CommandContext):
 @command('watcher')
 def watcher(self: WatcherCLI, ctx: CommandContext):
 
-    @child('restart')
-    def restart(_):
+    @command.child('restart')
+    def restart(_stat: str):
         self.watcher.restart_and_wait()
 
-    @child('schedule')
-    def schedule(_):
+    @command.child('schedule')
+    def schedule(_stat: str):
+
         minutes = ctx.positional(1)
         if minutes is None:
             return self.safePrint('Usage: watcher schedule <minutes>')
@@ -379,7 +360,9 @@ def watcher(self: WatcherCLI, ctx: CommandContext):
             return self.safePrint('Minutes must be an integer')
         self.watcher.schedule_restart(minutes)
 
-    @child('shutdown')
-    def shutdown(_):
+    @command.child('shutdown')
+    def shutdown(_stat: str):
         self.watcher.shutdown()
         return True
+
+    bind_nested_functions(ctx, locals())
