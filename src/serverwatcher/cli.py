@@ -106,7 +106,7 @@ class WatcherCLI(cmd.Cmd):
                 break
 
     def safePrint(self, msg="", end="\n"):
-        self.real_stdout.write(msg + end)
+        self.real_stdout.write(str(msg) + end)
         self.real_stdout.flush()
     
     def printHeader(self):
@@ -308,5 +308,5 @@ class WatcherCLI(cmd.Cmd):
     # ---------------------------------------------------------
     def bprint(self, text):
         if self.buffer.enabled:
-            self.buffer.captured.append(text)
-        self.safePrint(text)
+            self.buffer.captured.append(str(text))
+        self.safePrint(str(text))
