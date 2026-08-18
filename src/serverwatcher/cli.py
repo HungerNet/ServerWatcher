@@ -108,6 +108,12 @@ class WatcherCLI(cmd.Cmd):
     def safePrint(self, msg="", end="\n"):
         self.real_stdout.write(msg + end)
         self.real_stdout.flush()
+    
+    def printHeader(self):
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
+        self.safePrint(res("<yellow>-----------------------------------"))
+        self.safePrint("\n")
 
     # ---------------------------------------------------------
     # VIEW COMMANDS
@@ -135,10 +141,7 @@ class WatcherCLI(cmd.Cmd):
         self.safePrint("", end="")
 
         # header is always printed fresh, not stored in buffer
-        self.safePrint(res("<yellow>-----------------------------------"))
-        self.safePrint(res("<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------"))
-        self.safePrint(res("<yellow>-----------------------------------"))
-        self.safePrint("\n")
+        self.printHeader()
 
         # replay captured CLI output
         for msg in self.buffer.captured:
@@ -232,6 +235,41 @@ class WatcherCLI(cmd.Cmd):
             return
 
         self.bprint(value)
+
+    # ---------------------------------------------------------
+    # CLEAR COMMAND
+    # ---------------------------------------------------------
+    def do_clear(self, arg):
+        """
+        clear buffer:true
+        clear buffer:false
+        """
+        parts = arg.split()
+
+        # default: buffer:false
+        clear_buffer = False
+
+        # parse key:value pairs
+        for token in parts:
+            if ":" not in token:
+                continue
+            key, value = token.split(":", 1)
+            key = key.strip().lower()
+            value = value.strip().lower()
+
+            if key == "buffer":
+                clear_buffer = (value == "true")
+
+        # clear CLI buffer only
+        if clear_buffer:
+            self.buffer.captured.clear()
+
+        # clear terminal (but NOT watcher buffer)
+        self.watcher.clearTerminal(conditional=False)
+
+        # print header (not captured)
+        self.printHeader()
+
 
     # ---------------------------------------------------------
     # WATCHER COMMANDS
