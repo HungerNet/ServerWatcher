@@ -44,63 +44,57 @@ def parse_line(raw: str) -> ParsedArgs:
 
 
 # command registry
-COMMANDS: dict[str, 'CommandSpec'] = {}
-
+COMMANDS = {}
 
 class ParamSpec:
-    def __init__(self, name: str, type_: callable, default: object):
+    def __init__(self, name, type_, default):
         self.name = name
         self.type = type_
         self.default = default
 
-
 class FlagSpec:
-    def __init__(self, name: str):
+    def __init__(self, name):
         self.name = name
-
 
 class ChildSpec:
-    def __init__(self, name: str, func: callable):
+    def __init__(self, name, func):
         self.name = name
         self.func = func
-        self.params: dict[str, ParamSpec] = {}
-        self.flags: dict[str, FlagSpec] = {}
+        self.params = {}
+        self.flags = {}
 
-    def param(self, name: str, type: callable = str, default: object = None):
-        def deco(func: callable):
+    def param(self, name, type=str, default=None):
+        def deco(func):
             self.params[name] = ParamSpec(name, type, default)
             return func
         return deco
 
-    def flag(self, name: str):
-        def deco(func: callable):
+    def flag(self, name):
+        def deco(func):
             self.flags[name] = FlagSpec(name)
             return func
         return deco
 
-
 class CommandSpec:
-    def __init__(self, name: str, func: callable):
+    def __init__(self, name, func):
         self.name = name
         self.func = func
-        self.children: dict[str, ChildSpec] = {}
+        self.children = {}
 
-    def child(self, name: str):
-        def deco(func: callable):
+    def child(self, name):
+        def deco(func):
             child = ChildSpec(name, func)
             self.children[name] = child
             return func
         return deco
 
-
 class CommandDSL:
-    def __call__(self, name: str):
-        def deco(func: callable):
+    def __call__(self, name):
+        def deco(func):
             spec = CommandSpec(name, func)
             COMMANDS[name] = spec
             return spec
         return deco
-
 
 command = CommandDSL()
 
@@ -294,27 +288,27 @@ def stats_get(self: WatcherCLI, stat: str, **kwargs):
     self.bprint(f'{name}: {value}{unit}')
 
 
-@stats_get.param('rounding', type=int, default=2)
+@stats.get.param('rounding', type=int, default=2)
 def rounding(value: int):
     return value
 
 
-@stats_get.param('mode', type=str, default='current')
+@stats.get.param('mode', type=str, default='current')
 def mode(value: str):
     return value
 
 
-@stats_get.flag('raw')
+@stats.get.flag('raw')
 def raw():
     return False
 
 
-@stats_get.flag('formatted')
+@stats.get.flag('formatted')
 def formatted():
     return True
 
 
-@stats_get.flag('no-formatted')
+@stats.get.flag('no-formatted')
 def no_formatted():
     return False
 
@@ -363,7 +357,7 @@ def clear_buffer(self: WatcherCLI, _arg: str, **kwargs):
     self.printHeader()
 
 
-@clear_buffer.param('buffer', type=str, default='true')
+@clear.buffer.param('buffer', type=str, default='true')
 def buffer(value: str):
     return value.lower() == 'true'
 
@@ -395,6 +389,6 @@ def watcher_shutdown(self: WatcherCLI, _arg: str, **kwargs):
     return True
 
 
-@watcher_schedule.param('minutes', type=int, default=None)
+@watcher.schedule.param('minutes', type=int, default=None)
 def minutes(value: int):
     return value
