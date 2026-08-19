@@ -65,13 +65,15 @@ class ChildSpec:
 
     def param(self, name, type=str, default=None):
         def deco(func):
-            self.params[name] = ParamSpec(name, type, default)
+            pyname = name.replace('-', '_')
+            self.params[pyname] = ParamSpec(name, type, default)
             return func
         return deco
 
     def flag(self, name):
         def deco(func):
-            self.flags[name] = FlagSpec(name)
+            pyname = name.replace('-', '_')
+            self.flags[pyname] = FlagSpec(name)
             return func
         return deco
 
