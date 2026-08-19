@@ -13,21 +13,15 @@ class WatcherCLI(LiveCLI):
         self.buffer = utils.Buffer(enabled=True)
         self.outputMode = 'both'
 
-    def printHeader(self) -> None:
+    def printHeader(self):
         self.safePrint(res('<yellow>-----------------------------------'))
         self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
         self.safePrint(res('<yellow>-----------------------------------'))
-        self.safePrint('\n')
-
-
-# ---------------------------------------------------------------------------
-# stats command
-# ---------------------------------------------------------------------------
+        self.safePrint('')
 
 @command('stats', requires_children=True)
 def stats():
     __description__ = 'Retrieve and print server statistics'
-
 
 @stats.child('get', requires_arguments=False)
 def stats_get(self, arg=None):
@@ -36,13 +30,8 @@ def stats_get(self, arg=None):
     self.watcher.server.refresh()
 
     if arg is not None:
-        gb = not raw()
-        if formatted():
-            fmt = True
-        elif no_formatted():
-            fmt = False
-        else:
-            fmt = True
+        gb = raw()
+        fmt = not raw()
 
         unit = ''
         match arg:
@@ -75,44 +64,23 @@ def stats_get(self, arg=None):
 
         self.bprint(f'{name}: {value}{unit}')
     else:
-        return  # later: print all stats for `stats get`
-
+        return
 
 @stats.get.param('rounding', type=int, default=2)
-def rounding(value: int):
-    __description__ = 'placeholder'
+def rounding(value):
     return value
-
 
 @stats.get.param('mode', type=str, default='current')
-def mode(value: str):
+def mode(value):
     return value
-
 
 @stats.get.flag('raw')
 def raw():
-    __description__ = 'placeholder'
-    return True  # DSL overrides with presence/absence
-
-
-@stats.get.flag('formatted')
-def formatted():
-    return True  # DSL overrides with presence/absence
-
-
-@stats.get.flag('no-formatted')
-def no_formatted():
-    return False  # DSL overrides with presence/absence
-
-
-# ---------------------------------------------------------------------------
-# view command
-# ---------------------------------------------------------------------------
+    return True
 
 @command('view', requires_children=True)
 def view():
     __description__ = 'Switch terminal view'
-
 
 @view.child('cli')
 def view_cli(self):
@@ -126,7 +94,6 @@ def view_cli(self):
     for msg in self.buffer.captured:
         self.safePrint(msg)
 
-
 @view.child('watcher')
 def view_watcher(self):
     __description__ = 'Switch to Watcher view'
@@ -138,16 +105,10 @@ def view_watcher(self):
     for msg in self.watcher.router.buffer.captured:
         self.safePrint(msg)
 
-
-# ---------------------------------------------------------------------------
-# clear command
-# ---------------------------------------------------------------------------
-
 @command('clear')
 def clear():
     __description__ = 'Clear the CLI terminal'
 
-
 @clear.flag('no-buffer')
 def no_buffer():
-    return False  # DSL overrides with presence/absence
+    return False

@@ -5,10 +5,6 @@ import termios
 import tty
 import asyncio
 
-# ---------------------------------------------------------------------------
-# DSL core
-# ---------------------------------------------------------------------------
-
 COMMANDS: dict[str, 'CommandSpec'] = {}
 
 
@@ -31,16 +27,14 @@ class ChildSpec:
         self,
         name,
         func,
-        requires_children: bool = False,
-        requires_arguments: bool = False,
-        requires_params: bool = False,
-        requires_flags: bool = False,
-        has_arguments: bool = False,
+        requires_children=False,
+        requires_arguments=False,
+        requires_params=False,
+        requires_flags=False,
+        has_arguments=False,
     ):
         if has_arguments and requires_children:
-            raise ValueError(
-                f'Child \'{name}\' cannot both have arguments and require children'
-            )
+            raise ValueError(f'Child {name} cannot have arguments and children')
 
         self.name = name
         self.func = func
@@ -52,7 +46,7 @@ class ChildSpec:
 
         self.params: dict[str, ParamSpec] = {}
         self.flags: dict[str, FlagSpec] = {}
-        self.children: dict[str, 'ChildSpec'] = {}
+        self.children: dict[str, ChildSpec] = {}
 
         self.description = getattr(func, '__description__', None)
 
@@ -91,9 +85,7 @@ class CommandSpec:
         has_arguments=False,
     ):
         if has_arguments and requires_children:
-            raise ValueError(
-                f"Command '{name}' cannot both have arguments and require children"
-            )
+            raise ValueError(f'Command {name} cannot have arguments and children')
 
         self.name = name
         self.func = func
@@ -107,18 +99,18 @@ class CommandSpec:
         self.params: dict[str, ParamSpec] = {}
         self.flags: dict[str, FlagSpec] = {}
 
-        self.description = getattr(func, "__description__", None)
+        self.description = getattr(func, '__description__', None)
 
     def param(self, name, type=str, default=None):
         def deco(func):
-            pyname = name.replace("-", "_")
+            pyname = name.replace('-', '_')
             self.params[pyname] = ParamSpec(name, type, default, func)
             return func
         return deco
 
     def flag(self, name):
         def deco(func):
-            pyname = name.replace("-", "_")
+            pyname = name.replace('-', '_')
             self.flags[pyname] = FlagSpec(name, func)
             return func
         return deco
@@ -130,7 +122,6 @@ class CommandSpec:
             setattr(self, name, child)
             return child
         return deco
-
 
 
 class CommandDSL:
@@ -145,38 +136,59 @@ class CommandDSL:
 command = CommandDSL()
 
 
-# ---------------------------------------------------------------------------
-# Help generation
-# ---------------------------------------------------------------------------
-
-def generate_help(cmd: CommandSpec) -> str:
-    lines: list[str] = []
-    lines.append(f'{cmd.name}: {cmd.description or 'No description'}')
+def generate_command_help(cmd: CommandSpec) -> str:
+    lines = []
+    lines.append(f'{cmd.name}: {cmd.description or "No description"}')
+    lines.append(f'Usage: {cmd.name} [child] [arg] [--flags] [params]')
 
     if cmd.children:
         lines.append('')
         lines.append('Children:')
         for cname, child in cmd.children.items():
-            lines.append(f'  {cname}: {child.description or 'No description'}')
+            lines.append(f'  {cname}: {child.description or "No description"}')
 
-            if child.params:
-                lines.append('    Params:')
-                for pname, pspec in child.params.items():
-                    lines.append(
-                        f'      {pname} (CLI: {pspec.name}, type={pspec.type_.__name__}, default={pspec.default})'
-                    )
+    if cmd.flags:
+        lines.append('')
+        lines.append('Flags:')
+        for fname in cmd.flags:
+            lines.append(f'  --{fname}')
 
-            if child.flags:
-                lines.append('    Flags:')
-                for fname, fspec in child.flags.items():
-                    lines.append(f'      --{fspec.name}')
+    if cmd.params:
+        lines.append('')
+        lines.append('Params:')
+        for pname, pspec in cmd.params.items():
+            lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
 
     return '\n'.join(lines)
 
 
-# ---------------------------------------------------------------------------
-# Parsing + dispatch
-# ---------------------------------------------------------------------------
+def generate_child_help(child: ChildSpec) -> str:
+    lines = []
+    lines.append(f'{child.name}: {child.description or "No description"}')
+    lines.append(f'Usage: {child.name} [arg] [--flags] [params]')
+
+    if child.flags:
+        lines.append('')
+        lines.append('Flags:')
+        for fname in child.flags:
+            lines.append(f'  --{fname}')
+
+    if child.params:
+        lines.append('')
+        lines.append('Params:')
+        for pname, pspec in child.params.items():
+            lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
+
+    return '\n'.join(lines)
+
+
+def generate_help(obj):
+    if isinstance(obj, CommandSpec):
+        return generate_command_help(obj)
+    if isinstance(obj, ChildSpec):
+        return generate_child_help(obj)
+    return 'No help available'
+
 
 @dataclass
 class ParsedArgs:
@@ -193,9 +205,9 @@ def parse_line(raw: str) -> ParsedArgs:
 
     parts = raw.split()
     sub = parts[0]
-    positional: list[str] = []
-    flags: dict[str, bool] = {}
-    params: dict[str, str] = {}
+    positional = []
+    flags = {}
+    params = {}
 
     for token in parts[1:]:
         if token.startswith('--'):
@@ -216,27 +228,30 @@ def dispatch(cli, line: str):
 
     cmd = COMMANDS.get(parsed.subcommand)
     if cmd is None:
-        return cli.safePrint(f'Unknown command \'{parsed.subcommand}\'')
+        return cli.safePrint(f'Unknown command {parsed.subcommand}')
 
-    if cmd.requires_children and not cmd.children:
-        return cli.safePrint(f'Command \'{cmd.name}\' requires children')
+    if 'help' in parsed.flags:
+        return cli.safePrint(generate_help(cmd))
 
     cmd.func()
 
     if not parsed.positional:
         if cmd.requires_arguments:
-            return cli.safePrint(f'Command \'{cmd.name}\' requires an argument')
+            return cli.safePrint(f'Command {cmd.name} requires an argument')
         return cli.safePrint('Missing subcommand')
 
     child_name = parsed.positional[0]
     child = cmd.children.get(child_name)
     if child is None:
-        return cli.safePrint(f'Unknown subcommand \'{child_name}\'')
+        return cli.safePrint(f'Unknown subcommand {child_name}')
+
+    if 'help' in parsed.flags:
+        return cli.safePrint(generate_help(child))
 
     arg = parsed.positional[1] if len(parsed.positional) > 1 else None
 
     if child.requires_arguments and arg is None:
-        return cli.safePrint(f'Subcommand \'{child.name}\' requires an argument')
+        return cli.safePrint(f'Subcommand {child.name} requires an argument')
 
     g = child.func.__globals__
 
@@ -276,25 +291,21 @@ def dispatch(cli, line: str):
         return func(cli)
 
 
-# ---------------------------------------------------------------------------
-# Base LiveCLI
-# ---------------------------------------------------------------------------
-
 class LiveCLI(cmd.Cmd):
     prompt = ''
 
-    def safePrint(self, msg: object = '', end: str = '\n') -> None:
+    def safePrint(self, msg='', end='\n'):
         print(str(msg), end=end)
 
-    def bprint(self, msg: object) -> None:
+    def bprint(self, msg):
         self.safePrint(msg)
 
-    def read_line_raw(self) -> str:
+    def read_line_raw(self):
         fd = sys.stdin.fileno()
         old = termios.tcgetattr(fd)
         try:
             tty.setraw(fd)
-            chars: list[str] = []
+            chars = []
             while True:
                 ch = sys.stdin.read(1)
                 if ch in ('\r', '\n'):
@@ -314,5 +325,5 @@ class LiveCLI(cmd.Cmd):
             if stop:
                 break
 
-    def onecmd(self, line: str):
+    def onecmd(self, line):
         return dispatch(self, line)

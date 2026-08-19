@@ -19,3 +19,6 @@ description: |
   - Fix CommandSpec
   Dev 17:
   - Fix dispatch
+  Dev 18:
+  - Fix CLI
+  - Added auto-generated help flags
