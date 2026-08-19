@@ -268,8 +268,13 @@ def stats(self: WatcherCLI, parsed: ParsedArgs):
 
 
 @command.child('get')
-def stats_get(self: WatcherCLI, stat: str,
-              rounding, mode, raw, formatted, no_formatted):
+def stats_get(self: WatcherCLI, stat: str, **kwargs):
+
+    rounding = kwargs['rounding']
+    mode = kwargs['mode']
+    raw = kwargs['raw']
+    formatted = kwargs['formatted']
+    no_formatted = kwargs['no_formatted']
 
     @command.param('rounding', type=int, default=2)
     def _rounding(value):
@@ -294,12 +299,7 @@ def stats_get(self: WatcherCLI, stat: str,
     self.watcher.server.refresh()
 
     gb = not raw()
-    if formatted():
-        fmt = True
-    elif no_formatted():
-        fmt = False
-    else:
-        fmt = True
+    fmt = formatted() if formatted() else not no_formatted()
 
     unit = ''
     match stat:
@@ -331,7 +331,6 @@ def stats_get(self: WatcherCLI, stat: str,
             return self.safePrint('Unknown stat')
 
     self.bprint(f'{name}: {value}{unit}')
-
 
 # view command
 @command('view')
