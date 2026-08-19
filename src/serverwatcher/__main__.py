@@ -2,7 +2,7 @@ from mapres import rprint, setGlobalMaps, ascii_colors
 import time
 import asyncio
 import threading
-from .cli import WatcherCLI
+from .watchercli import WatcherCLI
 
 from hungerlib.validator import (
     ValidationError,
@@ -90,7 +90,7 @@ def main():
         rprint('<aqua>Please check your configuration and environment.')
         return
 
-    # if validation passes, start ServerWatcher
+    # Start watcher thread
     watcher = ServerWatcher()
     threading.Thread(target=watcher.run, daemon=True).start()
 
