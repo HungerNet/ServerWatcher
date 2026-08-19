@@ -150,7 +150,7 @@ def dispatch(cli: CLIBase, line: str):
 
     child = cmd.children.get(child_name)
     if child is None:
-        cli.safePrint(f'Unknown subcommand '{child_name}'')
+        cli.safePrint(f'Unknown subcommand \'{child_name}\'')
         return
 
     # second positional is the main argument (stat, etc.)
