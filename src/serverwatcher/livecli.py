@@ -1,3 +1,5 @@
+# livecli.py
+
 from dataclasses import dataclass
 import cmd
 import sys
@@ -136,57 +138,51 @@ class CommandDSL:
 command = CommandDSL()
 
 
-def generate_command_help(cmd: CommandSpec) -> str:
-    lines = []
-    lines.append(f'{cmd.name}: {cmd.description or "No description"}')
-    lines.append(f'Usage: {cmd.name} [child] [arg] [--flags] [params]')
-
-    if cmd.children:
-        lines.append('')
-        lines.append('Children:')
-        for cname, child in cmd.children.items():
-            lines.append(f'  {cname}: {child.description or "No description"}')
-
-    if cmd.flags:
-        lines.append('')
-        lines.append('Flags:')
-        for fname in cmd.flags:
-            lines.append(f'  --{fname}')
-
-    if cmd.params:
-        lines.append('')
-        lines.append('Params:')
-        for pname, pspec in cmd.params.items():
-            lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
-
-    return '\n'.join(lines)
-
-
-def generate_child_help(child: ChildSpec) -> str:
-    lines = []
-    lines.append(f'{child.name}: {child.description or "No description"}')
-    lines.append(f'Usage: {child.name} [arg] [--flags] [params]')
-
-    if child.flags:
-        lines.append('')
-        lines.append('Flags:')
-        for fname in child.flags:
-            lines.append(f'  --{fname}')
-
-    if child.params:
-        lines.append('')
-        lines.append('Params:')
-        for pname, pspec in child.params.items():
-            lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
-
-    return '\n'.join(lines)
-
-
 def generate_help(obj):
     if isinstance(obj, CommandSpec):
-        return generate_command_help(obj)
+        lines = []
+        lines.append(f'{obj.name}: {obj.description or "No description"}')
+        lines.append(f'Usage: {obj.name} [child] [arg] [--flags] [params]')
+
+        if obj.children:
+            lines.append('')
+            lines.append('Children:')
+            for cname, child in obj.children.items():
+                lines.append(f'  {cname}: {child.description or "No description"}')
+
+        if obj.flags:
+            lines.append('')
+            lines.append('Flags:')
+            for fname in obj.flags:
+                lines.append(f'  --{fname}')
+
+        if obj.params:
+            lines.append('')
+            lines.append('Params:')
+            for pname, pspec in obj.params.items():
+                lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
+
+        return '\n'.join(lines)
+
     if isinstance(obj, ChildSpec):
-        return generate_child_help(obj)
+        lines = []
+        lines.append(f'{obj.name}: {obj.description or "No description"}')
+        lines.append(f'Usage: {obj.name} [arg] [--flags] [params]')
+
+        if obj.flags:
+            lines.append('')
+            lines.append('Flags:')
+            for fname in obj.flags:
+                lines.append(f'  --{fname}')
+
+        if obj.params:
+            lines.append('')
+            lines.append('Params:')
+            for pname, pspec in obj.params.items():
+                lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
+
+        return '\n'.join(lines)
+
     return 'No help available'
 
 
@@ -230,14 +226,17 @@ def dispatch(cli, line: str):
     if cmd is None:
         return cli.safePrint(f'Unknown command {parsed.subcommand}')
 
-    if 'help' in parsed.flags:
+    if 'help' in parsed.flags and not parsed.positional:
         return cli.safePrint(generate_help(cmd))
 
     cmd.func()
 
+    if not cmd.children:
+        if 'help' in parsed.flags:
+            return cli.safePrint(generate_help(cmd))
+        return
+
     if not parsed.positional:
-        if cmd.requires_arguments:
-            return cli.safePrint(f'Command {cmd.name} requires an argument')
         return cli.safePrint('Missing subcommand')
 
     child_name = parsed.positional[0]

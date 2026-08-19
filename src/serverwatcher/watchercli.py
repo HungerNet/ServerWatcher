@@ -1,3 +1,5 @@
+# watchercli.py
+
 from hungerlib import utils
 from mapres import res, ascii_colors, setGlobalMaps
 from .watcher import ServerWatcher
@@ -18,15 +20,23 @@ class WatcherCLI(LiveCLI):
         self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
         self.safePrint(res('<yellow>-----------------------------------'))
         self.safePrint('')
+        
 
 @command('stats', requires_children=True)
 def stats():
-    __description__ = 'Retrieve and print server statistics'
+    pass
+
+stats.__description__ = 'Retrieve and print server statistics'
+
 
 @stats.child('get', requires_arguments=False)
 def stats_get(self, arg=None):
-    __description__ = 'Retrieve and print all or specific server statistics'
+    pass
 
+stats_get.__description__ = 'Retrieve and print all or specific server statistics'
+
+
+def stats_get(self, arg=None):
     self.watcher.server.refresh()
 
     if arg is not None:
@@ -66,26 +76,37 @@ def stats_get(self, arg=None):
     else:
         return
 
+
 @stats.get.param('rounding', type=int, default=2)
 def rounding(value):
     return value
+
 
 @stats.get.param('mode', type=str, default='current')
 def mode(value):
     return value
 
+
 @stats.get.flag('raw')
 def raw():
     return True
 
+
 @command('view', requires_children=True)
 def view():
-    __description__ = 'Switch terminal view'
+    pass
+
+view.__description__ = 'Switch terminal view'
+
 
 @view.child('cli')
 def view_cli(self):
-    __description__ = 'Switch to CLI view'
+    pass
 
+view_cli.__description__ = 'Switch to CLI view'
+
+
+def view_cli(self):
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -94,10 +115,15 @@ def view_cli(self):
     for msg in self.buffer.captured:
         self.safePrint(msg)
 
+
 @view.child('watcher')
 def view_watcher(self):
-    __description__ = 'Switch to Watcher view'
+    pass
 
+view_watcher.__description__ = 'Switch to Watcher view'
+
+
+def view_watcher(self):
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
     utils.clearTerminal()
@@ -105,9 +131,13 @@ def view_watcher(self):
     for msg in self.watcher.router.buffer.captured:
         self.safePrint(msg)
 
+
 @command('clear')
 def clear():
-    __description__ = 'Clear the CLI terminal'
+    pass
+
+clear.__description__ = 'Clear the CLI terminal'
+
 
 @clear.flag('no-buffer')
 def no_buffer():
