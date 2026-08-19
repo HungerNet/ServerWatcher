@@ -85,7 +85,7 @@ class CommandSpec:
         def deco(func):
             child = ChildSpec(name, func)
             self.children[name] = child
-            return func
+            return child
         return deco
 
 class CommandDSL:
