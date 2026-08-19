@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.19'
+version: '6-dev.20'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -22,5 +22,5 @@ description: |
   Dev 18:
   - Fix CLI
   - Added auto-generated help flags
-  Dev 19:
+  Dev 19-20:
   - CLI fixes

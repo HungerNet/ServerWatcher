@@ -20,23 +20,17 @@ class WatcherCLI(LiveCLI):
         self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
         self.safePrint(res('<yellow>-----------------------------------'))
         self.safePrint('')
-        
+
 
 @command('stats', requires_children=True)
 def stats():
-    pass
-
-stats.__description__ = 'Retrieve and print server statistics'
+    stats.__description__ = 'Retrieve and print server statistics'
 
 
 @stats.child('get', requires_arguments=False)
 def stats_get(self, arg=None):
-    pass
+    stats_get.__description__ = 'Retrieve and print all or specific server statistics'
 
-stats_get.__description__ = 'Retrieve and print all or specific server statistics'
-
-
-def stats_get(self, arg=None):
     self.watcher.server.refresh()
 
     if arg is not None:
@@ -77,36 +71,30 @@ def stats_get(self, arg=None):
         return
 
 
-@stats.get.param('rounding', type=int, default=2)
+@stats_get.param('rounding', type=int, default=2)
 def rounding(value):
     return value
 
 
-@stats.get.param('mode', type=str, default='current')
+@stats_get.param('mode', type=str, default='current')
 def mode(value):
     return value
 
 
-@stats.get.flag('raw')
+@stats_get.flag('raw')
 def raw():
     return True
 
 
 @command('view', requires_children=True)
 def view():
-    pass
-
-view.__description__ = 'Switch terminal view'
+    view.__description__ = 'Switch terminal view'
 
 
 @view.child('cli')
 def view_cli(self):
-    pass
+    view_cli.__description__ = 'Switch to CLI view'
 
-view_cli.__description__ = 'Switch to CLI view'
-
-
-def view_cli(self):
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -118,12 +106,8 @@ def view_cli(self):
 
 @view.child('watcher')
 def view_watcher(self):
-    pass
+    view_watcher.__description__ = 'Switch to Watcher view'
 
-view_watcher.__description__ = 'Switch to Watcher view'
-
-
-def view_watcher(self):
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
     utils.clearTerminal()
@@ -134,9 +118,12 @@ def view_watcher(self):
 
 @command('clear')
 def clear():
-    pass
+    clear.__description__ = 'Clear the CLI terminal'
 
-clear.__description__ = 'Clear the CLI terminal'
+    no_buf = no_buffer()
+    if not no_buf:
+        self = None  # placeholder if you later want instance-bound clear
+    utils.clearTerminal()
 
 
 @clear.flag('no-buffer')
