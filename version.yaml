@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.14'
+version: '6-dev.15'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -13,3 +13,5 @@ description: |
   - CLI rewrite (will continue to improve or redesign the system until it works)
   Dev 9-14:
   - CLI fixes
+  Dev 15:
+  - CLI rewrite

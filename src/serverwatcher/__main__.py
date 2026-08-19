@@ -1,8 +1,8 @@
-from mapres import rprint, setGlobalMaps, ascii_colors
 import time
 import asyncio
 import threading
-from .watchercli import WatcherCLI
+
+from mapres import rprint, setGlobalMaps, ascii_colors
 
 from hungerlib.validator import (
     ValidationError,
@@ -14,12 +14,12 @@ from hungerlib.validator import (
 
 from .watcher import ServerWatcher
 from .validator import validate_all
+from .watchercli import WatcherCLI
 
 
-# mapres setup
 setGlobalMaps(ascii_colors)
 
-# pretty printer for validator reports
+
 def pretty_report(report: str) -> str:
     lines = report.splitlines()
     out = []
@@ -43,7 +43,7 @@ def pretty_report(report: str) -> str:
         out.append(line)
     return '\n'.join(out)
 
-# main function
+
 def main():
     try:
         validate_all()
