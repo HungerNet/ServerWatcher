@@ -122,7 +122,7 @@ def dispatch(cli: CLIBase, line: str):
     if cmd is None:
         return cli.safePrint(f'Unknown command {parsed.subcommand}')
 
-    cmd.func(cli, parsed)
+    cmd.func()
 
     if not parsed.positional:
         return cli.safePrint('Missing subcommand')
@@ -238,12 +238,12 @@ class WatcherCLI(cmd.Cmd, CLIBase):
 
 # stats command
 @command('stats')
-def stats(self: WatcherCLI, parsed: ParsedArgs):
+def stats():
     pass
 
 
 @stats.child('get')
-def stats_get(self: WatcherCLI, stat: str, **kwargs):
+def stats_get(self, stat: str, **kwargs):
     rounding = kwargs['rounding']
     mode = kwargs['mode']
     raw = kwargs['raw']
@@ -319,12 +319,12 @@ def no_formatted():
 
 # view command
 @command('view')
-def view(self: WatcherCLI, parsed: ParsedArgs):
+def view():
     pass
 
 
 @view.child('cli')
-def view_cli(self: WatcherCLI, _arg: str, **kwargs):
+def view_cli(self, _arg: str, **kwargs):
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -335,7 +335,7 @@ def view_cli(self: WatcherCLI, _arg: str, **kwargs):
 
 
 @view.child('watcher')
-def view_watcher(self: WatcherCLI, _arg: str, **kwargs):
+def view_watcher(self, _arg: str, **kwargs):
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
     utils.clearTerminal()
@@ -346,12 +346,12 @@ def view_watcher(self: WatcherCLI, _arg: str, **kwargs):
 
 # clear command
 @command('clear')
-def clear(self: WatcherCLI, parsed: ParsedArgs):
+def clear():
     pass
 
 
 @clear.child('buffer')
-def clear_buffer(self: WatcherCLI, _arg: str, **kwargs):
+def clear_buffer(self, _arg: str, **kwargs):
     buffer = kwargs['buffer']
 
     if buffer():
@@ -368,17 +368,17 @@ def buffer(value: str):
 
 # watcher command
 @command('watcher')
-def watcher(self: WatcherCLI, parsed: ParsedArgs):
+def watcher():
     pass
 
 
 @watcher.child('restart')
-def watcher_restart(self: WatcherCLI, _arg: str, **kwargs):
+def watcher_restart(self, _arg: str, **kwargs):
     self.watcher.restart_and_wait()
 
 
 @watcher.child('schedule')
-def watcher_schedule(self: WatcherCLI, _arg: str, **kwargs):
+def watcher_schedule(self, _arg: str, **kwargs):
     minutes = kwargs['minutes']
 
     val = minutes()
@@ -388,7 +388,7 @@ def watcher_schedule(self: WatcherCLI, _arg: str, **kwargs):
 
 
 @watcher.child('shutdown')
-def watcher_shutdown(self: WatcherCLI, _arg: str, **kwargs):
+def watcher_shutdown(self, _arg: str, **kwargs):
     self.watcher.shutdown()
     return True
 
