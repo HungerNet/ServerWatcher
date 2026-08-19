@@ -43,7 +43,10 @@ def parse_line(raw: str) -> ParsedArgs:
     return ParsedArgs(sub, positional, flags, params)
 
 
-# command model
+# command registry
+COMMANDS: dict[str, 'CommandSpec'] = {}
+
+
 class ParamSpec:
     def __init__(self, name: str, type_: callable, default: object):
         self.name = name
@@ -63,6 +66,18 @@ class ChildSpec:
         self.params: dict[str, ParamSpec] = {}
         self.flags: dict[str, FlagSpec] = {}
 
+    def param(self, name: str, type: callable = str, default: object = None):
+        def deco(func: callable):
+            self.params[name] = ParamSpec(name, type, default)
+            return func
+        return deco
+
+    def flag(self, name: str):
+        def deco(func: callable):
+            self.flags[name] = FlagSpec(name)
+            return func
+        return deco
+
 
 class CommandSpec:
     def __init__(self, name: str, func: callable):
@@ -70,56 +85,27 @@ class CommandSpec:
         self.func = func
         self.children: dict[str, ChildSpec] = {}
 
-
-# DSL object
-class CommandDSL:
-    def __init__(self):
-        self.registry: dict[str, CommandSpec] = {}
-        self._current_command: CommandSpec | None = None
-        self._current_child: ChildSpec | None = None
-
-    def __call__(self, name: str):
-        def deco(func: callable):
-            cmd = CommandSpec(name, func)
-            self.registry[name] = cmd
-            self._current_command = cmd
-            self._current_child = None
-            return func
-        return deco
-
     def child(self, name: str):
         def deco(func: callable):
-            if self._current_command is None:
-                raise RuntimeError('child() used outside of a command')
             child = ChildSpec(name, func)
-            self._current_command.children[name] = child
-            self._current_child = child
+            self.children[name] = child
             return func
         return deco
 
-    def param(self, name: str, type: callable = str, default: object = None):
-        def deco(func: callable):
-            if self._current_child is None:
-                raise RuntimeError('param() used outside of a child')
-            spec = ParamSpec(name, type, default)
-            self._current_child.params[name] = spec
-            return func
-        return deco
 
-    def flag(self, name: str):
+class CommandDSL:
+    def __call__(self, name: str):
         def deco(func: callable):
-            if self._current_child is None:
-                raise RuntimeError('flag() used outside of a child')
-            spec = FlagSpec(name)
-            self._current_child.flags[name] = spec
-            return func
+            spec = CommandSpec(name, func)
+            COMMANDS[name] = spec
+            return spec
         return deco
 
 
 command = CommandDSL()
 
 
-# base CLI
+# base CLI helpers
 class CLIBase:
     def safePrint(self, msg: object = '', end: str = '\n') -> None:
         print(str(msg), end=end)
@@ -134,29 +120,22 @@ def dispatch(cli: CLIBase, line: str):
     if not parsed.subcommand:
         return
 
-    cmd = command.registry.get(parsed.subcommand)
+    cmd = COMMANDS.get(parsed.subcommand)
     if cmd is None:
-        cli.safePrint(f'Unknown command \'{parsed.subcommand}\'')
-        return
+        return cli.safePrint(f'Unknown command {parsed.subcommand}')
 
-    # run command handler to allow any setup logic
     cmd.func(cli, parsed)
 
-    # first positional selects child
-    child_name = parsed.positional[0] if parsed.positional else None
-    if not child_name:
-        cli.safePrint('Missing subcommand')
-        return
+    if not parsed.positional:
+        return cli.safePrint('Missing subcommand')
 
+    child_name = parsed.positional[0]
     child = cmd.children.get(child_name)
     if child is None:
-        cli.safePrint(f'Unknown subcommand \'{child_name}\'')
-        return
+        return cli.safePrint(f'Unknown subcommand {child_name}')
 
-    # second positional is the main argument (stat, etc.)
     stat = parsed.positional[1] if len(parsed.positional) > 1 else None
 
-    # build wrappers for params and flags
     wrappers: dict[str, callable] = {}
 
     for pname, pspec in child.params.items():
@@ -184,7 +163,6 @@ def dispatch(cli: CLIBase, line: str):
 
         wrappers[fname] = make_flag
 
-    # call child with stat and wrappers injected
     return child.func(cli, stat, **wrappers)
 
 
@@ -263,43 +241,26 @@ class WatcherCLI(cmd.Cmd, CLIBase):
 # stats command
 @command('stats')
 def stats(self: WatcherCLI, parsed: ParsedArgs):
-    # no setup needed for stats right now
     pass
 
 
-@command.child('get')
+@stats.child('get')
 def stats_get(self: WatcherCLI, stat: str, **kwargs):
-
     rounding = kwargs['rounding']
     mode = kwargs['mode']
     raw = kwargs['raw']
     formatted = kwargs['formatted']
     no_formatted = kwargs['no_formatted']
 
-    @command.param('rounding', type=int, default=2)
-    def _rounding(value):
-        return value
-
-    @command.param('mode', type=str, default='current')
-    def _mode(value):
-        return value
-
-    @command.flag('raw')
-    def _raw():
-        return False
-
-    @command.flag('formatted')
-    def _formatted():
-        return True
-
-    @command.flag('no-formatted')
-    def _no_formatted():
-        return False
-
     self.watcher.server.refresh()
 
     gb = not raw()
-    fmt = formatted() if formatted() else not no_formatted()
+    if formatted():
+        fmt = True
+    elif no_formatted():
+        fmt = False
+    else:
+        fmt = True
 
     unit = ''
     match stat:
@@ -332,15 +293,40 @@ def stats_get(self: WatcherCLI, stat: str, **kwargs):
 
     self.bprint(f'{name}: {value}{unit}')
 
+
+@stats_get.param('rounding', type=int, default=2)
+def rounding(value: int):
+    return value
+
+
+@stats_get.param('mode', type=str, default='current')
+def mode(value: str):
+    return value
+
+
+@stats_get.flag('raw')
+def raw():
+    return False
+
+
+@stats_get.flag('formatted')
+def formatted():
+    return True
+
+
+@stats_get.flag('no-formatted')
+def no_formatted():
+    return False
+
+
 # view command
 @command('view')
 def view(self: WatcherCLI, parsed: ParsedArgs):
-    # no setup needed for view
     pass
 
 
-@command.child('cli')
-def view_cli(self: WatcherCLI, _stat: str):
+@view.child('cli')
+def view_cli(self: WatcherCLI, _arg: str, **kwargs):
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -350,8 +336,8 @@ def view_cli(self: WatcherCLI, _stat: str):
         self.safePrint(msg)
 
 
-@command.child('watcher')
-def view_watcher(self: WatcherCLI, _stat: str):
+@view.child('watcher')
+def view_watcher(self: WatcherCLI, _arg: str, **kwargs):
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
     utils.clearTerminal()
@@ -363,15 +349,12 @@ def view_watcher(self: WatcherCLI, _stat: str):
 # clear command
 @command('clear')
 def clear(self: WatcherCLI, parsed: ParsedArgs):
-    # no setup needed
     pass
 
 
-@command.child('buffer')
-def clear_buffer(self: WatcherCLI, _stat: str, buffer):
-    @command.param('buffer', type=str, default='true')
-    def _buffer(value: str):
-        return value.lower() == 'true'
+@clear.child('buffer')
+def clear_buffer(self: WatcherCLI, _arg: str, **kwargs):
+    buffer = kwargs['buffer']
 
     if buffer():
         self.buffer.clear()
@@ -380,31 +363,38 @@ def clear_buffer(self: WatcherCLI, _stat: str, buffer):
     self.printHeader()
 
 
+@clear_buffer.param('buffer', type=str, default='true')
+def buffer(value: str):
+    return value.lower() == 'true'
+
+
 # watcher command
 @command('watcher')
 def watcher(self: WatcherCLI, parsed: ParsedArgs):
-    # no setup needed
     pass
 
 
-@command.child('restart')
-def watcher_restart(self: WatcherCLI, _stat: str):
+@watcher.child('restart')
+def watcher_restart(self: WatcherCLI, _arg: str, **kwargs):
     self.watcher.restart_and_wait()
 
 
-@command.child('schedule')
-def watcher_schedule(self: WatcherCLI, _stat: str, minutes):
-    @command.param('minutes', type=int, default=None)
-    def _minutes(value: int):
-        return value
+@watcher.child('schedule')
+def watcher_schedule(self: WatcherCLI, _arg: str, **kwargs):
+    minutes = kwargs['minutes']
 
     val = minutes()
     if val is None:
-        return self.safePrint('Usage: watcher schedule <minutes>')
+        return self.safePrint('Usage: watcher schedule minutes')
     self.watcher.schedule_restart(val)
 
 
-@command.child('shutdown')
-def watcher_shutdown(self: WatcherCLI, _stat: str):
+@watcher.child('shutdown')
+def watcher_shutdown(self: WatcherCLI, _arg: str, **kwargs):
     self.watcher.shutdown()
     return True
+
+
+@watcher_schedule.param('minutes', type=int, default=None)
+def minutes(value: int):
+    return value

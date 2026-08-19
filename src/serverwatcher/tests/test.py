@@ -1,58 +1,57 @@
 @command('stats')
-def stats():
+def stats(): pass
 
-    @command.child('get')
-    def get(stat: str):
+@stats.child('get')
+def get(stat: str):
+    self.watcher.server.refresh()
 
-        @command.param('rounding', type=int, default=2)
-        def rounding(value):
-            return value
+    unit = ''
+    match stat:
+        case 'ram':
+            value = self.watcher.server.getRAM(rounding=rounding(), gb=raw())
+            name = 'RAM'
+            unit = ' GB' if gb else ' MB'
+        case 'cpu':
+            value = self.watcher.server.getCPU(rounding=rounding())
+            name = 'CPU'
+            unit = '%'
+        case 'uptime':
+            value = self.watcher.server.getUptime(formatted=formatted())
+            name = 'Uptime'
+            unit = '' if fmt else 'ms'
+        case 'tps':
+            value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
+            name = 'TPS'
+        case 'players':
+            value = self.watcher.server.getPlayers()
+            name = 'Players'
+        case 'version':
+            value = self.watcher.server.version
+            name = 'Minecraft version'
+        case 'platform':
+            value = self.watcher.server.platform
+            name = 'Server platform'
+        case _:
+            return self.safePrint('Unknown stat')
 
-        @command.param('mode', type=str, default='current')
-        def mode(value):
-            return value
+    self.bprint(f'{name}: {value}{unit}')
 
-        @command.flag('raw')
-        def raw():
-            return False
+@stats.get.param('rounding', type=int, default=2)
+def rounding(value):
+    return value
 
-        @command.flag('formatted')
-        def formatted():
-            return True
+@stats.get.param('mode', type=str, default='current')
+def mode(value):
+    return value
 
-        @command.flag('no-formatted')
-        def no_formatted():
-            return False
+@stats.get.flag('raw')
+def raw():
+    return False
 
-        self.watcher.server.refresh()
+@stats.get.flag('formatted')
+def formatted():
+    return True
 
-        unit = ''
-        match stat:
-            case 'ram':
-                value = self.watcher.server.getRAM(rounding=rounding(), gb=raw())
-                name = 'RAM'
-                unit = ' GB' if gb else ' MB'
-            case 'cpu':
-                value = self.watcher.server.getCPU(rounding=rounding())
-                name = 'CPU'
-                unit = '%'
-            case 'uptime':
-                value = self.watcher.server.getUptime(formatted=formatted())
-                name = 'Uptime'
-                unit = '' if fmt else 'ms'
-            case 'tps':
-                value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
-                name = 'TPS'
-            case 'players':
-                value = self.watcher.server.getPlayers()
-                name = 'Players'
-            case 'version':
-                value = self.watcher.server.version
-                name = 'Minecraft version'
-            case 'platform':
-                value = self.watcher.server.platform
-                name = 'Server platform'
-            case _:
-                return self.safePrint('Unknown stat')
-
-        self.bprint(f'{name}: {value}{unit}')
+@stats.get.flag('no-formatted')
+def no_formatted():
+    return False
