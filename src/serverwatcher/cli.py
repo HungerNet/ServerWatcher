@@ -85,6 +85,8 @@ class CommandSpec:
         def deco(func):
             child = ChildSpec(name, func)
             self.children[name] = child
+            # expose child as attribute so stats.get, clear.buffer, watcher.schedule work
+            setattr(self, name, child)
             return child
         return deco
 
