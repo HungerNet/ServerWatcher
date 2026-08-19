@@ -84,15 +84,15 @@ class CommandSpec:
         self,
         name,
         func,
-        requires_children: bool = False,
-        requires_arguments: bool = False,
-        requires_params: bool = False,
-        requires_flags: bool = False,
-        has_arguments: bool = False,
+        requires_children=False,
+        requires_arguments=False,
+        requires_params=False,
+        requires_flags=False,
+        has_arguments=False,
     ):
         if has_arguments and requires_children:
             raise ValueError(
-                f'Command \'{name}\' cannot both have arguments and require children'
+                f"Command '{name}' cannot both have arguments and require children"
             )
 
         self.name = name
@@ -104,7 +104,24 @@ class CommandSpec:
         self.has_arguments = has_arguments
 
         self.children: dict[str, ChildSpec] = {}
-        self.description = getattr(func, '__description__', None)
+        self.params: dict[str, ParamSpec] = {}
+        self.flags: dict[str, FlagSpec] = {}
+
+        self.description = getattr(func, "__description__", None)
+
+    def param(self, name, type=str, default=None):
+        def deco(func):
+            pyname = name.replace("-", "_")
+            self.params[pyname] = ParamSpec(name, type, default, func)
+            return func
+        return deco
+
+    def flag(self, name):
+        def deco(func):
+            pyname = name.replace("-", "_")
+            self.flags[pyname] = FlagSpec(name, func)
+            return func
+        return deco
 
     def child(self, name, **meta):
         def deco(func):
@@ -113,6 +130,7 @@ class CommandSpec:
             setattr(self, name, child)
             return child
         return deco
+
 
 
 class CommandDSL:
