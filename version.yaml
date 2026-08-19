@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.16'
+version: '6-dev.17'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -17,3 +17,5 @@ description: |
   - CLI rewrite
   Dev 16:
   - Fix CommandSpec
+  Dev 17:
+  - Fix dispatch

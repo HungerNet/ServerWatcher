@@ -238,10 +238,8 @@ def dispatch(cli, line: str):
     if child.requires_arguments and arg is None:
         return cli.safePrint(f'Subcommand \'{child.name}\' requires an argument')
 
-    # Inject param/flag functions into child.func globals
     g = child.func.__globals__
 
-    # Params: use provided value or default, then call original func(value)
     for pname, pspec in child.params.items():
         if pname in parsed.params:
             raw_value = parsed.params[pname]
@@ -259,7 +257,6 @@ def dispatch(cli, line: str):
 
         g[pname] = make_param_func()
 
-    # Flags: presence → True, absence → False
     for fname, fspec in child.flags.items():
         present = fname in parsed.flags
 
@@ -270,7 +267,13 @@ def dispatch(cli, line: str):
 
         g[fname] = make_flag_func()
 
-    return child.func(cli, arg)
+    func = child.func
+    argc = func.__code__.co_argcount
+
+    if argc >= 2:
+        return func(cli, arg)
+    else:
+        return func(cli)
 
 
 # ---------------------------------------------------------------------------
