@@ -49,6 +49,21 @@ class ChildSpec:
         self.children: dict[str, ChildSpec] = {}
 
         self.description = getattr(func, '__description__', None)
+    
+    def param(self, name, type=str, default=None):
+        def deco(func):
+            pyname = name.replace('-', '_')
+            self.params[pyname] = ParamSpec(name, type, default, func)
+            return func
+        return deco
+
+    def flag(self, name):
+        def deco(func):
+            pyname = name.replace('-', '_')
+            self.flags[pyname] = FlagSpec(name, func)
+            return func
+        return deco
+
 
 
 class CommandSpec:

@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.24'
+version: '6-dev.25'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -31,5 +31,5 @@ description: |
   - Fixed commands:
     - view
     - clear
-  Dev 22-24:
+  Dev 22-25:
   - Debugging and fixes
