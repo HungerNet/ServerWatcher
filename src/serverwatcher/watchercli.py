@@ -92,17 +92,17 @@ def stats_get(self, arg=None):
         return
 
 
-@stats_get.param('rounding', type=int, default=2)
+@stats.get.param('rounding', type=int, default=2)
 def rounding(value):
     return value
 
 
-@stats_get.param('mode', type=str, default='current')
+@stats.get.param('mode', type=str, default='current')
 def mode(value):
     return value
 
 
-@stats_get.flag('raw')
+@stats.get.flag('raw')
 def raw():
     return True
 
