@@ -8,6 +8,20 @@ from .livecli import LiveCLI, command
 setGlobalMaps(ascii_colors)
 
 
+class BufferingStdout:
+    def __init__(self, buffer, real_stdout):
+        self.buffer = buffer
+        self.real_stdout = real_stdout
+
+    def write(self, text):
+        if self.buffer.enabled and text.strip():
+            self.buffer.captured.append(text.rstrip("\n"))
+        self.real_stdout.write(text)
+
+    def flush(self):
+        self.real_stdout.flush()
+
+
 class WatcherCLI(LiveCLI):
     def __init__(self, watcher: ServerWatcher):
         super().__init__()
@@ -29,6 +43,16 @@ def stats():
 
 @stats.child('get', requires_arguments=False)
 def stats_get(self, arg=None):
+    '''
+    args:
+        ram [rounding] [--raw]
+        cpu [rounding]
+        uptime [--raw]
+        tps [rounding] [mode]
+        players
+        version
+        platform
+    '''
     stats_get.__description__ = 'Retrieve and print all or specific server statistics'
 
     self.watcher.server.refresh()
@@ -117,15 +141,26 @@ def view_watcher(self):
 
 
 @command('clear')
-def clear():
+def clear(self):
     clear.__description__ = 'Clear the CLI terminal'
 
-    no_buf = no_buffer()
-    if not no_buf:
-        self = None  # placeholder if you later want instance-bound clear
+    # default: buffer:false
+    clear_buffer = False
+
+    # parse key:value pairs from params (buffer:true|false)
+    # our DSL already parses params as key:value tokens
+    # here we just look at globals injected by dispatch if needed
+    # but simpler: rely on a param
+    buf = buffer()
+    clear_buffer = bool(buf)
+
+    if clear_buffer:
+        self.buffer.clear()
+
     utils.clearTerminal()
+    self.printHeader()
 
 
-@clear.flag('no-buffer')
-def no_buffer():
-    return False
+@clear.param('buffer', type=bool, default=False)
+def buffer(value):
+    return value
