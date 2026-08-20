@@ -50,28 +50,6 @@ class ChildSpec:
 
         self.description = getattr(func, '__description__', None)
 
-    def param(self, name, type=str, default=None):
-        def deco(func):
-            pyname = name.replace('-', '_')
-            self.params[pyname] = ParamSpec(name, type, default, func)
-            return func
-        return deco
-
-    def flag(self, name):
-        def deco(func):
-            pyname = name.replace('-', '_')
-            self.flags[pyname] = FlagSpec(name, func)
-            return func
-        return deco
-
-    def child(self, name, **meta):
-        def deco(func):
-            child = ChildSpec(name, func, **meta)
-            self.children[name] = child
-            setattr(self, name, child)
-            return child
-        return deco
-
 
 class CommandSpec:
     def __init__(
@@ -168,19 +146,6 @@ def parse_line(raw: str) -> ParsedArgs:
 
 
 def parse_docstring_args(doc: str | None) -> dict[str, list[tuple[str, bool]]]:
-    """
-    Returns {arg_name: [(item_name, required_bool), ...]}.
-    Syntax:
-
-    args:
-        ram [rounding] [--raw]
-        cpu [rounding]
-        uptime [--raw]
-        tps [rounding] [mode]
-        players
-        version
-        platform
-    """
     result: dict[str, list[tuple[str, bool]]] = {}
     if not doc:
         return result
@@ -200,13 +165,7 @@ def parse_docstring_args(doc: str | None) -> dict[str, list[tuple[str, bool]]]:
         if not in_args:
             continue
 
-        # stop if we hit something that looks like non-args section
-        if ':' not in stripped and ' ' not in stripped and stripped != 'args:':
-            # still allow bare "players" etc
-            parts = stripped.split()
-        else:
-            parts = stripped.split()
-
+        parts = stripped.split()
         if not parts:
             continue
 
@@ -233,21 +192,21 @@ def generate_help(obj):
 
         if obj.children:
             lines.append('')
-            lines.append('Children:')
+            lines.append('    Children:')
             for cname, child in obj.children.items():
-                lines.append(f'  {cname}: {child.description or "No description"}')
+                lines.append(f'        {cname}: {child.description or "No description"}')
 
         if obj.flags:
             lines.append('')
-            lines.append('Flags:')
+            lines.append('    Flags:')
             for fname in obj.flags:
-                lines.append(f'  --{fname}')
+                lines.append(f'        --{fname}')
 
         if obj.params:
             lines.append('')
-            lines.append('Params:')
+            lines.append('    Params:')
             for pname, pspec in obj.params.items():
-                lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
+                lines.append(f'        {pname} (type={pspec.type_.__name__}, default={pspec.default})')
 
         return '\n'.join(lines)
 
@@ -256,13 +215,12 @@ def generate_help(obj):
         lines.append(f'{obj.name}: {obj.description or "No description"}')
         lines.append(f'Usage: {obj.name} [arg] [--flags] [params]')
 
-        # docstring-based args
         args_meta = parse_docstring_args(obj.func.__doc__)
         if args_meta:
             lines.append('')
-            lines.append('Args:')
+            lines.append('    Args:')
             for arg_name, items in args_meta.items():
-                line = f'  {arg_name}'
+                line = f'        {arg_name}'
                 for item_name, required in items:
                     if required:
                         line += f' {item_name}'
@@ -272,15 +230,15 @@ def generate_help(obj):
 
         if obj.flags:
             lines.append('')
-            lines.append('Flags:')
+            lines.append('    Flags:')
             for fname in obj.flags:
-                lines.append(f'  --{fname}')
+                lines.append(f'        --{fname}')
 
         if obj.params:
             lines.append('')
-            lines.append('Params:')
+            lines.append('    Params:')
             for pname, pspec in obj.params.items():
-                lines.append(f'  {pname} (type={pspec.type_.__name__}, default={pspec.default})')
+                lines.append(f'        {pname} (type={pspec.type_.__name__}, default={pspec.default})')
 
         return '\n'.join(lines)
 
@@ -299,7 +257,7 @@ def dispatch(cli, line: str):
     if 'help' in parsed.flags and not parsed.positional:
         return cli.safePrint(generate_help(cmd_spec))
 
-    cmd_spec.func()
+    cmd_spec.func(cli)
 
     if not cmd_spec.children:
         if 'help' in parsed.flags:
@@ -324,7 +282,33 @@ def dispatch(cli, line: str):
 
     g = child.func.__globals__
 
-    # params
+    for pname, pspec in cmd_spec.params.items():
+        if pname in parsed.params:
+            raw_value = parsed.params[pname]
+            try:
+                converted = pspec.type_(raw_value)
+            except Exception:
+                converted = pspec.default
+        else:
+            converted = pspec.default
+
+        def make_param_func(func=pspec.func, value=converted):
+            def wrapper():
+                return func(value)
+            return wrapper
+
+        g[pname] = make_param_func()
+
+    for fname, fspec in cmd_spec.flags.items():
+        present = fname in parsed.flags
+
+        def make_flag_func(func=fspec.func, present=present):
+            def wrapper():
+                return present
+            return wrapper
+
+        g[fname] = make_flag_func()
+
     for pname, pspec in child.params.items():
         if pname in parsed.params:
             raw_value = parsed.params[pname]
@@ -342,7 +326,6 @@ def dispatch(cli, line: str):
 
         g[pname] = make_param_func()
 
-    # flags
     for fname, fspec in child.flags.items():
         present = fname in parsed.flags
 

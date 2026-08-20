@@ -1,5 +1,3 @@
-# watchercli.py
-
 from hungerlib import utils
 from mapres import res, ascii_colors, setGlobalMaps
 from .watcher import ServerWatcher
@@ -15,7 +13,7 @@ class BufferingStdout:
 
     def write(self, text):
         if self.buffer.enabled and text.strip():
-            self.buffer.captured.append(text.rstrip("\n"))
+            self.buffer.captured.append(text.rstrip('\n'))
         self.real_stdout.write(text)
 
     def flush(self):
@@ -37,8 +35,8 @@ class WatcherCLI(LiveCLI):
 
 
 @command('stats', requires_children=True)
-def stats():
-    stats.__description__ = 'Retrieve and print server statistics'
+def stats(self):
+    __description__ = 'Retrieve and print server statistics'
 
 
 @stats.child('get', requires_arguments=False)
@@ -54,7 +52,6 @@ def stats_get(self, arg=None):
         platform
     '''
     __description__ = 'Retrieve and print all or specific server statistics'
-
     self.watcher.server.refresh()
 
     if arg is not None:
@@ -111,7 +108,7 @@ def raw():
 
 
 @command('view', requires_children=True)
-def view():
+def view(self):
     view.__description__ = 'Switch terminal view'
 
 
@@ -122,8 +119,12 @@ def view_cli(self):
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
+
     utils.clearTerminal()
+    self.safePrint('', end='')
+
     self.printHeader()
+
     for msg in self.buffer.captured:
         self.safePrint(msg)
 
@@ -134,8 +135,10 @@ def view_watcher(self):
 
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
+
     utils.clearTerminal()
-    self.printHeader()
+    self.safePrint('', end='')
+
     for msg in self.watcher.router.buffer.captured:
         self.safePrint(msg)
 
@@ -144,13 +147,6 @@ def view_watcher(self):
 def clear(self):
     clear.__description__ = 'Clear the CLI terminal'
 
-    # default: buffer:false
-    clear_buffer = False
-
-    # parse key:value pairs from params (buffer:true|false)
-    # our DSL already parses params as key:value tokens
-    # here we just look at globals injected by dispatch if needed
-    # but simpler: rely on a param
     buf = buffer()
     clear_buffer = bool(buf)
 
