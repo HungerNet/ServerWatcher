@@ -53,7 +53,7 @@ def stats_get(self, arg=None):
         version
         platform
     '''
-    stats_get.__description__ = 'Retrieve and print all or specific server statistics'
+    __description__ = 'Retrieve and print all or specific server statistics'
 
     self.watcher.server.refresh()
 
