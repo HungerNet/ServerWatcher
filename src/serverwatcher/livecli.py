@@ -49,7 +49,7 @@ class ChildSpec:
         self.children: dict[str, ChildSpec] = {}
 
         self.description = getattr(func, '__description__', None)
-    
+
     def param(self, name, type=str, default=None):
         def deco(func):
             pyname = name.replace('-', '_')
@@ -63,7 +63,6 @@ class ChildSpec:
             self.flags[pyname] = FlagSpec(name, func)
             return func
         return deco
-
 
 
 class CommandSpec:
@@ -199,17 +198,27 @@ def parse_docstring_args(doc: str | None) -> dict[str, list[tuple[str, bool]]]:
     return result
 
 
+def get_doc_description(func) -> str | None:
+    doc = func.__doc__
+    if not doc:
+        return None
+    first = doc.strip().splitlines()[0].strip()
+    return first or None
+
+
 def generate_help(obj):
     if isinstance(obj, CommandSpec):
+        desc = get_doc_description(obj.func) or obj.description or 'No description'
         lines = []
-        lines.append(f'{obj.name}: {obj.description or "No description"}')
+        lines.append(f'{obj.name}: {desc}')
         lines.append(f'Usage: {obj.name} [child] [arg] [--flags] [params]')
 
         if obj.children:
             lines.append('')
             lines.append('    Children:')
             for cname, child in obj.children.items():
-                lines.append(f'        {cname}: {child.description or "No description"}')
+                cdesc = get_doc_description(child.func) or child.description or 'No description'
+                lines.append(f'        {cname}: {cdesc}')
 
         if obj.flags:
             lines.append('')
@@ -226,8 +235,9 @@ def generate_help(obj):
         return '\n'.join(lines)
 
     if isinstance(obj, ChildSpec):
+        desc = get_doc_description(obj.func) or obj.description or 'No description'
         lines = []
-        lines.append(f'{obj.name}: {obj.description or "No description"}')
+        lines.append(f'{obj.name}: {desc}')
         lines.append(f'Usage: {obj.name} [arg] [--flags] [params]')
 
         args_meta = parse_docstring_args(obj.func.__doc__)
@@ -272,6 +282,35 @@ def dispatch(cli, line: str):
     if 'help' in parsed.flags and not parsed.positional:
         return cli.safePrint(generate_help(cmd_spec))
 
+    g_cmd = cmd_spec.func.__globals__
+
+    for pname, pspec in cmd_spec.params.items():
+        if pname in parsed.params:
+            raw_value = parsed.params[pname]
+            try:
+                converted = pspec.type_(raw_value)
+            except Exception:
+                converted = pspec.default
+        else:
+            converted = pspec.default
+
+        def make_param_func(func=pspec.func, value=converted):
+            def wrapper():
+                return func(value)
+            return wrapper
+
+        g_cmd[pname] = make_param_func()
+
+    for fname, fspec in cmd_spec.flags.items():
+        present = fname in parsed.flags
+
+        def make_flag_func(func=fspec.func, present=present):
+            def wrapper():
+                return present
+            return wrapper
+
+        g_cmd[fname] = make_flag_func()
+
     cmd_spec.func(cli)
 
     if not cmd_spec.children:
@@ -296,33 +335,6 @@ def dispatch(cli, line: str):
         return cli.safePrint(f'Subcommand {child.name} requires an argument')
 
     g = child.func.__globals__
-
-    for pname, pspec in cmd_spec.params.items():
-        if pname in parsed.params:
-            raw_value = parsed.params[pname]
-            try:
-                converted = pspec.type_(raw_value)
-            except Exception:
-                converted = pspec.default
-        else:
-            converted = pspec.default
-
-        def make_param_func(func=pspec.func, value=converted):
-            def wrapper():
-                return func(value)
-            return wrapper
-
-        g[pname] = make_param_func()
-
-    for fname, fspec in cmd_spec.flags.items():
-        present = fname in parsed.flags
-
-        def make_flag_func(func=fspec.func, present=present):
-            def wrapper():
-                return present
-            return wrapper
-
-        g[fname] = make_flag_func()
 
     for pname, pspec in child.params.items():
         if pname in parsed.params:

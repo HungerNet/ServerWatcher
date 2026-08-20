@@ -36,12 +36,16 @@ class WatcherCLI(LiveCLI):
 
 @command('stats', requires_children=True)
 def stats(self):
-    __description__ = 'Retrieve and print server statistics'
+    '''
+    Retrieve and print server statistics
+    '''
 
 
 @stats.child('get', requires_arguments=False)
 def stats_get(self, arg=None):
     '''
+    Retrieve and print all or specific server statistics
+
     args:
         ram [rounding] [--raw]
         cpu [rounding]
@@ -51,45 +55,44 @@ def stats_get(self, arg=None):
         version
         platform
     '''
-    __description__ = 'Retrieve and print all or specific server statistics'
     self.watcher.server.refresh()
 
-    if arg is not None:
-        gb = raw()
-        fmt = not raw()
-
-        unit = ''
-        match arg:
-            case 'ram':
-                value = self.watcher.server.getRAM(rounding=rounding(), gb=gb)
-                name = 'RAM'
-                unit = ' GB' if gb else ' MB'
-            case 'cpu':
-                value = self.watcher.server.getCPU(rounding=rounding())
-                name = 'CPU'
-                unit = '%'
-            case 'uptime':
-                value = self.watcher.server.getUptime(formatted=fmt)
-                name = 'Uptime'
-                unit = '' if fmt else 'ms'
-            case 'tps':
-                value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
-                name = 'TPS'
-            case 'players':
-                value = self.watcher.server.getPlayers()
-                name = 'Players'
-            case 'version':
-                value = self.watcher.server.version
-                name = 'Minecraft version'
-            case 'platform':
-                value = self.watcher.server.platform
-                name = 'Server platform'
-            case _:
-                return self.safePrint('Unknown stat')
-
-        self.bprint(f'{name}: {value}{unit}')
-    else:
+    if arg is None:
         return
+
+    gb = not raw()
+    fmt = not raw()
+
+    unit = ''
+    match arg:
+        case 'ram':
+            value = self.watcher.server.getRAM(rounding=rounding(), gb=gb)
+            name = 'RAM'
+            unit = ' GB' if gb else ' MB'
+        case 'cpu':
+            value = self.watcher.server.getCPU(rounding=rounding())
+            name = 'CPU'
+            unit = '%'
+        case 'uptime':
+            value = self.watcher.server.getUptime(formatted=fmt)
+            name = 'Uptime'
+            unit = '' if fmt else 'ms'
+        case 'tps':
+            value = self.watcher.server.getTPS(rounding=rounding(), mode=mode())
+            name = 'TPS'
+        case 'players':
+            value = self.watcher.server.getPlayers()
+            name = 'Players'
+        case 'version':
+            value = self.watcher.server.version
+            name = 'Minecraft version'
+        case 'platform':
+            value = self.watcher.server.platform
+            name = 'Server platform'
+        case _:
+            return self.safePrint('Unknown stat')
+
+    self.bprint(f'{name}: {value}{unit}')
 
 
 @stats.get.param('rounding', type=int, default=2)
@@ -109,13 +112,16 @@ def raw():
 
 @command('view', requires_children=True)
 def view(self):
-    view.__description__ = 'Switch terminal view'
+    '''
+    Switch terminal view
+    '''
 
 
 @view.child('cli')
 def view_cli(self):
-    view_cli.__description__ = 'Switch to CLI view'
-
+    '''
+    Switch to CLI view
+    '''
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -131,8 +137,9 @@ def view_cli(self):
 
 @view.child('watcher')
 def view_watcher(self):
-    view_watcher.__description__ = 'Switch to Watcher view'
-
+    '''
+    Switch to Watcher view
+    '''
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
 
@@ -145,18 +152,17 @@ def view_watcher(self):
 
 @command('clear')
 def clear(self):
-    clear.__description__ = 'Clear the CLI terminal'
-
-    buf = buffer()
-    clear_buffer = bool(buf)
-
-    if clear_buffer:
+    '''
+    Clear the CLI terminal
+    '''
+    no_buf = no_buffer()
+    if not no_buf:
         self.buffer.clear()
 
     utils.clearTerminal()
     self.printHeader()
 
 
-@clear.param('buffer', type=bool, default=False)
-def buffer(value):
-    return value
+@clear.flag('no-buffer')
+def no_buffer():
+    return True
