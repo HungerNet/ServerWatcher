@@ -423,21 +423,29 @@ class LiveCLI(cmd.Cmd):
             return ''.join(chars)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old)
+
     async def run(self):
         while True:
+            # print prompt (not buffered)
+            self.safePrint("> ", end="", write_buffer=False)
+
+            # read raw input
             line = await asyncio.to_thread(self.read_line_raw)
             line = line.strip()
             if not line:
                 continue
 
-            # Optional command capture
-            buf = getattr(self, 'buffer', None)
-            if buf is not None and getattr(buf, 'enabled', False):
-                if not line.startswith('view'):  # avoid double-storing view commands
-                    buf.captured.append(line)
+            # erase Pterodactyl echo
+            erase = "\b" * len(line)
+            self.safePrint(erase, end="", write_buffer=False)
 
+            # print our own prompt + command (buffered)
+            self.safePrint(f"> {line}", write_buffer=True)
+
+            # execute command
             stop = await asyncio.to_thread(self.onecmd, line)
             if stop:
                 break
+
     def onecmd(self, line):
         return dispatch(self, line)
