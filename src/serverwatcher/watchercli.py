@@ -28,7 +28,7 @@ class WatcherCLI(LiveCLI):
         self.safePrint(res('<yellow>-----------------------------------'))
         self.safePrint('')
 
-@command('stats')
+@command('stats', root_command=True)
 def stats(self):
     '''
     Retrieve and print server statistics
