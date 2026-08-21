@@ -435,11 +435,10 @@ class LiveCLI(cmd.Cmd):
             if not line:
                 continue
 
-            # erase Pterodactyl echo
-            erase = "\b" * len(line)
-            self.safePrint(erase, end="", write_buffer=False)
+            # ERASE PTERODACTYL ECHO BEFORE PRINTING YOUR PROMPT
+            self.safePrint("\b" * len(line), end="", write_buffer=False)
 
-            # print our own prompt + command (buffered)
+            # NOW print your own prompt + command (buffered)
             self.safePrint(f"> {line}", write_buffer=True)
 
             # execute command
