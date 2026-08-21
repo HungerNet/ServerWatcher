@@ -220,34 +220,34 @@ def parse_line(raw):
 def help_command(cmd):
     lines = []
     d = cmd.desc or 'No description'
-    lines.append(f'{cmd.name}: {d}')
+    lines.append(res(f'<bold><yellow>{cmd.name}<reset>: <gray>{d}<reset>'))
 
     if cmd.children:
         if cmd.is_namespace:
-            u = res(f'<green>Usage: {cmd.name} \<child\>')
+            u = res(f'<aqua>Usage:<reset> <gold>{cmd.name}<reset> <dark_gray>\\<<reset>child<dark_gray>\\><reset>')
         else:
-            u = f'Usage: {cmd.name} [child]'
+            u = res(f'<aqua>Usage:<reset> <gold>{cmd.name}<reset> <dark_gray>[<reset>child<dark_gray>]<reset>')
     else:
-        u = f'Usage: {cmd.name}'
+        u = res(f'<aqua>Usage:<reset> <gold>{cmd.name}<reset>')
 
     if cmd.flags:
-        u += ' [--flags]'
+        u += res(' <dark_gray>[<reset>--flags<dark_gray>]<reset>')
 
     lines.append(u)
 
     if cmd.flags:
         lines.append('')
-        lines.append('\0    Flags:')
+        lines.append(res('\0    <light_purple>Flags:<reset>'))
         for n, fs in cmd.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{fs.name}: {d}')
+            lines.append(res(f'\0        <blue>--{fs.name}<reset>: <gray>{d}<reset>'))
 
     if cmd.children:
         lines.append('')
-        lines.append('\0    Children:')
+        lines.append(res('\0    <light_purple>Children:<reset>'))
         for n, c in cmd.children.items():
             cd = c.desc or 'No description'
-            lines.append(f'\0        {n}: {cd}')
+            lines.append(res(f'\0        <green>{n}<reset>: <gray>{cd}<reset>'))
 
     return '\n'.join(lines)
 
@@ -255,83 +255,92 @@ def help_child(child):
     lines = []
     d = child.desc or 'No description'
     p = child.parent.name
-    lines.append(f'{child.name}: {d}')
-    u = f'Usage: {p} {child.name}'
+    lines.append(res(f'<bold><green>{child.name}<reset>: <gray>{d}<reset>'))
+
+    u = res(f'<aqua>Usage:<reset> <gold>{p}<reset> <green>{child.name}<reset>')
     if child.requires_arg:
-        u += ' <arg>'
+        u += res(' <dark_gray>\\<<reset>arg<dark_gray>\\><reset>')
     elif child.optional_arg:
-        u += ' [arg]'
+        u += res(' <dark_gray>[<reset>arg<dark_gray>]<reset>')
     if child.params:
-        u += ' [params]'
+        u += res(' <dark_gray>[<reset>params<dark_gray>]<reset>')
     if child.flags:
-        u += ' [--flags]'
+        u += res(' <dark_gray>[<reset>--flags<dark_gray>]<reset>')
     lines.append(u)
+
     if child.args_meta:
         lines.append('')
-        lines.append('\0    Args:')
+        lines.append(res('\0    <light_purple>Args:<reset>'))
         for a, m in child.args_meta.items():
-            parts = [a]
+            parts = [res(f'<green>{a}<reset>')]
             for pn in m.params:
-                parts.append(f'[{pn}]')
+                parts.append(res(f'<dark_gray>[<reset>{pn}<dark_gray>]<reset>'))
             for fn in m.flags:
-                parts.append(f'[--{fn}]')
+                parts.append(res(f'<dark_gray>[<reset>--{fn}<dark_gray>]<reset>'))
             lines.append('\0        ' + ' '.join(parts))
+
     if child.params:
         lines.append('')
-        lines.append('\0    Params:')
+        lines.append(res('\0    <light_purple>Params:<reset>'))
         for n, ps in child.params.items():
             t = ps.type_.__name__
             d = ps.desc or 'No description'
-            lines.append(f'\0        {n} (type={t}, default={ps.default}): {d}')
+            lines.append(res(f'\0        <blue>{n}<reset> (type=<gold>{t}<reset>, default=<gray>{ps.default}<reset>): <gray>{d}<reset>'))
+
     if child.flags:
         lines.append('')
-        lines.append('\0    Flags:')
+        lines.append(res('\0    <light_purple>Flags:<reset>'))
         for n, fs in child.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{fs.name}: {d}')
+            lines.append(res(f'\0        <blue>--{fs.name}<reset>: <gray>{d}<reset>'))
+
     return '\n'.join(lines)
 
 def help_arg(child, meta):
     lines = []
     p = child.parent.name
     a = meta.name
-    lines.append(f'{a}: Retrieve and print the {a} of the server')
-    u = f'Usage: {p} {child.name} {a}'
+    lines.append(res(f'<bold><aqua>{a}<reset>: <gray>Retrieve and print the {a} of the server<reset>'))
+
+    u = res(f'<aqua>Usage:<reset> <gold>{p}<reset> <green>{child.name}<reset> <aqua>{a}<reset>')
     req = []
     opt = []
     for pn in meta.params:
         ps = child.params.get(pn)
         t = ps.type_.__name__ if ps else 'str'
         if pn in meta.required_params:
-            req.append(f'<{pn}:{t}>')
+            req.append(res(f'<dark_gray>\\<<reset>{pn}:{t}<dark_gray>\\><reset>'))
         else:
-            opt.append(f'[{pn}:{t}]')
+            opt.append(res(f'<dark_gray>[<reset>{pn}:{t}<dark_gray>]<reset>'))
     if req:
         u += ' ' + ' '.join(req)
     if opt:
         u += ' ' + ' '.join(opt)
     if meta.flags:
-        u += ' [--flags]'
+        u += res(' <dark_gray>[<reset>--flags<dark_gray>]<reset>')
     lines.append(u)
+
     if meta.params:
         lines.append('')
-        lines.append('\0    Params:')
+        lines.append(res('\0    <light_purple>Params:<reset>'))
         for pn in meta.params:
             ps = child.params.get(pn)
             if not ps:
                 continue
             t = ps.type_.__name__
             d = ps.desc or 'No description'
-            lines.append(f'\0        {pn} (type={t}, default={ps.default}): {d}')
+            lines.append(res(f'\0        <blue>{pn}<reset> (type=<gold>{t}<reset>, default=<gray>{ps.default}<reset>): <gray>{d}<reset>'))
+
     if meta.flags:
         lines.append('')
-        lines.append('\0    Flags:')
+        lines.append(res('\0    <light_purple>Flags:<reset>'))
         for fn in meta.flags:
             fs = child.flags.get(fn)
             if not fs:
                 continue
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{fn}: {d}')
+            lines.append(res(f'\0        <blue>--{fn}<reset>: <gray>{d}<reset>'))
+
     return '\n'.join(lines)
 
 def dispatch(cli, line):
@@ -340,29 +349,29 @@ def dispatch(cli, line):
         return
     cmd = COMMANDS.get(p.sub)
     if not cmd:
-        return cli.safePrint(f'Unknown command {p.sub}')
+        return cli.safePrint(res(f'<red>Error:<reset> <gray>Unknown command {p.sub}<reset>'))
     if 'help' in p.flags and not p.pos:
         return cli.safePrint(help_command(cmd))
     if cmd.children:
         if not p.pos:
-            return cli.safePrint('Missing subcommand')
+            return cli.safePrint(res('<red>Error:<reset> <gray>Missing subcommand<reset>'))
     else:
         return cmd.func(cli)
     cname = p.pos[0]
     child = cmd.children.get(cname)
     if not child:
-        return cli.safePrint(f'Unknown subcommand {cname}')
+        return cli.safePrint(res(f'<red>Error:<reset> <gray>Unknown subcommand {cname}<reset>'))
     if 'help' in p.flags and len(p.pos) == 1:
         return cli.safePrint(help_child(child))
     if 'help' in p.flags and len(p.pos) >= 2:
         an = p.pos[1]
         meta = child.args_meta.get(an)
         if not meta:
-            return cli.safePrint(f'Unknown argument {an}')
+            return cli.safePrint(res(f'<red>Error:<reset> <gray>Unknown argument {an}<reset>'))
         return cli.safePrint(help_arg(child, meta))
     arg = p.pos[1] if len(p.pos) > 1 else None
     if child.requires_arg and arg is None:
-        return cli.safePrint(f'Subcommand {child.name} requires an argument')
+        return cli.safePrint(res(f'<red>Error:<reset> <gray>Subcommand {child.name} requires an argument<reset>'))
     g = child.func.__globals__
     for n, ps in child.params.items():
         if n in p.params:
@@ -391,6 +400,7 @@ def dispatch(cli, line):
 
 class LiveCLI(cmd.Cmd):
     prompt = ''
+
     def safePrint(self, msg='', end='\n'):
         print(str(msg), end=end)
     def bprint(self, msg):
