@@ -153,10 +153,11 @@ class CommandSpec:
 
     def _infer_namespace(self):
         src = inspect.getsource(self.func)
-        body = src.split('\n', 1)[1]
+        lines = src.splitlines()
+
         stripped = []
-        for l in body.splitlines():
-            s = l.strip()
+        for line in lines[1:]:
+            s = line.strip()
             if not s:
                 continue
             if s == 'pass':
