@@ -231,9 +231,17 @@ def help_command(cmd):
     d = cmd.desc or 'No description'
     lines.append(f'{cmd.name}: {d}')
 
-    u = f'Usage: {cmd.name}'
+    if cmd.children:
+        if cmd.is_namespace and len(cmd.children) == 1:
+            u = f'Usage: {cmd.name} <child>'
+        else:
+            u = f'Usage: {cmd.name} [child]'
+    else:
+        u = f'Usage: {cmd.name}'
+
     if cmd.flags:
         u += ' [--flags]'
+
     lines.append(u)
 
     if cmd.flags:
@@ -241,7 +249,7 @@ def help_command(cmd):
         lines.append('\0    Flags:')
         for n, fs in cmd.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{n}: {d}')
+            lines.append(f'\0        --{fs.name}: {d}')
 
     if cmd.children:
         lines.append('')
@@ -289,7 +297,7 @@ def help_child(child):
         lines.append('\0    Flags:')
         for n, fs in child.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{n}: {d}')
+            lines.append(f'\0        --{fs.name}: {d}')
     return '\n'.join(lines)
 
 def help_arg(child, meta):
