@@ -146,4 +146,3 @@ def clear(self):
 def no_buffer():
     '''Do not clear buffer'''
     return True
-Z
