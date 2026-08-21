@@ -154,7 +154,16 @@ class CommandSpec:
     def _infer_namespace(self):
         src = inspect.getsource(self.func)
         body = src.split('\n', 1)[1]
-        stripped = [l.strip() for l in body.splitlines() if l.strip() not in ('', 'pass')]
+        stripped = []
+        for l in body.splitlines():
+            s = l.strip()
+            if not s:
+                continue
+            if s == 'pass':
+                continue
+            if s.startswith("'''") or s.startswith('"""'):
+                continue
+            stripped.append(s)
         return stripped == []
 
     def param(self, name, type=str, default=None):
