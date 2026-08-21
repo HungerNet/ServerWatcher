@@ -6,15 +6,15 @@ from .livecli import LiveCLI, command
 setGlobalMaps(ascii_colors)
 
 class BufferingStdout:
-    def __init__(self, buffer, real):
+    def __init__(self, buffer, real_stdout):
         self.buffer = buffer
-        self.real = real
+        self.real_stdout = real_stdout
     def write(self, text):
         if self.buffer.enabled and text.strip():
             self.buffer.captured.append(text.rstrip('\n'))
-        self.real.write(text)
+        self.real_stdout.write(text)
     def flush(self):
-        self.real.flush()
+        self.real_stdout.flush()
 
 class WatcherCLI(LiveCLI):
     def __init__(self, watcher: ServerWatcher):

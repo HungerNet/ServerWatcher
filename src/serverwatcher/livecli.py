@@ -1,5 +1,3 @@
-# livecli.py
-
 from dataclasses import dataclass
 import cmd
 import sys
@@ -41,12 +39,34 @@ class ChildSpec:
         self.flags = {}
         self.args_meta = {}
         self.desc = self._doc(func)
+        self._extract_args_block()
         self._parse_args_meta()
         self._infer_arg_requirement()
 
     def _doc(self, f):
         d = f.__doc__
         return d.strip().splitlines()[0].strip() if d else None
+
+    def _extract_args_block(self):
+        src = inspect.getsource(self.func)
+        lines = src.splitlines()
+        block = []
+        in_block = False
+        for line in lines:
+            s = line.strip()
+            if s.startswith('__args__'):
+                in_block = True
+                continue
+            if in_block:
+                if s.startswith("'''") or s.startswith('"""'):
+                    if not block:
+                        continue
+                    else:
+                        break
+                block.append(line)
+        if block:
+            raw = '\n'.join(l.strip() for l in block)
+            setattr(self.func, '__args__', raw)
 
     def _parse_args_meta(self):
         raw = getattr(self.func, '__args__', None)
@@ -134,8 +154,8 @@ class CommandSpec:
     def _infer_namespace(self):
         src = inspect.getsource(self.func)
         body = src.split('\n', 1)[1]
-        stripped = [l.strip() for l in body.splitlines() if l.strip()]
-        return stripped == [] or stripped == ['pass']
+        stripped = [l.strip() for l in body.splitlines() if l.strip() not in ('', 'pass')]
+        return stripped == []
 
     def param(self, name, type=str, default=None):
         def deco(f):
