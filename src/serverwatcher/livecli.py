@@ -161,7 +161,7 @@ class CommandSpec:
                 continue
             if s == 'pass':
                 continue
-            if s.startswith("'''") or s.startswith('\"\"\"'):
+            if s.startswith(("'''", '"""')) or s.endswith(("'''", '"""')):
                 continue
             stripped.append(s)
         return stripped == []
