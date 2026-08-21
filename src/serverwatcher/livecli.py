@@ -227,10 +227,10 @@ def help_command(cmd):
         else:
             lines.append(f'Usage: {cmd.name} [child]')
         lines.append('')
-        lines.append('    Children:')
+        lines.append('+    Children:')
         for n, c in cmd.children.items():
             cd = c.desc or 'No description'
-            lines.append(f'        {n}: {cd}')
+            lines.append(f'+        {n}: {cd}')
     else:
         lines.append(f'Usage: {cmd.name}')
     return '\n'.join(lines)
@@ -252,27 +252,27 @@ def help_child(child):
     lines.append(u)
     if child.args_meta:
         lines.append('')
-        lines.append('    Args:')
+        lines.append('+    Args:')
         for a, m in child.args_meta.items():
             parts = [a]
             for pn in m.params:
                 parts.append(f'[{pn}]')
             for fn in m.flags:
                 parts.append(f'[--{fn}]')
-            lines.append('        ' + ' '.join(parts))
+            lines.append('+        ' + ' '.join(parts))
     if child.params:
         lines.append('')
-        lines.append('    Params:')
+        lines.append('+    Params:')
         for n, ps in child.params.items():
             t = ps.type_.__name__
             d = ps.desc or 'No description'
-            lines.append(f'        {n} (type={t}, default={ps.default}): {d}')
+            lines.append(f'+        {n} (type={t}, default={ps.default}): {d}')
     if child.flags:
         lines.append('')
-        lines.append('    Flags:')
+        lines.append('+    Flags:')
         for n, fs in child.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'        --{n}: {d}')
+            lines.append(f'+        --{n}: {d}')
     return '\n'.join(lines)
 
 def help_arg(child, meta):
@@ -299,23 +299,23 @@ def help_arg(child, meta):
     lines.append(u)
     if meta.params:
         lines.append('')
-        lines.append('    Params:')
+        lines.append('+    Params:')
         for pn in meta.params:
             ps = child.params.get(pn)
             if not ps:
                 continue
             t = ps.type_.__name__
             d = ps.desc or 'No description'
-            lines.append(f'        {pn} (type={t}, default={ps.default}): {d}')
+            lines.append(f'+        {pn} (type={t}, default={ps.default}): {d}')
     if meta.flags:
         lines.append('')
-        lines.append('    Flags:')
+        lines.append('+    Flags:')
         for fn in meta.flags:
             fs = child.flags.get(fn)
             if not fs:
                 continue
             d = fs.desc or 'No description'
-            lines.append(f'        --{fn}: {d}')
+            lines.append(f'+        --{fn}: {d}')
     return '\n'.join(lines)
 
 def dispatch(cli, line):
