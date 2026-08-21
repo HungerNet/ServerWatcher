@@ -58,7 +58,7 @@ class ChildSpec:
                 in_block = True
                 continue
             if in_block:
-                if s.startswith("'''") or s.startswith('"""'):
+                if s.startswith(("'''", '"""')):
                     if not block:
                         continue
                     else:
@@ -138,34 +138,19 @@ class ChildSpec:
         return deco
 
 class CommandSpec:
-    def __init__(self, name, func):
+    def __init__(self, name, func, root_command=False):
         self.name = name
         self.func = func
         self.children = {}
         self.params = {}
         self.flags = {}
         self.desc = self._doc(func)
-        self.is_namespace = self._infer_namespace()
+
+        self.is_namespace = root_command
 
     def _doc(self, f):
         d = f.__doc__
         return d.strip().splitlines()[0].strip() if d else None
-
-    def _infer_namespace(self):
-        src = inspect.getsource(self.func)
-        lines = src.splitlines()
-
-        stripped = []
-        for line in lines[1:]:
-            s = line.strip()
-            if not s:
-                continue
-            if s == 'pass':
-                continue
-            if s.startswith(("'''", '"""')) or s.endswith(("'''", '"""')):
-                continue
-            stripped.append(s)
-        return stripped == []
 
     def param(self, name, type=str, default=None):
         def deco(f):
@@ -192,9 +177,9 @@ class CommandSpec:
         return deco
 
 class CommandDSL:
-    def __call__(self, name):
+    def __call__(self, name, root_command=False):
         def deco(f):
-            spec = CommandSpec(name, f)
+            spec = CommandSpec(name, f, root_command=root_command)
             COMMANDS[name] = spec
             return spec
         return deco
@@ -233,7 +218,7 @@ def help_command(cmd):
     lines.append(f'{cmd.name}: {d}')
 
     if cmd.children:
-        if cmd.is_namespace and len(cmd.children) > 0:
+        if cmd.is_namespace:
             u = f'Usage: {cmd.name} <child>'
         else:
             u = f'Usage: {cmd.name} [child]'
@@ -298,7 +283,7 @@ def help_child(child):
         lines.append('\0    Flags:')
         for n, fs in child.flags.items():
             d = fs.desc or 'No description'
-            lines.append(f'\0        --{fs.name}: {d}')
+            lines.append(f'\0        --{fs.name}: {d}')
     return '\n'.join(lines)
 
 def help_arg(child, meta):
