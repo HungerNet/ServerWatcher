@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.26'
+version: '6-dev.27'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -33,3 +33,5 @@ description: |
     - clear
   Dev 22-26:
   - Debugging and fixes
+  Dev 27:
+  - Full CLI rewrite
