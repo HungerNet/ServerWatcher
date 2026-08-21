@@ -143,7 +143,7 @@ class ChildSpec:
         return deco
 
 class CommandSpec:
-    def __init__(self, name, func, root_command=False):
+    def __init__(self, name, func, namespace=False):
         self.name = name
         self.func = func
         self.children = {}
@@ -151,7 +151,7 @@ class CommandSpec:
         self.flags = {}
         self.desc = self._doc(func)
 
-        self.is_namespace = root_command
+        self.is_namespace = namespace
 
     def _doc(self, f):
         d = f.__doc__
@@ -182,9 +182,9 @@ class CommandSpec:
         return deco
 
 class CommandDSL:
-    def __call__(self, name, root_command=False):
+    def __call__(self, name, namespace=False):
         def deco(f):
-            spec = CommandSpec(name, f, root_command=root_command)
+            spec = CommandSpec(name, f, namespace=namespace)
             COMMANDS[name] = spec
             return spec
         return deco
@@ -402,9 +402,14 @@ class LiveCLI(cmd.Cmd):
     prompt = ''
 
     def safePrint(self, msg='', end='\n'):
-        print(str(msg), end=end)
-    def bprint(self, msg):
-        self.safePrint(msg)
+        text = str(msg)
+
+        # Optional buffering: only if subclass defines self.buffer
+        buf = getattr(self, 'buffer', None)
+        if buf is not None and getattr(buf, 'enabled', False) and text.strip():
+            buf.captured.append(text.rstrip('\n'))
+
+        print(text, end=end)
     def read_line_raw(self):
         fd = sys.stdin.fileno()
         old = termios.tcgetattr(fd)
@@ -425,6 +430,13 @@ class LiveCLI(cmd.Cmd):
             line = line.strip()
             if not line:
                 continue
+
+            # Optional command capture
+            buf = getattr(self, 'buffer', None)
+            if buf is not None and getattr(buf, 'enabled', False):
+                if not line.startswith('view'):  # avoid double-storing view commands
+                    buf.captured.append(line)
+
             stop = await asyncio.to_thread(self.onecmd, line)
             if stop:
                 break

@@ -28,7 +28,7 @@ class WatcherCLI(LiveCLI):
         self.safePrint(res('<yellow>-----------------------------------'))
         self.safePrint('')
 
-@command('stats', root_command=True)
+@command('stats', namespace=True)
 def stats(self):
     '''
     Retrieve and print server statistics
@@ -81,7 +81,7 @@ def stats_get(self, arg=None):
             name = 'Server platform'
         case _:
             return self.safePrint('Unknown stat')
-    self.bprint(f'{name}: {value}{unit}')
+    self.safePrint(f'{name}: {value}{unit}')
 
 @stats.get.param('rounding', type=int, default=2)
 def rounding(value):
@@ -98,7 +98,7 @@ def raw():
     '''Return the raw value instead of the formatted string'''
     return True
 
-@command('view')
+@command('view', namespace=True)
 def view(self):
     '''
     Switch terminal view
@@ -136,8 +136,7 @@ def clear(self):
     '''
     Clear the CLI terminal
     '''
-    no_buf = no_buffer()
-    if not no_buf:
+    if not no_buffer():
         self.buffer.clear()
     utils.clearTerminal()
     self.printHeader()
