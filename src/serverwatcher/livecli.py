@@ -232,7 +232,7 @@ def help_command(cmd):
     lines.append(f'{cmd.name}: {d}')
 
     if cmd.children:
-        if cmd.is_namespace and len(cmd.children) == 1:
+        if cmd.is_namespace and len(cmd.children) > 0:
             u = f'Usage: {cmd.name} <child>'
         else:
             u = f'Usage: {cmd.name} [child]'
