@@ -23,10 +23,10 @@ class WatcherCLI(LiveCLI):
         self.buffer = utils.Buffer(enabled=True)
         self.outputMode = 'both'
     def printHeader(self):
-        self.safePrint(res('<yellow>-----------------------------------'))
-        self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'))
-        self.safePrint(res('<yellow>-----------------------------------'))
-        self.safePrint('')
+        self.safePrint(res('<yellow>-----------------------------------'), write_buffer=False)
+        self.safePrint(res('<yellow>-------- <aqua>ServerWatcher CLI <yellow>--------'), write_buffer=False)
+        self.safePrint(res('<yellow>-----------------------------------'), write_buffer=False)
+        self.safePrint('', write_buffer=False)
 
 @command('stats', namespace=True)
 def stats(self):
