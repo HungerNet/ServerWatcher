@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.27'
+version: '6-dev.28'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -35,3 +35,5 @@ description: |
   - Debugging and fixes
   Dev 27:
   - Full CLI rewrite
+  Dev 28:
+  - Fixed uptime logic (hungerlib update)

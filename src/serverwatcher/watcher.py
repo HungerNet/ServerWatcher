@@ -237,7 +237,7 @@ class ServerWatcher:
         if self.config.debug:
             self.router.debug(f'RAM: {snap.ram}/{self.watcherconfig.threshold_ram}')
             self.router.debug(f'CPU: {snap.cpu}/{self.watcherconfig.threshold_cpu}')
-            self.router.debug(f'Uptime: {snap.uptime // 3600}/{self.watcherconfig.threshold_uptime}')
+            self.router.debug(f'Uptime: {(snap.uptime // 1000) // 3600}/{self.watcherconfig.threshold_uptime}') # outputs raw ms, must convert to seconds first. this was changed in 6-dev.28
             self.router.debug(f'TPS: {snap.tps}/{self.watcherconfig.threshold_tps}')
             self.router.debug(f'Players: {snap.players}/{self.server.max_players}')
 
@@ -249,7 +249,7 @@ class ServerWatcher:
             restart_reasons.append(self.res(self.messages.reason_cpu, cpu=snap.cpu, threshold=self.watcherconfig.threshold_cpu))
             pro += self.watcherconfig.weight_cpu
 
-        if snap.uptime // 3600 >= self.watcherconfig.threshold_uptime:
+        if (snap.uptime // 1000) // 3600 >= self.watcherconfig.threshold_uptime: # outputs raw ms, must convert to seconds first. this was changed in 6-dev.28
             restart_reasons.append(self.res(self.messages.reason_uptime, uptime=snap.uptime_formatted, threshold=self.watcherconfig.threshold_uptime))
             pro += self.watcherconfig.weight_uptime
 
