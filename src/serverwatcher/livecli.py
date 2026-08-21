@@ -161,7 +161,7 @@ class CommandSpec:
                 continue
             if s == 'pass':
                 continue
-            if s.startswith("'''") or s.startswith('"""'):
+            if s.startswith("'''") or s.startswith('\"\"\"'):
                 continue
             stripped.append(s)
         return stripped == []
@@ -230,18 +230,26 @@ def help_command(cmd):
     lines = []
     d = cmd.desc or 'No description'
     lines.append(f'{cmd.name}: {d}')
+
+    u = f'Usage: {cmd.name}'
+    if cmd.flags:
+        u += ' [--flags]'
+    lines.append(u)
+
+    if cmd.flags:
+        lines.append('')
+        lines.append('\0    Flags:')
+        for n, fs in cmd.flags.items():
+            d = fs.desc or 'No description'
+            lines.append(f'\0        --{n}: {d}')
+
     if cmd.children:
-        if cmd.is_namespace and len(cmd.children) == 1:
-            lines.append(f'Usage: {cmd.name} <child>')
-        else:
-            lines.append(f'Usage: {cmd.name} [child]')
         lines.append('')
         lines.append('\0    Children:')
         for n, c in cmd.children.items():
             cd = c.desc or 'No description'
             lines.append(f'\0        {n}: {cd}')
-    else:
-        lines.append(f'Usage: {cmd.name}')
+
     return '\n'.join(lines)
 
 def help_child(child):
