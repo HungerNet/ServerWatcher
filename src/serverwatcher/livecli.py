@@ -6,6 +6,11 @@ import tty
 import asyncio
 import inspect
 
+from mapres import res, ascii_colors, setGlobalMaps
+
+setGlobalMaps(ascii_colors)
+
+
 COMMANDS = {}
 
 @dataclass
@@ -219,7 +224,7 @@ def help_command(cmd):
 
     if cmd.children:
         if cmd.is_namespace:
-            u = f'Usage: {cmd.name} <child>'
+            u = res(f'<green>Usage: {cmd.name} \<child\>')
         else:
             u = f'Usage: {cmd.name} [child]'
     else:
