@@ -117,7 +117,7 @@ def view_cli(self):
     self.safePrint('', end='')
     self.printHeader()
     for msg in self.buffer.captured:
-        self.safePrint(msg)
+        self.safePrint(msg, write_buffer=False)
 
 @view.child('watcher')
 def view_watcher(self):
@@ -129,7 +129,7 @@ def view_watcher(self):
     utils.clearTerminal()
     self.safePrint('', end='')
     for msg in self.watcher.router.buffer.captured:
-        self.safePrint(msg)
+        self.safePrint(msg, write_buffer=False)
 
 @command('clear')
 def clear(self):
