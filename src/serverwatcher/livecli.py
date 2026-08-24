@@ -426,20 +426,19 @@ class LiveCLI(cmd.Cmd):
 
     async def run(self):
         while True:
-            # print prompt (not buffered)
-            self.safePrint("> ", end="", write_buffer=False)
-
-            # read raw input
             line = await asyncio.to_thread(self.read_line_raw)
             line = line.strip()
             if not line:
                 continue
 
-            # ERASE PTERODACTYL ECHO BEFORE PRINTING YOUR PROMPT
-            self.safePrint("\b" * len(line), end="", write_buffer=False)
+            # buffer the command (but not view commands)
+            buf = getattr(self, 'buffer', None)
+            if buf is not None and getattr(buf, 'enabled', False):
+                if not line.startswith('view'):
+                    buf.captured.append(f"> {line}")
 
-            # NOW print your own prompt + command (buffered)
-            self.safePrint(f"> {line}", write_buffer=True)
+            # print your own prompt + command
+            self.safePrint(f"> {line}", write_buffer=False)
 
             # execute command
             stop = await asyncio.to_thread(self.onecmd, line)
