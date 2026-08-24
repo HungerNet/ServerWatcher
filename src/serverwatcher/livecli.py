@@ -435,7 +435,8 @@ class LiveCLI(cmd.Cmd):
             buf = getattr(self, 'buffer', None)
             if buf is not None and getattr(buf, 'enabled', False):
                 if not line.startswith('view'):
-                    buf.captured.append(f"> {line}")
+                    # buf.captured.append(f"> {line}")
+                    buf.captured.append(line)
 
             # print your own prompt + command
             self.safePrint(f"> {line}", write_buffer=False)
