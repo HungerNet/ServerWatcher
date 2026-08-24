@@ -434,11 +434,12 @@ class LiveCLI(cmd.Cmd):
             # buffer the command (but not view commands)
             buf = getattr(self, 'buffer', None)
             if buf is not None and getattr(buf, 'enabled', False):
-                if not line.startswith('view'):
+                if not line.startswith(("view", "clear")):
                     buf.captured.append(line)
 
             # execute command
             stop = await asyncio.to_thread(self.onecmd, line)
+            self.safePrint("", write_buffer=False)
             if stop:
                 break
 
