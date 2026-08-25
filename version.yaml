@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.53'
+version: '6-dev.54'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -43,3 +43,6 @@ description: |
   - Debugging
   Dev 53:
   - Uses relative imports
+  Dev 54:
+  - Now uses C2E instead of built-in livecli.py
+  - Update deps

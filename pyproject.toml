@@ -25,11 +25,9 @@ keywords = [
 ]
 
 dependencies = [
-    "requests",
-    "mcrcon",
     "hungerlib>=3.1",
-    "PyYaml",
     "mapres",
+    "C2E",
 ]
 
 classifiers = [
