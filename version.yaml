@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.55'
+version: '6-dev.56'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -48,3 +48,5 @@ description: |
   - Update deps
   Dev 55:
   - Fixed import
+  Dev 56:
+  - Removed "rcon" keyword from pyproject.toml
