@@ -1,7 +1,7 @@
 from hungerlib import utils
 from mapres import res, ascii_colors, setGlobalMaps
-from .watcher import ServerWatcher
-from .livecli import LiveCLI, command
+from watcher import ServerWatcher
+from livecli import LiveCLI, command
 
 setGlobalMaps(ascii_colors)
 

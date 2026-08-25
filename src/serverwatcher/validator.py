@@ -3,9 +3,9 @@ from dataclasses import fields
 
 from hungerlib import utils, loadConfig, Validator
 
-from serverwatcher.configclasses.config import GlobalConfig
-from serverwatcher.configclasses.messages import MessagesConfig
-from serverwatcher.configclasses.watcher import WatcherConfig
+from .configclasses.config import GlobalConfig
+from .configclasses.messages import MessagesConfig
+from .configclasses.watcher import WatcherConfig
 
 
 utils.clearTerminal()

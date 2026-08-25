@@ -6,9 +6,9 @@ from hungerlib import servers, MessageRouter, loadConfig, WebhookClient, utils
 from hungerlib.configloader import deep_get
 from mapres import MapResolver, maps
 
-from serverwatcher.configclasses.config import GlobalConfig
-from serverwatcher.configclasses.messages import MessagesConfig
-from serverwatcher.configclasses.watcher import WatcherConfig
+from .configclasses.config import GlobalConfig
+from .configclasses.messages import MessagesConfig
+from .configclasses.watcher import WatcherConfig
 
 
 class ServerWatcher:
