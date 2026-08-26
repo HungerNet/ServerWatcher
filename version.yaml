@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.60'
+version: '6-dev.61'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -58,3 +58,5 @@ description: |
   - Rename `stats get` to `stats` (issue 4)
   Dev 60:
   - Simplify docstrings
+  Dev 61:
+  - Update egg to include C2E startup variable

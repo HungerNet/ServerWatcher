@@ -12,7 +12,7 @@
         "Python 3.14": "ghcr.io/red-shadows-rs/pterodactyl-containers/python:v3.14"
     },
     "file_denylist": [],
-    "startup": "pip install --upgrade pip && ( [[ \"{{SERVERWATCHER_DEV}}\" == \"1\" ]] && pip install -U --pre serverwatcher || pip install -U serverwatcher ) && ( [[ \"{{HUNGERLIB_DEV}}\" == \"1\" ]] && pip install -U --pre hungerlib || pip install -U hungerlib ) && ( [[ \"{{MAPRES_DEV}}\" == \"1\" ]] && pip install -U --pre mapres || pip install -U mapres ) && python3 -m serverwatcher",
+    "startup": "pip install --upgrade pip && ( [[ \"{{SERVERWATCHER_DEV}}\" == \"1\" ]] && pip install -U --pre serverwatcher || pip install -U serverwatcher ) && ( [[ \"{{HUNGERLIB_DEV}}\" == \"1\" ]] && pip install -U --pre hungerlib || pip install -U hungerlib ) && ( [[ \"{{MAPRES_DEV}}\" == \"1\" ]] && pip install -U --pre mapres || pip install -U mapres ) && ( [[ \"{{C2E_DEV}}\" == \"1\" ]] && pip install -U --pre c2e || pip install -U c2e ) && python3 -m serverwatcher",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"ServerWatcher is running!\"\r\n}",
@@ -51,6 +51,16 @@
             "name": "mapres dev",
             "description": "Install mapres prerelease versions",
             "env_variable": "MAPRES_DEV",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "C2E dev",
+            "description": "Install C2E prerelease versions",
+            "env_variable": "C2E_DEV",
             "default_value": "0",
             "user_viewable": true,
             "user_editable": true,
