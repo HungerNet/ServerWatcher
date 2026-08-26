@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.59'
+version: '6-dev.60'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -56,3 +56,5 @@ description: |
   - Remove livecli.py, instead using C2E
   Dev 59:
   - Rename `stats get` to `stats` (issue 4)
+  Dev 60:
+  - Simplify docstrings

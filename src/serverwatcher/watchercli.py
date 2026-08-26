@@ -30,9 +30,7 @@ class WatcherCLI(LiveCLI):
 
 @command('stats')
 def stats(self, arg=None):
-    '''
-    Retrieve and print all or specific server statistics
-    '''
+    '''Retrieve and print all or specific server statistics'''
     __args__ = '''
     ram: rounding, --raw
     cpu: rounding
@@ -93,16 +91,12 @@ def raw():
 
 @command('view', namespace=True)
 def view(self):
-    '''
-    Switch terminal view
-    '''
+    '''Switch terminal view'''
     pass
 
 @view.child('cli')
 def view_cli(self):
-    '''
-    Switch to CLI view
-    '''
+    '''Switch to CLI view'''
     self.watcher.router.disableOriginOutput()
     self.outputMode = 'cli'
     self.buffer.enabled = True
@@ -114,9 +108,7 @@ def view_cli(self):
 
 @view.child('watcher')
 def view_watcher(self):
-    '''
-    Switch to Watcher view
-    '''
+    '''Switch to Watcher view'''
     self.watcher.router.enableOriginOutput()
     self.outputMode = 'both'
     utils.clearTerminal()
