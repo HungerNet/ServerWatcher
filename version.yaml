@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.58'
+version: '6-dev.59'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -54,3 +54,5 @@ description: |
   - Update github username
   Dev 58:
   - Remove livecli.py, instead using C2E
+  Dev 59:
+  - Rename `stats get` to `stats` (issue 4)

@@ -28,15 +28,8 @@ class WatcherCLI(LiveCLI):
         self.safePrint(res('<yellow>-----------------------------------'), write_buffer=False)
         self.safePrint('', write_buffer=False)
 
-@command('stats', namespace=True)
-def stats(self):
-    '''
-    Retrieve and print server statistics
-    '''
-    pass
-
-@stats.child('get')
-def stats_get(self, arg=None):
+@command('stats')
+def stats(self, arg=None):
     '''
     Retrieve and print all or specific server statistics
     '''
@@ -83,17 +76,17 @@ def stats_get(self, arg=None):
             return self.safePrint('Unknown stat')
     self.safePrint(f'{name}: {value}{unit}')
 
-@stats.get.param('rounding', type=int, default=2)
+@stats.param('rounding', type=int, default=2)
 def rounding(value):
     '''The decimal place to round to'''
     return value
 
-@stats.get.param('mode', type=str, default='current')
+@stats.param('mode', type=str, default='current')
 def mode(value):
     '''The mode for TPS. Accepted: current, 1m, 5m, tick_time'''
     return value
 
-@stats.get.flag('raw')
+@stats.flag('raw')
 def raw():
     '''Return the raw value instead of the formatted string'''
     return True
@@ -133,9 +126,7 @@ def view_watcher(self):
 
 @command('clear')
 def clear(self):
-    '''
-    Clear the CLI terminal
-    '''
+    '''Clear the CLI terminal'''
     if not no_buffer():
         self.buffer.clear()
     utils.clearTerminal()
