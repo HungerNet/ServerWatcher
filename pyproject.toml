@@ -43,10 +43,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/iFamishedX/ServerWatcher"
-Documentation = "https://github.com/iFamishedX/ServerWatcher"
-Source = "https://github.com/iFamishedX/ServerWatcher"
-Issues = "https://github.com/iFamishedX/ServerWatcher/issues"
+Homepage = "https://github.com/iFamished/ServerWatcher"
+Documentation = "https://github.com/iFamished/ServerWatcher"
+Source = "https://github.com/iFamished/ServerWatcher"
+Issues = "https://github.com/iFamished/ServerWatcher/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

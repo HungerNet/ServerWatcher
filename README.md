@@ -22,7 +22,7 @@ A highly configurable Minecraft server monitoring and restart engine for HungerB
 - Optional. Only necessary if you want to use file logging.
 
 ## Installation
-- Download the [**ServerWatcher Pterodactyl egg**](https://github.com/iFamishedX/ServerWatcher/blob/main/eggs/serverwatcher.json)
+- Download the [**ServerWatcher Pterodactyl egg**](https://github.com/iFamished/ServerWatcher/blob/main/eggs/serverwatcher.json)
 - Import it into your desired nest in your panel
 - Create a server with the egg selected
 - Start the server and wait for instalation and file generation to finish
