@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.1'
+version: '6-alpha.2'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -62,3 +62,6 @@ description: |
   - Update egg to include C2E startup variable
   Alpha 1:
   - Update MinecraftServer method usage (hungerlib update)
+  Alpha 2:
+  - Added stats overview: `stats`
+  - Added bridge argument

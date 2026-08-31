@@ -41,7 +41,18 @@ def stats(self, arg=None):
     '''
     self.watcher.server.refresh()
     if arg is None:
-        return
+        self.safePrint(
+            f'''
+            RAM: {self.watcher.server.getRAM(gb=True)} GiB
+            CPU: {self.watcher.server.getCPU()}%
+            Uptime: {self.watcher.server.getUptime(formatted=True)}
+            TPS: {self.watcher.server.getTPS()}
+            Players: {self.watcher.server.getPlayers()}
+            Version: {self.watcher.server.getVersion()}
+            Platform: {self.watcher.server.getPlatform()}
+            Bridge: {self.watcher.server.getBridgeVersion()}
+            '''
+        )
     gb = not raw()
     fmt = not raw()
     unit = ''
@@ -49,7 +60,7 @@ def stats(self, arg=None):
         case 'ram':
             value = self.watcher.server.getRAM(rounding=rounding(), gb=gb)
             name = 'RAM'
-            unit = ' GB' if gb else ' MB'
+            unit = ' GiB' if gb else ' MiB'
         case 'cpu':
             value = self.watcher.server.getCPU(rounding=rounding())
             name = 'CPU'
@@ -70,6 +81,9 @@ def stats(self, arg=None):
         case 'platform':
             value = self.watcher.server.getPlatform()
             name = 'Server platform'
+        case 'bridge':
+            value = self.watcher.server.getBridgeVersion()
+            name = 'Bridge version'
         case _:
             return self.safePrint('Unknown stat')
     self.safePrint(f'{name}: {value}{unit}')
