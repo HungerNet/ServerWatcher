@@ -41,17 +41,17 @@ def stats(self, arg=None):
     '''
     self.watcher.server.refresh()
     if arg is None:
-        self.safePrint('Fetching server statistics...')
-        self.safePrint(
-            f'''RAM: {self.watcher.server.getRAM(gb=True)} GiB
-            CPU: {self.watcher.server.getCPU()}%
-            Uptime: {self.watcher.server.getUptime(formatted=True)}
-            TPS: {self.watcher.server.getTPS()}
-            Players: {self.watcher.server.getPlayers()}
-            Version: {self.watcher.server.getVersion()}
-            Platform: {self.watcher.server.getPlatform().title()}
-            Bridge: v{self.watcher.server.getBridgeVersion()}'''
-        )
+        self.safePrint(res('<gray>Fetching server statistics...'))
+        self.safePrint(res(
+            f'''<blue>RAM: <reset>{self.watcher.server.getRAM(gb=True)} <gray>GiB
+            <blue>CPU: <reset>{self.watcher.server.getCPU()}<gray>%
+            <blue>Uptime: <reset>{self.watcher.server.getUptime(formatted=True)}
+            <blue>TPS: <reset>{self.watcher.server.getTPS()}
+            <blue>Players: <reset>{self.watcher.server.getPlayers()}
+            <blue>Version: <reset>{self.watcher.server.getVersion()}
+            <blue>Platform: <reset>{self.watcher.server.getPlatform().title()}
+            <blue>Bridge: <gray>v<reset>{self.watcher.server.getBridgeVersion()}'''
+        ))
         return
     gb = not raw()
     fmt = not raw()
@@ -79,14 +79,14 @@ def stats(self, arg=None):
             value = self.watcher.server.getVersion()
             name = 'Minecraft version'
         case 'platform':
-            value = self.watcher.server.getPlatform()
+            value = self.watcher.server.getPlatform().title()
             name = 'Server platform'
         case 'bridge':
-            value = self.watcher.server.getBridgeVersion()
+            value = res(f'<gray>v<reset>{self.watcher.server.getBridgeVersion()}')
             name = 'Bridge version'
         case _:
             return self.safePrint('Unknown stat')
-    self.safePrint(f'{name}: {value}{unit}')
+    self.safePrint(res(f'<blue>{name}: <reset>{value}<gray>{unit}'))
 
 @stats.param('rounding', type=int, default=2)
 def rounding(value):
