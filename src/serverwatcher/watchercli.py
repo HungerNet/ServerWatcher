@@ -10,8 +10,12 @@ class BufferingStdout:
         self.buffer = buffer
         self.real_stdout = real_stdout
     def write(self, text):
-        if self.buffer.enabled and text.strip():
-            self.buffer.captured.append(text.rstrip('\n'))
+        if self.buffer.enabled:
+            # preserve blank lines and indentation
+            if text.endswith('\n'):
+                self.buffer.captured.append(text[:-1])
+            else:
+                self.buffer.captured.append(text)
         self.real_stdout.write(text)
     def flush(self):
         self.real_stdout.flush()

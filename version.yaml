@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.7'
+version: '6-alpha.8'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -71,3 +71,5 @@ description: |
   - Debugging
   Alpha 6-7:
   - Colorize
+  Alpha 8:
+  - Fix write method
