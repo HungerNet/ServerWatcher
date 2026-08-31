@@ -49,8 +49,8 @@ def stats(self, arg=None):
             TPS: {self.watcher.server.getTPS()}
             Players: {self.watcher.server.getPlayers()}
             Version: {self.watcher.server.getVersion()}
-            Platform: {self.watcher.server.getPlatform()}
-            Bridge: {self.watcher.server.getBridgeVersion()}'''
+            Platform: {self.watcher.server.getPlatform().title()}
+            Bridge: v{self.watcher.server.getBridgeVersion()}'''
         )
         return
     gb = not raw()
