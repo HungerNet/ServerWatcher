@@ -65,10 +65,10 @@ def stats(self, arg=None):
             value = self.watcher.server.getPlayers()
             name = 'Players'
         case 'version':
-            value = self.watcher.server.version
+            value = self.watcher.server.getVersion()
             name = 'Minecraft version'
         case 'platform':
-            value = self.watcher.server.platform
+            value = self.watcher.server.getPlatform()
             name = 'Server platform'
         case _:
             return self.safePrint('Unknown stat')

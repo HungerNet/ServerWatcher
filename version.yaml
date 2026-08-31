@@ -1,5 +1,5 @@
 run: true
-version: '6-dev.61'
+version: '6-alpha.1'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -60,3 +60,5 @@ description: |
   - Simplify docstrings
   Dev 61:
   - Update egg to include C2E startup variable
+  Alpha 1:
+  - Update MinecraftServer method usage (hungerlib update)
