@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.3'
+version: '6-alpha.4'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -67,3 +67,5 @@ description: |
   - Added bridge argument
   Alpha 3:
   - Fixes
+  Alpha 4:
+  - Debugging

@@ -41,18 +41,16 @@ def stats(self, arg=None):
     '''
     self.watcher.server.refresh()
     if arg is None:
-        self.safePrint('Fetching server statistics...\n')
+        self.safePrint('Fetching server statistics...')
         self.safePrint(
-            f'''
-            RAM: {self.watcher.server.getRAM(gb=True)} GiB
+            f'''RAM: {self.watcher.server.getRAM(gb=True)} GiB
             CPU: {self.watcher.server.getCPU()}%
             Uptime: {self.watcher.server.getUptime(formatted=True)}
             TPS: {self.watcher.server.getTPS()}
             Players: {self.watcher.server.getPlayers()}
             Version: {self.watcher.server.getVersion()}
             Platform: {self.watcher.server.getPlatform()}
-            Bridge: {self.watcher.server.getBridgeVersion()}
-            '''
+            Bridge: {self.watcher.server.getBridgeVersion()}'''
         )
         return
     gb = not raw()
