@@ -41,6 +41,7 @@ def stats(self, arg=None):
     '''
     self.watcher.server.refresh()
     if arg is None:
+        self.safePrint('Fetching server statistics...\n')
         self.safePrint(
             f'''
             RAM: {self.watcher.server.getRAM(gb=True)} GiB
@@ -53,6 +54,7 @@ def stats(self, arg=None):
             Bridge: {self.watcher.server.getBridgeVersion()}
             '''
         )
+        return
     gb = not raw()
     fmt = not raw()
     unit = ''

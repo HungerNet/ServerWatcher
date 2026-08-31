@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.2'
+version: '6-alpha.3'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -65,3 +65,5 @@ description: |
   Alpha 2:
   - Added stats overview: `stats`
   - Added bridge argument
+  Alpha 3:
+  - Fixes
