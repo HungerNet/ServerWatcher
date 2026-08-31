@@ -43,14 +43,14 @@ def stats(self, arg=None):
     if arg is None:
         self.safePrint(res('<gray>Fetching server statistics...'))
         self.safePrint(res(
-            f'''<blue>RAM: <reset>{self.watcher.server.getRAM(gb=True)} <gray>GiB
-            <blue>CPU: <reset>{self.watcher.server.getCPU()}<gray>%
+            f'''<blue>RAM: <reset>{self.watcher.server.getRAM(gb=True)} GiB
+            <blue>CPU: <reset>{self.watcher.server.getCPU()}%
             <blue>Uptime: <reset>{self.watcher.server.getUptime(formatted=True)}
             <blue>TPS: <reset>{self.watcher.server.getTPS()}
             <blue>Players: <reset>{self.watcher.server.getPlayers()}
             <blue>Version: <reset>{self.watcher.server.getVersion()}
             <blue>Platform: <reset>{self.watcher.server.getPlatform().title()}
-            <blue>Bridge: <gray>v<reset>{self.watcher.server.getBridgeVersion()}'''
+            <blue>Bridge: <reset>v{self.watcher.server.getBridgeVersion()}'''
         ))
         return
     gb = not raw()
@@ -86,7 +86,7 @@ def stats(self, arg=None):
             name = 'Bridge version'
         case _:
             return self.safePrint('Unknown stat')
-    self.safePrint(res(f'<blue>{name}: <reset>{value}<gray>{unit}'))
+    self.safePrint(res(f'<blue>{name}: <reset>{value}{unit}'))
 
 @stats.param('rounding', type=int, default=2)
 def rounding(value):

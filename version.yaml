@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.6'
+version: '6-alpha.7'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -69,5 +69,5 @@ description: |
   - Fixes
   Alpha 4-5:
   - Debugging
-  Alpha 6:
+  Alpha 6-7:
   - Colorize
