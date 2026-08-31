@@ -1,5 +1,5 @@
 run: true
-version: '6-alpha.10'
+version: '6-alpha.11'
 description: |
   Dev 1:
   - Added ctrl+c handling
@@ -73,5 +73,5 @@ description: |
   - Colorize
   Alpha 8-9:
   - Fix write method
-  Alpha 10:
+  Alpha 10-11:
   - Fix buffering

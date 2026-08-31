@@ -129,7 +129,7 @@ def view_watcher(self):
     self.safePrint('', end='')
     for msg in self.watcher.router.buffer.captured:
         self.safePrint(msg, write_buffer=False)
-        self.safePrint()
+        self.safePrint('\n')
 
 @command('clear')
 def clear(self):
