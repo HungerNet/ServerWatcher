@@ -118,7 +118,14 @@ def view_cli(self):
     self.safePrint('', end='')
     self.printHeader()
     for msg in self.buffer.captured:
-        self.safePrint(msg, write_buffer=False)
+        # Split multi-line chunks into real lines
+        for line in msg.splitlines():
+            self.safePrint(line, write_buffer=False)
+
+        # If the chunk ended with a newline, preserve the blank line
+        if msg.endswith("\n"):
+            self.safePrint("", write_buffer=False)
+
 
 @view.child('watcher')
 def view_watcher(self):
@@ -129,7 +136,6 @@ def view_watcher(self):
     self.safePrint('', end='')
     for msg in self.watcher.router.buffer.captured:
         self.safePrint(msg, write_buffer=False)
-        self.safePrint('\n')
 
 @command('clear')
 def clear(self):
