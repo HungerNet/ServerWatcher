@@ -69,11 +69,11 @@ class TargetServer:
 
     def isOnline(self):
         '''Returns True if online, False if offline'''
-        return self.mc_server.isOnline()
+        return self.mc_server.isContainerOnline()
 
     def isOffline(self):
         '''Returns True if offline, False if online'''
-        return self.mc_server.isOffline()
+        return self.mc_server.isContainerOffline()
 
     def refreshResources(self):
         '''Refreshes the server's resources (ptero only)'''
@@ -86,14 +86,14 @@ class TargetServer:
     def getRAM(self):
         '''Returns current RAM usage'''
         if self.ptero_enabled:
-            return self.mc_server.getRAM(rounding=0, gb=False)
+            return self.mc_server.getContainerRAM(rounding=0, gb=False)
         else:
             return self.bridge.getMemoryStats()['process_used']
 
     def getDisk(self):
         '''Returns current disk usage'''
         if self.ptero_enabled:
-            return self.mc_server.getDisk(rounding=0, gb=False)
+            return self.mc_server.getContainerDisk(rounding=0, gb=False)
         else:
             return
             # raise UnsupportedOperationError('Bridge-only mode: getting disk usage is not supported')
@@ -101,7 +101,7 @@ class TargetServer:
     def getCPULoad(self):
         '''Returns current CPU usage'''
         if self.ptero_enabled:
-            return self.mc_server.getCPU(rounding=0)
+            return self.mc_server.getContainerCPU(rounding=0)
         else:
             return self.bridge.getCPUStats()['load']
 
@@ -112,14 +112,14 @@ class TargetServer:
     def getUptime(self):
         '''Returns the uptime'''
         if self.ptero_enabled:
-            return self.mc_server.getUptime()
+            return self.mc_server.getContainerUptime()
         else:
             return self.bridge.getUptime()
 
     def startServer(self):
         '''Starts the server (ptero-only)'''
         if self.ptero_enabled:
-            return self.mc_server.start()
+            return self.mc_server.startContainer()
         elif self.bridge_start_handler is not None:
             self.bridge_start_handler()
         else:
@@ -129,7 +129,7 @@ class TargetServer:
     def restartServer(self):
         '''Restarts the server (ptero-only)'''
         if self.ptero_enabled:
-            return self.mc_server.restart()
+            return self.mc_server.restartContainer()
         elif self.bridge_restart_handler is not None:
             self.bridge_restart_handler()
         else:
@@ -139,14 +139,14 @@ class TargetServer:
     def stopServer(self):
         '''Stops the server (ptero and bridge)'''
         if self.ptero_enabled:
-            return self.mc_server.stop()
+            return self.mc_server.stopContainer()
         else:
             self.bridge.stopServer()
 
     def killServer(self):
         '''Kills the server (ptero-only)'''
         if self.ptero_enabled:
-            return self.mc_server.kill()
+            return self.mc_server.killContainer()
         elif self.bridge_kill_handler is not None:
             self.bridge_kill_handler()
         else:
