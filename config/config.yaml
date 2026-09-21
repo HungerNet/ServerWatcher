@@ -1,0 +1,23 @@
+debug: False
+timezone: 'America/Chicago'
+
+server:
+  name: 'My SMP'
+  domain: 'mc.example.com'
+  port: 25565
+
+logger:
+  enabled: True
+  name: 'ServerWatcher'
+  log_path: '/home/container/logs/'
+  
+  prefixes:
+    info: '<white>[%hh%:%mm%:%ss%] [INFO]: '
+    warn: '<yellow>[%hh%:%mm%:%ss%] [WARN]: '
+    error: '<red>[%hh%:%mm%:%ss%] [ERROR]: '
+    fatal: '<dark_red>[%hh%:%mm%:%ss%] [FATAL]: '
+    debug: '<aqua>[%hh%:%mm%:%ss%] [DEBUG]: '
+
+terminal:
+  enable_clearing: True
+  handle_keyboard_interrupt: True

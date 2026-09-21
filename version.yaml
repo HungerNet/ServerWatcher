@@ -1,5 +1,5 @@
 run: true
-version: '7-dev.3'
+version: '7-dev.4'
 description: |
   Dev 1:
   - Fully redesigned
@@ -7,3 +7,5 @@ description: |
   - Implemented `__main__.py`
   Dev 3:
   - Fix bridge initialization
+  Dev 4:
+  - Fix proxy method issue

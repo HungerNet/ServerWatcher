@@ -34,28 +34,28 @@ class TargetServer:
         self.bridge_restart_handler = bridge_restart_handler
         self.bridge_kill_handler = bridge_kill_handler
 
-        m.proxy(self, self.bridge.getTokenInfo)
+        m.proxy(self.bridge.getTokenInfo)
 
-        m.proxy(self, self.bridge.getPlatform)
-        m.proxy(self, self.bridge.getMinecraftVersion)
-        m.proxy(self, self.bridge.getBridgeVersion)
-        m.proxy(self, self.bridge.getBridgePort)
+        m.proxy(self.bridge.getPlatform)
+        m.proxy(self.bridge.getMinecraftVersion)
+        m.proxy(self.bridge.getBridgeVersion)
+        m.proxy(self.bridge.getBridgePort)
 
-        m.proxy(self, self.bridge.getPlayers)
-        m.proxy(self, self.bridge.getMaxPlayers)
+        m.proxy(self.bridge.getPlayers)
+        m.proxy(self.bridge.getMaxPlayers)
 
-        m.proxy(self, self.bridge.getTPS)
-        m.proxy(self, self.bridge.getMSPT)
+        m.proxy(self.bridge.getTPS)
+        m.proxy(self.bridge.getMSPT)
 
-        m.proxy(self, self.bridge.getLoadedChunks)
-        m.proxy(self, self.bridge.getLoadedEntities)
+        m.proxy(self.bridge.getLoadedChunks)
+        m.proxy(self.bridge.getLoadedEntities)
 
-        m.proxy(self, self.bridge.getGCStats)
-        m.proxy(self, self.bridge.getThreadStats)
-        m.proxy(self, self.bridge.getNetworkStats)
+        m.proxy(self.bridge.getGCStats)
+        m.proxy(self.bridge.getThreadStats)
+        m.proxy(self.bridge.getNetworkStats)
 
-        m.proxy(self, self.bridge.log)
-        m.proxy(self, self.bridge.runCommand)
+        m.proxy(self.bridge.log)
+        m.proxy(self.bridge.runCommand)
 
         self.stream = self.bridge.stream
 

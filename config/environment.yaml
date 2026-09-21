@@ -1,0 +1,10 @@
+hungerbridge:
+  url: 'https://api.example.com'
+  token_id: 'CHANGE_ME'
+  token_secret: 'CHANGE_ME'
+
+pterodactyl:
+  enabled: False
+  url: 'https://panel.example.com'
+  api_key: 'CHANGE_ME'
+  server_id: 'CHANGE_ME'

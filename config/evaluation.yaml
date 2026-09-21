@@ -1,0 +1,47 @@
+sampling:
+  duration: 5.0
+  interval: 1.0
+  drop_outliers: 1
+
+thresholds:
+  ram: 6            # GiB
+  cpu: 150          # %
+  uptime: 12        # minutes
+  min_uptime: 30    # do not restart if uptime < 30 minutes
+
+  players: 0        # optional
+  max_players: 0    # usually unused
+
+  tps: 19.5
+  tps_1m: 19.5
+  tps_5m: 19.5
+  tps_15m: 19.5
+
+  mspt: 50          # mspt > 50 = lag
+
+  loaded_chunks: 0  # optional
+  loaded_entities: 0
+
+  gc_pause_ms: 200  # last_gc_pause_ms threshold
+  thread_peak: 500  # thread leak threshold
+
+weights:
+  ram: 2
+  cpu: 2
+  uptime: 1
+
+  players: 1
+  max_players: 0
+
+  tps: 3
+  tps_1m: 1
+  tps_5m: 1
+  tps_15m: 1
+
+  mspt: 3
+
+  loaded_chunks: 0
+  loaded_entities: 0
+
+  gc_pause_ms: 2
+  thread_peak: 2
