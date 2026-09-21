@@ -32,15 +32,19 @@ class ActionPerformer:
 
         raise ValueError(f'Unknown action: {action}')
 
+    def notifyWebhook(self, event: str, **ctx):
+        if self.webhook is not None:
+            self.webhook.send(event=event, **ctx)
+
     # immediate restart
     def _restart_now(self):
         self.router.info('Performing immediate restart...')
-        self.webhook.send(event='restart_now')
+        self.notifyWebhook(event='restart_now')
 
         # send restart command
         self.server.restartServer()
         self.router.info('Restart action sent. Waiting...')
-        self.webhook.send(event='restart_action_sent')
+        self.notifyWebhook(event='restart_action_sent')
 
         # wait before checking status
         time.sleep(self.cfg.restart_wait_seconds)
@@ -56,10 +60,10 @@ class ActionPerformer:
         if alive:
             self.router.info('Server is back online!')
             self.router.destination('ServerWatcher successfully restarted the server.')
-            self.webhook.send(event='server_back_online')
+            self.notifyWebhook(event='server_back_online')
         else:
             self.router.error('Server failed to restart!')
-            self.webhook.send(event='server_failed_restart')
+            self.notifyWebhook(event='server_failed_restart')
 
         return alive
 
@@ -78,7 +82,7 @@ class ActionPerformer:
 
         # broadcast restart time
         self.router.broadcast(f'[Server Watcher] The server will restart at {time_str} CDT.')
-        self.webhook.send(event='restart_scheduled', time=time_str)
+        self.notifyWebhook(event='restart_scheduled', time=time_str)
 
         # build minute + second callbacks
         minute_callbacks = self._build_minute_callbacks()
@@ -97,7 +101,7 @@ class ActionPerformer:
     # no action
     def _no_action(self):
         self.router.info('No restart required.')
-        self.webhook.send(event='no_action')
+        self.notifyWebhook(event='no_action')
         return True
 
     # helpers for countdown events
