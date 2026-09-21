@@ -1,5 +1,4 @@
 from hungerlib import Panel, MinecraftServer, BridgeClient
-from hungerlib import utils
 from hungerlib.utils import methods as m
 
 from .configmanager import config_manager
@@ -61,7 +60,8 @@ class TargetServer:
 
     def checkPtero(self):
         '''Check if the panel is reachable and the API key is valid.'''
-        return utils.validateAll(self.panel, self.mc_server)
+        if self.panel.ping() and self.panel.validateAPI():
+            return True
 
     def checkBridge(self):
         '''Check if the bridge is reachable and the token is valid.'''
