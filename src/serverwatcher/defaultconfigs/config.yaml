@@ -1,35 +1,21 @@
 debug: False
 timezone: 'America/Chicago'
 
-panel:
-  name: 'My Panel'
-  url: 'https://example.com'
-  api_key: 'CHANGE_ME'
-
 server:
   name: 'My SMP'
-  server_id: 'CHANGE_ME'
   domain: 'mc.example.com'
   port: 25565
 
-hungerbridge:
-  token: 'CHANGE_ME'
-  url: 'https://api.example.com'
-
-discord:
-  enabled: False
-  token: 'CHANGE_ME'
-  url: 'https://bot.example.com/webhook'
-
 logger:
   enabled: True
-  name: 'Server Watcher'
+  name: 'ServerWatcher'
   log_path: '/home/container/logs/'
   
   prefixes:
     info: '<white>[%hh%:%mm%:%ss%] [INFO]: '
     warn: '<yellow>[%hh%:%mm%:%ss%] [WARN]: '
     error: '<red>[%hh%:%mm%:%ss%] [ERROR]: '
+    fatal: '<dark_red>[%hh%:%mm%:%ss%] [FATAL]: '
     debug: '<aqua>[%hh%:%mm%:%ss%] [DEBUG]: '
 
 terminal:

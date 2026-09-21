@@ -6,14 +6,12 @@ try:
 except PackageNotFoundError:
     __version__ = '0.0.0'
 
-from .watcher import ServerWatcher
-from .configclasses.config import GlobalConfig
-from .configclasses.messages import MessagesConfig
-from .configclasses.watcher import WatcherConfig
+from serverwatcher.watcher import ServerWatcher
+from serverwatcher.configclasses.config import GlobalConfig
+from serverwatcher.configclasses.watcher import WatcherConfig
 
-__all__ = [
+__all__: list[str] = [
     'ServerWatcher',
     'GlobalConfig',
-    'MessagesConfig',
     'WatcherConfig',
 ]

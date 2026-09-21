@@ -6,3 +6,4 @@ build/
 .env
 helloworld.py
 src/tests/
+zsrc-old/

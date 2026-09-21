@@ -1,34 +1,12 @@
-watch_interval: 300      # in seconds
-
-sampling:
-  duration: 5.0          # total seconds to sample
-  interval: 1.0          # delay between samples (0 = no smoothing)
-  drop_outliers: 1       # number of highest and lowest samples to drop
-
-thresholds:
-  ram: 6
-  cpu: 150
-  uptime: 12
-  tps: 19.5
-  min_uptime: 30         # will not restart the server if the total uptime is less than 30 minutes
-  low_gap: 2
-
-weights:
-  restart_soon: 3
-  ram: 1
-  cpu: 1
-  uptime: 1
-  tps: 1
-  low_uptime: 5
-  per_player: 1
-
-gaps:
-  low_gap_minutes: 120
-  high_gap_minutes: 60
-
-snap_minutes: [0, 30]    # will snap the scheduled time to the nearest hour or half hour
-
 restart:
   wait_seconds: 30
-  online_timeout: 120
+  timeout: 120
   online_interval: 2
+
+schedule:
+  threshold_low_gap: 2
+  low_gap_minutes: 120
+  high_gap_minutes: 60
+  snap_minutes: [0, 30]
+
+watch_interval: 300
