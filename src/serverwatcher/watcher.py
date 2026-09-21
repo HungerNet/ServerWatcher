@@ -26,10 +26,12 @@ class ServerWatcher:
 
         self.r = Router(self.target)
 
-        self.webhook = WebhookClient(
-            url=self.discordcfg.discord_url,
-            token=self.discordcfg.discord_token
-        )
+        self.webhook = None
+        if self.discordcfg.discord_enabled:
+            self.webhook = WebhookClient(
+                url=self.discordcfg.discord_url,
+                token=self.discordcfg.discord_token
+            )
 
         self.fetcher = MetricFetcher(self.target)
         self.evaluator = Evaluator(self.evaluatorcfg)
@@ -41,7 +43,7 @@ class ServerWatcher:
         )
     
     def webhookSend(self, event: str, **ctx):
-        if self.discordcfg.discord_enabled:
+        if self.discordcfg.discord_enabled and self.webhook is not None:
             self.webhook.send(event=event, **ctx)
 
     def shutdown(self):
