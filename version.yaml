@@ -1,5 +1,7 @@
 run: true
-version: '7-dev.1'
+version: '7-dev.2'
 description: |
   Dev 1:
   - Fully redesigned
+  Dev 2:
+  - Implemented `__main__.py`
