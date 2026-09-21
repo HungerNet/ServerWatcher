@@ -61,7 +61,7 @@ class TargetServer:
 
     def checkPtero(self):
         '''Check if the panel is reachable and the API key is valid.'''
-        return utils.validateAll(panel=self.panel, server=self.server)
+        return utils.validateAll(panel=self.panel, server=self.mc_server)
 
     def checkBridge(self):
         '''Check if the bridge is reachable and the token is valid.'''
