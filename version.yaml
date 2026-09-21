@@ -1,7 +1,9 @@
 run: true
-version: '7-dev.2'
+version: '7-dev.3'
 description: |
   Dev 1:
   - Fully redesigned
   Dev 2:
   - Implemented `__main__.py`
+  Dev 3:
+  - Fix bridge initialization

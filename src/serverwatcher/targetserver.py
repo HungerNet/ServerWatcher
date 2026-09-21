@@ -1,5 +1,6 @@
 from hungerlib import Panel, MinecraftServer, BridgeClient
-from hungerlib import utils, methods as m
+from hungerlib import utils
+from hungerlib.utils import methods as m
 
 from .configmanager import config_manager
 from .exceptions import UnsupportedOperationError
@@ -12,6 +13,13 @@ class TargetServer:
 
         self.ptero_enabled = self.env.ptero_enabled
 
+        self.bridge = BridgeClient(
+            url = self.env.bridge_url,
+            token_id = self.env.bridge_token_id,
+            token_secret = self.env.bridge_token_secret,
+            static_delay = 0.5
+        )
+
         self.panel = Panel('Panel', self.env.ptero_url, self.env.ptero_api_key)
         self.mc_server = MinecraftServer(
             'Minecraft Server',
@@ -19,13 +27,7 @@ class TargetServer:
             self.env.ptero_server_id,
             self.config.server_domain,
             self.config.server_port,
-            None
-        )
-        self.bridge = BridgeClient(
-            url = self.env.bridge_url,
-            token_id = self.env.bridge_token_id,
-            token_secret = self.env.bridge_token_secret,
-            static_delay = 0.5
+            self.bridge
         )
 
         self.bridge_start_handler = bridge_start_handler
