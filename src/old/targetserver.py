@@ -1,6 +1,6 @@
-from hungerlib import Panel, MinecraftServer, BridgeClient
-from hungerlib import utils
-from hungerlib import methods as m
+from hungercore import Panel, MinecraftServer, BridgeClient
+from hungercore import utils
+from hungercore import methods as m
 
 from .configmanager import config_manager
 from .exceptions import UnsupportedOperationError

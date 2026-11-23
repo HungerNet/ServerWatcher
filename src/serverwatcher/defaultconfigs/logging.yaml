@@ -1,0 +1,10 @@
+logger:
+  name: 'ServerWatcher'
+  log_path: '/home/container/logs/'
+
+terminal:
+  enable_clearing: True
+  handle_keyboard_interrupt: True
+
+debug: False
+timezone: 'America/Chicago'

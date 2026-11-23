@@ -3,7 +3,7 @@ import os
 import shutil
 from dataclasses import fields
 
-from hungerlib import utils, loadConfig, Validator
+from hungercore import utils, loadConfig, Validator
 
 from serverwatcher.configclasses.config import GlobalConfig
 from serverwatcher.configclasses.discord import DiscordConfig

@@ -1,0 +1,12 @@
+restart:
+  wait_seconds: 30
+  timeout: 120
+  online_interval: 2
+
+schedule:
+  threshold_low_gap: 2
+  low_gap_minutes: 120
+  high_gap_minutes: 60
+  snap_minutes: [0, 30]
+
+watch_interval: 300

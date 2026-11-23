@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "serverwatcher"
 version = "0.0.0"
-description = "A HungerLib-powered Minecraft server automation engine."
+description = "A HungerCore-powered Minecraft server automation engine."
 readme = "README.md"
 requires-python = ">=3.14"
 license = { text = "GPL-3.0" }
@@ -19,12 +19,12 @@ keywords = [
     "minecraft",
     "automation",
     "server-management",
-    "hungerlib",
+    "hungercore",
     "hungernet"
 ]
 
 dependencies = [
-    "hungerlib>=3.1",
+    "hungercore",
     "mapres",
     "C2E",
 ]

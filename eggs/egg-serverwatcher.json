@@ -12,7 +12,7 @@
         "Python 3.14": "ghcr.io/red-shadows-rs/pterodactyl-containers/python:v3.14"
     },
     "file_denylist": [],
-    "startup": "pip install --upgrade pip && ( [[ \"{{SERVERWATCHER_DEV}}\" == \"1\" ]] && pip install -U --pre serverwatcher || pip install -U serverwatcher ) && ( [[ \"{{HUNGERLIB_DEV}}\" == \"1\" ]] && pip install -U --pre hungerlib || pip install -U hungerlib ) && ( [[ \"{{MAPRES_DEV}}\" == \"1\" ]] && pip install -U --pre mapres || pip install -U mapres ) && ( [[ \"{{C2E_DEV}}\" == \"1\" ]] && pip install -U --pre c2e || pip install -U c2e ) && python3 -m serverwatcher",
+    "startup": "pip install --upgrade pip && ( [[ \"{{SERVERWATCHER_DEV}}\" == \"1\" ]] && pip install -U --pre serverwatcher || pip install -U serverwatcher ) && ( [[ \"{{HUNGERLIB_DEV}}\" == \"1\" ]] && pip install -U --pre hungercore || pip install -U hungercore ) && ( [[ \"{{MAPRES_DEV}}\" == \"1\" ]] && pip install -U --pre mapres || pip install -U mapres ) && ( [[ \"{{C2E_DEV}}\" == \"1\" ]] && pip install -U --pre c2e || pip install -U c2e ) && python3 -m serverwatcher",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"ServerWatcher is running!\"\r\n}",
@@ -38,8 +38,8 @@
             "field_type": "text"
         },
         {
-            "name": "hungerlib dev",
-            "description": "Install hungerlib prerelease versions",
+            "name": "hungercore dev",
+            "description": "Install hungercore prerelease versions",
             "env_variable": "HUNGERLIB_DEV",
             "default_value": "0",
             "user_viewable": true,

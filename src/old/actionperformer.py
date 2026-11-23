@@ -1,6 +1,6 @@
 import time
 from zoneinfo import ZoneInfo
-from hungerlib import utils
+from hungercore import utils
 
 
 class ActionPerformer:

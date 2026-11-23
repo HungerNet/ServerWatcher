@@ -1,21 +1,14 @@
 from zoneinfo import ZoneInfo
 
-from hungerlib import servers, MessageRouter
+from calagoapi_minecraft import MinecraftServer
+from hungercore import MessageRouter
 from mapres import MapResolver, maps
 
-from .configmanager import config_manager
-from .targetserver import TargetServer
+from .settings import settings
 
 class Router:
-    def __init__(self, server: TargetServer):
-        self.config_manager = config_manager
-        self.config = self.config_manager.config
-        self.discordcfg = self.config_manager.discordcfg
-        self.env = self.config_manager.env
-        self.watchercfg = self.config_manager.watchercfg
-
+    def __init__(self, server: MinecraftServer):
         # resolver for internal mapping
-        self.resolver = MapResolver()
         self.res = self.resolver.res
 
         # logger name
@@ -27,7 +20,7 @@ class Router:
             Servers=[server],
             log_path=self.config.log_path,
 
-            origin_maps=[
+            self.origin_maps=[
                 maps.ascii_colors,
                 maps.time(self.config.timezone),
                 self.config,

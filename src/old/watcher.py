@@ -1,5 +1,5 @@
 import time
-from hungerlib import WebhookClient, utils
+from hungercore import WebhookClient, utils
 
 from .configmanager import config_manager
 from .targetserver import TargetServer
