@@ -1,17 +1,7 @@
-run: true
-version: '7-dev.12'
+run: false
+version: '1-dev.1'
 description: |
   Dev 1:
-  - Fully redesigned
-  Dev 2:
-  - Implemented `__main__.py`
-  Dev 3:
-  - Fix bridge initialization
-  Dev 4:
-  - Fix proxy method issue
-  Dev 5:
-  - Fix m.bind issue
-  Dev 6:
-  - Fix discord webhook config
-  Dev 7-12:
-  - Fixes
+  - Rebrand to Oxide
+  - Start work on full rewrite
+  - Add test file (credentials not valid)
